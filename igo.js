@@ -1,18 +1,21 @@
 onload = function() {
-  draw();
+  var canvas = get_canvas_context();
+  init(canvas);
 };
 
-function draw() {
-  var ctx = get_canvas_context();
+var dimension = {
+  originX: 20,
+  originY: 20,
+}
 
-  /* 四角を描く */
-  ctx.beginPath();
-  ctx.moveTo(20, 20);
-  ctx.lineTo(120, 20);
-  ctx.lineTo(120, 120);
-  ctx.lineTo(20, 120);
-  ctx.closePath();
-  ctx.stroke();
+function init(canvas) {
+  canvas.beginPath();
+  canvas.moveTo(dimension.originX, dimension.originY);
+  canvas.lineTo(120, 20);
+  canvas.lineTo(120, 120);
+  canvas.lineTo(20, 120);
+  canvas.closePath();
+  canvas.stroke();
 }
 
 
