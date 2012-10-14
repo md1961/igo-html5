@@ -1,6 +1,27 @@
 onload = function() {
-  var canvas = get_canvas_context('board');
-  init(canvas);
+  //var canvas = get_canvas_context('board');
+  //init(canvas);
+
+  for (i = 0; i < 4; i++) {
+    canvas0 = get_canvas_context('canvas0' + i);
+    canvas0.beginPath();
+    canvas0.moveTo( 0, 11);
+    canvas0.lineTo(21, 11);
+    canvas0.moveTo(11,  0);
+    canvas0.lineTo(11, 21);
+    canvas0.closePath();
+    canvas0.stroke();
+  }
+  /*
+    canvas1 = get_canvas_context('canvas01');
+    canvas1.beginPath();
+    canvas1.moveTo( 0, 11);
+    canvas1.lineTo(21, 11);
+    canvas1.moveTo(11,  0);
+    canvas1.lineTo(11, 21);
+    canvas1.closePath();
+    canvas1.stroke();
+  */
 };
 
 var dimension = {
