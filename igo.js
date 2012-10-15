@@ -39,12 +39,37 @@ function updateCanvasDisplay(x, y) {
 
   var cxt = getCanvasContext(getCanvasId(x, y));
   cxt.beginPath();
+
   var end = dim.gridPitch;
   var mid = Math.floor(dim.gridPitch / 2) + 1;
-  cxt.moveTo(  0, mid);
-  cxt.lineTo(end, mid);
-  cxt.moveTo(mid,   0);
-  cxt.lineTo(mid, end);
+  // horizontal line
+  var x0 = isLeftmost(x, y)  ? mid : 0;
+  var x1 = isRightmost(x, y) ? mid : end;
+  cxt.moveTo(x0, mid);
+  cxt.lineTo(x1, mid);
+  // vertical line
+  var y0 = isTop(x, y)    ? mid : 0;
+  var y1 = isBottom(x, y) ? mid : end;
+  cxt.moveTo(mid, y0);
+  cxt.lineTo(mid, y1);
+
   cxt.closePath();
   cxt.stroke();
 }
+
+function isTop(x, y) {
+  return y == 1;
+}
+
+function isBottom(x, y) {
+  return y == dimension.numGrids;
+}
+
+function isLeftmost(x, y) {
+  return x == 1;
+}
+
+function isRightmost(x, y) {
+  return x == dimension.numGrids;
+}
+
