@@ -9,6 +9,9 @@ var boardDimension = {
   stoneDiameterShrinkage: 2,
 }
 
+const BLACK = 'black';
+const WHITE = 'white';
+
 function initializeBoard(tableId) {
   var dim = boardDimension;
 
@@ -26,10 +29,10 @@ function initializeBoard(tableId) {
       canvas.width  = dim.gridPitch;
       canvas.height = dim.gridPitch;
 
-      if (x <= 2 && y == 1) {
-        canvas.class = 'black';
-        if (x == 2) {
-          canvas.class = 'white';
+      if (x <= 2 && y == 3) {
+        canvas.class = BLACK;
+        if (x == 1) {
+          canvas.class = WHITE;
         }
       }
 
@@ -69,10 +72,10 @@ function updateCanvasDisplay(x, y) {
   cxt.closePath();
 
   var clazz = getCanvasClass(x, y);
-  if (clazz == 'white' || clazz == 'black') {
+  if (clazz == WHITE || clazz == BLACK) {
     cxt.beginPath();
     cxt.arc(mid, mid, mid - dim.stoneDiameterShrinkage, 0, Math.PI * 2);
-    if (clazz == 'black') {
+    if (clazz == BLACK) {
       cxt.fillStyle = "rgb(0, 0, 0)";
       cxt.fill();
     }
