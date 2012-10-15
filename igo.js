@@ -6,6 +6,7 @@ var boardDimension = {
   margin:    10,
   gridPitch: 31,  // must be odd
   numGrids:   4,
+  stoneDiameterShrinkage: 2,
 }
 
 function initializeBoard(tableId) {
@@ -25,6 +26,13 @@ function initializeBoard(tableId) {
       canvas.width  = dim.gridPitch;
       canvas.height = dim.gridPitch;
 
+      if (x <= 2 && y == 1) {
+        canvas.class = 'black';
+        if (x == 2) {
+          canvas.class = 'white';
+        }
+      }
+
       updateCanvasDisplay(x, y);
     }
   }
@@ -32,6 +40,11 @@ function initializeBoard(tableId) {
 
 function getCanvasId(x, y) {
   return 'g' + ('0' + x).substr(-2) + ('0' + y).substr(-2);
+}
+
+function getCanvasClass(x, y) {
+  var canvas = document.getElementById(getCanvasId(x, y));
+  return canvas.class;
 }
 
 function updateCanvasDisplay(x, y) {
@@ -55,10 +68,11 @@ function updateCanvasDisplay(x, y) {
 
   cxt.closePath();
 
-  if (x == 2 && (y == 2 || y == 3)) {
+  var clazz = getCanvasClass(x, y);
+  if (clazz == 'white' || clazz == 'black') {
     cxt.beginPath();
-    cxt.arc(mid, mid, mid - 2, 0, Math.PI * 2);
-    if (y == 3) {
+    cxt.arc(mid, mid, mid - dim.stoneDiameterShrinkage, 0, Math.PI * 2);
+    if (clazz == 'black') {
       cxt.fillStyle = "rgb(0, 0, 0)";
       cxt.fill();
     }
