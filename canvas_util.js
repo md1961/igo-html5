@@ -1,7 +1,7 @@
-function getCanvasContext(canvas_id) {
+function getCanvasContext(canvasId) {
 
   /* canvas要素のノードオブジェクト */
-  var canvas = document.getElementById(canvas_id);
+  var canvas = document.getElementById(canvasId);
 
   /* canvas要素の存在チェックとCanvas未対応ブラウザの対処 */
   if ( ! canvas || ! canvas.getContext ) {

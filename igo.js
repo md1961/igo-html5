@@ -1,17 +1,17 @@
 onload = function() {
-  init("main_board");
+  initializeBoard("main_board");
 };
 
-var dimension = {
-  margin: 10,
-  gridPitch: 31,
-  numGrids: 4,
+var boardDimension = {
+  margin:    10,
+  gridPitch: 31,  // must be odd
+  numGrids:   4,
 }
 
-function init(table_id) {
-  var dim = dimension;
+function initializeBoard(tableId) {
+  var dim = boardDimension;
 
-  var table = document.getElementById(table_id);
+  var table = document.getElementById(tableId);
   for (y = 1; y <= dim.numGrids; y++) {
     var row = document.createElement('tr');
     table.appendChild(row);
@@ -35,7 +35,7 @@ function getCanvasId(x, y) {
 }
 
 function updateCanvasDisplay(x, y) {
-  var dim = dimension;
+  var dim = boardDimension;
 
   var cxt = getCanvasContext(getCanvasId(x, y));
   cxt.beginPath();
@@ -43,12 +43,12 @@ function updateCanvasDisplay(x, y) {
   var end = dim.gridPitch;
   var mid = Math.floor(dim.gridPitch / 2) + 1;
   // horizontal line
-  var x0 = isLeftmost(x, y)  ? mid : 0;
+  var x0 = isLeftmost(x, y)  ? mid :   0;
   var x1 = isRightmost(x, y) ? mid : end;
   cxt.moveTo(x0, mid);
   cxt.lineTo(x1, mid);
   // vertical line
-  var y0 = isTop(x, y)    ? mid : 0;
+  var y0 = isTop(x, y)    ? mid :   0;
   var y1 = isBottom(x, y) ? mid : end;
   cxt.moveTo(mid, y0);
   cxt.lineTo(mid, y1);
@@ -62,7 +62,7 @@ function isTop(x, y) {
 }
 
 function isBottom(x, y) {
-  return y == dimension.numGrids;
+  return y == boardDimension.numGrids;
 }
 
 function isLeftmost(x, y) {
@@ -70,6 +70,6 @@ function isLeftmost(x, y) {
 }
 
 function isRightmost(x, y) {
-  return x == dimension.numGrids;
+  return x == boardDimension.numGrids;
 }
 
