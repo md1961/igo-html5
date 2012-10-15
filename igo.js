@@ -9,6 +9,7 @@ var boardDimension = {
   stoneDiameterShrinkage: 2,
 }
 
+const NONE  = 'none';
 const BLACK = 'black';
 const WHITE = 'white';
 
@@ -28,6 +29,7 @@ function initializeBoard(tableId) {
       canvas.id = id;
       canvas.setAttribute('x_coord', x);
       canvas.setAttribute('y_coord', y);
+      canvas.class = NONE;
       canvas.width  = dim.gridPitch;
       canvas.height = dim.gridPitch;
       canvas.onclick = gridClickHandler;
@@ -47,10 +49,19 @@ function initializeBoard(tableId) {
 }
 
 function gridClickHandler() {
-  x = this.getAttribute('x_coord');
-  y = this.getAttribute('y_coord');
-
-  alert('x_coord = ' + x + ', y_coord = ' + y);
+  switch (this.class) {
+    case NONE:
+      this.class = BLACK;
+      break;
+    case BLACK:
+      this.class = WHITE;
+      break;
+    default:
+      this.class = NONE;
+  }
+  x = parseInt(this.getAttribute('x_coord'));
+  y = parseInt(this.getAttribute('y_coord'));
+  updateCanvasDisplay(x, y);
 }
 
 function getCanvasId(x, y) {
@@ -65,11 +76,15 @@ function getCanvasClass(x, y) {
 function updateCanvasDisplay(x, y) {
   var dim = boardDimension;
 
-  var cxt = getCanvasContext(getCanvasId(x, y));
-  cxt.beginPath();
-
   var end = dim.gridPitch;
   var mid = Math.floor(dim.gridPitch / 2) + 1;
+
+  var cxt = getCanvasContext(getCanvasId(x, y));
+
+  cxt.fillStyle = "rgb(255, 255, 255)";
+  cxt.clearRect(0, 0, end, end);
+  cxt.beginPath();
+
   // horizontal line
   var x0 = isLeftmost(x, y)  ? mid :   0;
   var x1 = isRightmost(x, y) ? mid : end;
