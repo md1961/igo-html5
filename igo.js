@@ -54,6 +54,17 @@ function updateCanvasDisplay(x, y) {
   cxt.lineTo(mid, y1);
 
   cxt.closePath();
+
+  if (x == 2 && (y == 2 || y == 3)) {
+    cxt.beginPath();
+    cxt.arc(mid, mid, mid - 2, 0, Math.PI * 2);
+    if (y == 3) {
+      cxt.fillStyle = "rgb(0, 0, 0)";
+      cxt.fill();
+    }
+    cxt.closePath();
+  }
+
   cxt.stroke();
 }
 
