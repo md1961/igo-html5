@@ -26,15 +26,19 @@ function initializeBoard(tableId) {
       var canvas = document.createElement('canvas');
       cell.appendChild(canvas);
       canvas.id = id;
+      canvas.setAttribute('x_coord', x);
+      canvas.setAttribute('y_coord', y);
       canvas.width  = dim.gridPitch;
       canvas.height = dim.gridPitch;
 
+      /*
       if (x <= 2 && y == 3) {
         canvas.class = BLACK;
         if (x == 1) {
           canvas.class = WHITE;
         }
       }
+      */
 
       updateCanvasDisplay(x, y);
     }
