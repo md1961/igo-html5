@@ -4,8 +4,8 @@ onload = function() {
 
 var dimension = {
   margin: 10,
-  gridPitch: 41,
-  numGrids: 19,
+  gridPitch: 31,
+  numGrids: 4,
 }
 
 function init(table_id) {
@@ -25,16 +25,7 @@ function init(table_id) {
       canvas.width  = dim.gridPitch;
       canvas.height = dim.gridPitch;
 
-      cxt = getCanvasContext(id);
-      cxt.beginPath();
-      var end = dim.gridPitch;
-      var mid = Math.floor(dim.gridPitch / 2) + 1;
-      cxt.moveTo(  0, mid);
-      cxt.lineTo(end, mid);
-      cxt.moveTo(mid,   0);
-      cxt.lineTo(mid, end);
-      cxt.closePath();
-      cxt.stroke();
+      updateCanvasDisplay(x, y);
     }
   }
 }
@@ -43,3 +34,17 @@ function getCanvasId(x, y) {
   return 'g' + ('0' + x).substr(-2) + ('0' + y).substr(-2);
 }
 
+function updateCanvasDisplay(x, y) {
+  var dim = dimension;
+
+  var cxt = getCanvasContext(getCanvasId(x, y));
+  cxt.beginPath();
+  var end = dim.gridPitch;
+  var mid = Math.floor(dim.gridPitch / 2) + 1;
+  cxt.moveTo(  0, mid);
+  cxt.lineTo(end, mid);
+  cxt.moveTo(mid,   0);
+  cxt.lineTo(mid, end);
+  cxt.closePath();
+  cxt.stroke();
+}
