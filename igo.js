@@ -30,6 +30,7 @@ function initializeBoard(tableId) {
       canvas.setAttribute('y_coord', y);
       canvas.width  = dim.gridPitch;
       canvas.height = dim.gridPitch;
+      canvas.onclick = gridClickHandler;
 
       /*
       if (x <= 2 && y == 3) {
@@ -43,6 +44,13 @@ function initializeBoard(tableId) {
       updateCanvasDisplay(x, y);
     }
   }
+}
+
+function gridClickHandler() {
+  x = this.getAttribute('x_coord');
+  y = this.getAttribute('y_coord');
+
+  alert('x_coord = ' + x + ', y_coord = ' + y);
 }
 
 function getCanvasId(x, y) {
