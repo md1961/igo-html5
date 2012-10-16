@@ -127,3 +127,8 @@ function isRightmost(x, y) {
   return x == boardDimension.numGrids;
 }
 
+function nextInArray(element, array) {
+  index = array.index(element);
+  return array[index >= array.length - 1 ? 0 : index + 1]
+}
+
