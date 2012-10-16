@@ -22,6 +22,9 @@
       table.board tr td {
         padding: 0px;
       }
+      div.panel {
+        text-size: xx-small;
+      }
     </style>
   </head>
 
@@ -32,18 +35,18 @@
 
     <table id="main_board" class="board"></table>
 
-    <p>
-      モード
+    <div class="panel">
+      モード<br />
       <input type="radio" name="mode" id="radio_mode_init" value="init">
       <label for="radio_mode_init">配置</label>
       <input type="radio" name="mode" id="radio_mode_turn" value="turn" checked>
       <label for="radio_mode_turn">交互</label>
-    </p>
-    <p>
+    </div>
+    <div class="form">
       <input type="radio" name="turn" id="radio_turn_black" value="black" checked>
       <label for="radio_turn_black">黒番</label>
       <input type="radio" name="turn" id="radio_turn_white" value="white">
       <label for="radio_turn_white">白番</label>
-    </p>
+    </div>
   </body>
 </html>

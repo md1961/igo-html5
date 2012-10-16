@@ -21,12 +21,12 @@ function initializeBoard(tableId) {
     var row = document.createElement('tr');
     table.appendChild(row);
     for (x = 1; x <= dim.numGrids; x++) {
-      var id = getCanvasId(x, y);
       var cell = document.createElement('td');
       row.appendChild(cell);
       var canvas = document.createElement('canvas');
       cell.appendChild(canvas);
-      canvas.id = id;
+
+      canvas.id = getCanvasId(x, y);
       canvas.setAttribute('x_coord', x);
       canvas.setAttribute('y_coord', y);
       canvas.class = NONE;
