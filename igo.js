@@ -1,4 +1,4 @@
-onload = function() {
+window.onload = function() {
   initializeBoard("main_board");
 };
 
@@ -40,6 +40,9 @@ function initializeBoard(tableId) {
 }
 
 function gridClickHandler() {
+  alert("isInitMode = " + isInitMode());
+  return;
+
   switch (this.class) {
     case NONE:
       this.class = BLACK;
@@ -53,6 +56,10 @@ function gridClickHandler() {
   x = parseInt(this.getAttribute('x_coord'));
   y = parseInt(this.getAttribute('y_coord'));
   updateCanvasDisplay(x, y);
+}
+
+function isInitMode() {
+  return document.getElementById("radio_mode_init").checked;
 }
 
 function getCanvasId(x, y) {
