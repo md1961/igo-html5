@@ -34,15 +34,6 @@ function initializeBoard(tableId) {
       canvas.height = dim.gridPitch;
       canvas.onclick = gridClickHandler;
 
-      /*
-      if (x <= 2 && y == 3) {
-        canvas.class = BLACK;
-        if (x == 1) {
-          canvas.class = WHITE;
-        }
-      }
-      */
-
       updateCanvasDisplay(x, y);
     }
   }
