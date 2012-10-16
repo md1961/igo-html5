@@ -40,9 +40,6 @@ function initializeBoard(tableId) {
 }
 
 function gridClickHandler() {
-  alert("isInitMode = " + isInitMode());
-  return;
-
   switch (this.class) {
     case NONE:
       this.class = BLACK;
@@ -60,6 +57,10 @@ function gridClickHandler() {
 
 function isInitMode() {
   return document.getElementById("radio_mode_init").checked;
+}
+
+function isBlackTurn() {
+  return document.getElementById("radio_turn_black").checked;
 }
 
 function getCanvasId(x, y) {
