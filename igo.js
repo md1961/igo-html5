@@ -33,11 +33,22 @@ function initializeBoard(tableId) {
       canvas.id = getCanvasId(x, y);
       canvas.setAttribute('x_coord', x);
       canvas.setAttribute('y_coord', y);
-      canvas.class = NONE;
       canvas.width  = dim.gridPitch;
       canvas.height = dim.gridPitch;
       canvas.onclick = gridClickHandler;
+    }
+  }
 
+  clearBoard();
+}
+
+function clearBoard() {
+  var dim = boardDimension;
+
+  for (y = 1; y <= dim.numGrids; y++) {
+    for (x = 1; x <= dim.numGrids; x++) {
+      var canvas = getCanvas(x, y)
+      canvas.class = NONE;
       updateCanvasDisplay(x, y);
     }
   }
@@ -79,9 +90,12 @@ function getCanvasId(x, y) {
   return 'g' + ('0' + x).substr(-2) + ('0' + y).substr(-2);
 }
 
-function getCanvasClass(x, y) {
-  var canvas = document.getElementById(getCanvasId(x, y));
-  return canvas.class;
+function getCanvas(x, y) {
+  return document.getElementById(getCanvasId(x, y));
+}
+
+function getStone(x, y) {
+  return getCanvas(x, y).class;
 }
 
 function updateCanvasDisplay(x, y) {
@@ -109,11 +123,11 @@ function updateCanvasDisplay(x, y) {
 
   cxt.closePath();
 
-  var clazz = getCanvasClass(x, y);
-  if (clazz == WHITE || clazz == BLACK) {
+  var stone = getStone(x, y);
+  if (stone == WHITE || stone == BLACK) {
     cxt.beginPath();
     cxt.arc(mid, mid, mid - dim.stoneDiameterShrinkage, 0, Math.PI * 2);
-    if (clazz == BLACK) {
+    if (stone == BLACK) {
       cxt.fillStyle = "rgb(0, 0, 0)";
       cxt.fill();
     }
