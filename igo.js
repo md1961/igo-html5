@@ -5,7 +5,7 @@ window.onload = function() {
 var boardDimension = {
   margin:    10,
   gridPitch: 31,  // must be odd
-  numGrids:   4,
+  numGrids:   9,
   stoneDiameterShrinkage: 2,
 }
 
