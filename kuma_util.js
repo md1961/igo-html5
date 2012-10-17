@@ -1,4 +1,4 @@
-var Kuma = {
+var KumaUtil = {
 
   nextInArray: function(_element, _array) {
     index = _array.indexOf(_element);
