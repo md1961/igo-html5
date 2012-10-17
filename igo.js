@@ -9,6 +9,10 @@ var boardDimension = {
   stoneDiameterShrinkage: 2,
 }
 
+const RADIO_MODE_INIT_ID  = "radio_mode_init";
+const RADIO_TURN_BLACK_ID = "radio_turn_black";
+const RADIO_TURN_WHITE_ID = "radio_turn_white";
+
 const NONE  = 'none';
 const BLACK = 'black';
 const WHITE = 'white';
@@ -40,27 +44,35 @@ function initializeBoard(tableId) {
 }
 
 function gridClickHandler() {
-  switch (this.class) {
-    case NONE:
-      this.class = BLACK;
-      break;
-    case BLACK:
-      this.class = WHITE;
-      break;
-    default:
-      this.class = NONE;
+  if (isInitMode()) {
+    var turnCycle = isBlackTurn() ? [NONE, BLACK, WHITE] : [NONE, WHITE, BLACK];
+    this.class = KumaUtil.nextInArray(this.class, turnCycle);
+  } else if (this.class == NONE) {
+    this.class = isBlackTurn() ? BLACK : WHITE;
+    toggleRadioTurn();
   }
+
   x = parseInt(this.getAttribute('x_coord'));
   y = parseInt(this.getAttribute('y_coord'));
   updateCanvasDisplay(x, y);
 }
 
+function toggleRadioTurn() {
+  var radio_black = document.getElementById(RADIO_TURN_BLACK_ID);
+  var radio_white = document.getElementById(RADIO_TURN_WHITE_ID);
+  if (radio_black.checked) {
+    radio_white.checked = true;
+  } else {
+    radio_black.checked = true;
+  }
+}
+
 function isInitMode() {
-  return document.getElementById("radio_mode_init").checked;
+  return document.getElementById(RADIO_MODE_INIT_ID).checked;
 }
 
 function isBlackTurn() {
-  return document.getElementById("radio_turn_black").checked;
+  return document.getElementById(RADIO_TURN_BLACK_ID).checked;
 }
 
 function getCanvasId(x, y) {
