@@ -47,24 +47,25 @@ function clearBoard() {
 
   for (y = 1; y <= dim.numGrids; y++) {
     for (x = 1; x <= dim.numGrids; x++) {
-      var canvas = getCanvas(x, y)
-      canvas.class = NONE;
+      setStone(x, y, NONE);
       updateCanvasDisplay(x, y);
     }
   }
 }
 
 function gridClickHandler() {
+  x = parseInt(this.getAttribute('x_coord'));
+  y = parseInt(this.getAttribute('y_coord'));
+
   if (isInitMode()) {
     var turnCycle = isBlackTurn() ? [NONE, BLACK, WHITE] : [NONE, WHITE, BLACK];
-    this.class = KumaUtil.nextInArray(this.class, turnCycle);
-  } else if (this.class == NONE) {
-    this.class = isBlackTurn() ? BLACK : WHITE;
+    var stone = KumaUtil.nextInArray(this.class, turnCycle);
+    setStone(x, y, stone);
+  } else if (getStone(x, y) == NONE) {
+    setStone(x, y, isBlackTurn() ? BLACK : WHITE);
     toggleRadioTurn();
   }
 
-  x = parseInt(this.getAttribute('x_coord'));
-  y = parseInt(this.getAttribute('y_coord'));
   updateCanvasDisplay(x, y);
 }
 
@@ -96,6 +97,11 @@ function getCanvas(x, y) {
 
 function getStone(x, y) {
   return getCanvas(x, y).class;
+}
+
+function setStone(x, y, stone) {
+  var canvas = getCanvas(x, y);
+  canvas.class = stone;
 }
 
 function updateCanvasDisplay(x, y) {
