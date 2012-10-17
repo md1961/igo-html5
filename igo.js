@@ -16,6 +16,7 @@ const RADIO_TURN_WHITE_ID = "radio_turn_white";
 const NONE  = 'none';
 const BLACK = 'black';
 const WHITE = 'white';
+const STONES = [NONE, BLACK, WHITE];
 
 function initializeBoard(tableId) {
   var dim = boardDimension;
@@ -65,10 +66,10 @@ function gridClickHandler() {
     var currentTurn = getCurrentTurn();
     setStone(x, y, currentTurn);
 
-    takeStones(x - 1, y    );
-    takeStones(x    , y - 1);
-    takeStones(x + 1, y    );
-    takeStones(x    , y + 1);
+    takeStones(x - 1, y    , currentTurn);
+    takeStones(x    , y - 1, currentTurn);
+    takeStones(x + 1, y    , currentTurn);
+    takeStones(x    , y + 1, currentTurn);
 
     toggleTurn();
   }
@@ -86,7 +87,14 @@ function toggleTurn() {
   }
 }
 
-function takeStones(x, y, turn) {
+function takeStones(x, y, currentTurn) {
+  var stone = getStone(x, y);
+  var opponent = getOpponent(currentTurn);
+  if (stone != opponent) {
+    return;
+  }
+
+  //TODO
 }
 
 function isInitMode() {
@@ -99,6 +107,19 @@ function isBlackTurn() {
 
 function getCurrentTurn() {
   return isBlackTurn() ? BLACK : WHITE;
+}
+
+function getOpponent(stone) {
+  switch (stone) {
+    case BLACK:
+      return WHITE;
+      break;
+    case WHITE:
+      return BLACK;
+      break;
+    default:
+      throw "getOpponent(): Argument stone must be BLACK or WHITE";
+  }
 }
 
 function getCanvasId(x, y) {
@@ -114,6 +135,10 @@ function getStone(x, y) {
 }
 
 function setStone(x, y, stone) {
+  if (STONES.indexOf(stone) < 0) {
+    throw "setStone(): Argument stone must be NONE, BLACK or WHITE";
+  }
+
   var canvas = getCanvas(x, y);
   canvas.class = stone;
 }
