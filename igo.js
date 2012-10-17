@@ -62,14 +62,21 @@ function gridClickHandler() {
     var stone = KumaUtil.nextInArray(this.class, turnCycle);
     setStone(x, y, stone);
   } else if (getStone(x, y) == NONE) {
-    setStone(x, y, isBlackTurn() ? BLACK : WHITE);
-    toggleRadioTurn();
+    var currentTurn = getCurrentTurn();
+    setStone(x, y, currentTurn);
+
+    takeStones(x - 1, y    );
+    takeStones(x    , y - 1);
+    takeStones(x + 1, y    );
+    takeStones(x    , y + 1);
+
+    toggleTurn();
   }
 
   updateCanvasDisplay(x, y);
 }
 
-function toggleRadioTurn() {
+function toggleTurn() {
   var radio_black = document.getElementById(RADIO_TURN_BLACK_ID);
   var radio_white = document.getElementById(RADIO_TURN_WHITE_ID);
   if (radio_black.checked) {
@@ -79,12 +86,19 @@ function toggleRadioTurn() {
   }
 }
 
+function takeStones(x, y, turn) {
+}
+
 function isInitMode() {
   return document.getElementById(RADIO_MODE_INIT_ID).checked;
 }
 
 function isBlackTurn() {
   return document.getElementById(RADIO_TURN_BLACK_ID).checked;
+}
+
+function getCurrentTurn() {
+  return isBlackTurn() ? BLACK : WHITE;
 }
 
 function getCanvasId(x, y) {
