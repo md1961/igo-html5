@@ -7,6 +7,7 @@ var boardDimension = {
   gridPitch: 31,  // must be odd
   numGrids:  19,
   stoneDiameterShrinkage: 2,
+  starDiameter:           3,
 }
 
 const RADIO_MODE_INIT_ID  = "radio_mode_init";
@@ -242,12 +243,19 @@ function updateCanvasDisplay(x, y) {
   cxt.lineTo(mid, y1);
 
   cxt.closePath();
+  cxt.stroke();
 
   var stone = getStone(x, y);
   if (stone == WHITE || stone == BLACK) {
     cxt.beginPath();
     cxt.arc(mid, mid, mid - dim.stoneDiameterShrinkage, 0, Math.PI * 2);
     cxt.fillStyle = stone == BLACK ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)";
+    cxt.fill();
+    cxt.closePath();
+  } else if (isStar(x, y)) {
+    cxt.beginPath();
+    cxt.arc(mid, mid, dim.starDiameter, 0, Math.PI * 2);
+    cxt.fillStyle = "rgb(0, 0, 0)";
     cxt.fill();
     cxt.closePath();
   }
@@ -269,5 +277,15 @@ function isLeftmost(x, y) {
 
 function isRightmost(x, y) {
   return x == boardDimension.numGrids;
+}
+
+const STAR_COORDS = [4, 10, 16];
+
+function isStar(x, y) {
+  if (boardDimension.numGrids == 19) {
+    if (STAR_COORDS.indexOf(x) >= 0 && STAR_COORDS.indexOf(y) >= 0) {
+      return true;
+    }
+  }
 }
 
