@@ -17,6 +17,7 @@ const NONE  = 'none';
 const BLACK = 'black';
 const WHITE = 'white';
 const STONES = [NONE, BLACK, WHITE];
+const OUT_OF_BOUNDS = 'out_of_bounds'
 
 function initializeBoard(tableId) {
   var dim = boardDimension;
@@ -55,8 +56,8 @@ function clearBoard() {
 }
 
 function gridClickHandler() {
-  x = parseInt(this.getAttribute('x_coord'));
-  y = parseInt(this.getAttribute('y_coord'));
+  var x = parseInt(this.getAttribute('x_coord'));
+  var y = parseInt(this.getAttribute('y_coord'));
 
   if (isInitMode()) {
     var turnCycle = isBlackTurn() ? [NONE, BLACK, WHITE] : [NONE, WHITE, BLACK];
@@ -68,9 +69,9 @@ function gridClickHandler() {
 
     var adjs = adjacentCoordsInArray(x, y);
     for (var i = 0; i < adjs.length; i++) {
-      var _x = adjs[i][0];
-      var _y = adjs[i][1];
-      takeStones(_x, _y, currentTurn);
+      var xAdj = adjs[i][0];
+      var yAdj = adjs[i][1];
+      checkIfStoneTaken(xAdj, yAdj, currentTurn);
     }
 
     toggleTurn();
@@ -98,22 +99,71 @@ function toggleTurn() {
   }
 }
 
-function takeStones(x, y, currentTurn) {
+function checkIfStoneTaken(x, y, currentTurn) {
   var stone = getStone(x, y);
   var opponent = getOpponent(currentTurn);
   if (stone != opponent) {
     return;
   }
 
-  //TODO
-  alert("creating...")
-  throw "creating..."
-
   if (isDead(x, y)) {
+    takeStones();
+  }
+
+  unmarkAllStones();
+}
+
+function takeStones() {
+  var dim = boardDimension;
+
+  for (y = 1; y <= dim.numGrids; y++) {
+    for (x = 1; x <= dim.numGrids; x++) {
+      if (isMarked(x, y)) {
+        setStone(x, y, NONE);
+        /* TODO: Count up taken stones */
+
+        updateCanvasDisplay(x, y);
+      }
+    }
   }
 }
 
 function isDead(x, y) {
+  markStone(x, y, 'true');
+  var stoneToBeTaken = getStone(x, y);
+  var adjs = adjacentCoordsInArray(x, y);
+  for (var i = 0; i < adjs.length; i++) {
+    var xAdj = adjs[i][0];
+    var yAdj = adjs[i][1];
+    var stoneAdj = getStone(xAdj, yAdj);
+    if (stoneAdj == NONE) {
+      return false;
+    } else if (stoneAdj == stoneToBeTaken) {
+      if (! isMarked(xAdj, yAdj) && ! isDead(xAdj, yAdj)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+function isMarked(x, y) {
+  return getCanvas(x, y).getAttribute('marked') == 'true';
+}
+
+function markStone(x, y, value) {
+  getCanvas(x, y).setAttribute('marked', value);
+}
+
+function unmarkAllStones() {
+  var dim = boardDimension;
+
+  for (y = 1; y <= dim.numGrids; y++) {
+    for (x = 1; x <= dim.numGrids; x++) {
+      markStone(x, y, 'false');
+    }
+  }
 }
 
 function isInitMode() {
@@ -150,6 +200,11 @@ function getCanvas(x, y) {
 }
 
 function getStone(x, y) {
+  var dim = boardDimension;
+
+  if (x < 1 || x > dim.numGrids || y < 1 || y > dim.numGrids) {
+    return OUT_OF_BOUNDS;
+  }
   return getCanvas(x, y).class;
 }
 
