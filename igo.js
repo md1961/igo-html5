@@ -66,15 +66,26 @@ function gridClickHandler() {
     var currentTurn = getCurrentTurn();
     setStone(x, y, currentTurn);
 
-    takeStones(x - 1, y    , currentTurn);
-    takeStones(x    , y - 1, currentTurn);
-    takeStones(x + 1, y    , currentTurn);
-    takeStones(x    , y + 1, currentTurn);
+    var adjs = adjacentCoordsInArray(x, y);
+    for (var i = 0; i < adjs.length; i++) {
+      var _x = adjs[i][0];
+      var _y = adjs[i][1];
+      takeStones(_x, _y, currentTurn);
+    }
 
     toggleTurn();
   }
 
   updateCanvasDisplay(x, y);
+}
+
+function adjacentCoordsInArray(x, y) {
+  return [
+    [x - 1, y    ],
+    [x    , y - 1],
+    [x + 1, y    ],
+    [x    , y + 1]
+  ];
 }
 
 function toggleTurn() {
@@ -95,6 +106,14 @@ function takeStones(x, y, currentTurn) {
   }
 
   //TODO
+  alert("creating...")
+  throw "creating..."
+
+  if (isDead(x, y)) {
+  }
+}
+
+function isDead(x, y) {
 }
 
 function isInitMode() {
