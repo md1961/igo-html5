@@ -5,7 +5,7 @@ window.onload = function() {
 var boardDimension = {
   margin:    10,
   gridPitch: 31,  // must be odd
-  numGrids:   9,
+  numGrids:  19,
   stoneDiameterShrinkage: 2,
 }
 
@@ -37,6 +37,7 @@ function initializeBoard(tableId) {
       canvas.setAttribute('y_coord', y);
       canvas.width  = dim.gridPitch;
       canvas.height = dim.gridPitch;
+      canvas.style.backgroundColor = '#fb0';
       canvas.onclick = gridClickHandler;
     }
   }
@@ -246,10 +247,8 @@ function updateCanvasDisplay(x, y) {
   if (stone == WHITE || stone == BLACK) {
     cxt.beginPath();
     cxt.arc(mid, mid, mid - dim.stoneDiameterShrinkage, 0, Math.PI * 2);
-    if (stone == BLACK) {
-      cxt.fillStyle = "rgb(0, 0, 0)";
-      cxt.fill();
-    }
+    cxt.fillStyle = stone == BLACK ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)";
+    cxt.fill();
     cxt.closePath();
   }
 
