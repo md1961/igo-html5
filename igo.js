@@ -38,6 +38,10 @@ function MoveSet() {
     }
     this.moves.push(move);
   };
+  this.popLastMove = function() {
+    var move = this.moves.pop();
+    return move;
+  }
   this.toJson = function() {
     return JSON.stringify({"moves": this.moves});
   };
@@ -47,19 +51,29 @@ function stringifyMove(stone, x, y) {
   return stone[0] + KumaUtil.zeroLeftPad(x, 2) + KumaUtil.zeroLeftPad(y, 2);
 }
 
-function parseMove(s) {
+function parseMove(stringifiedMove) {
+  var m = stringifiedMove.match(/^([nbw]\d{2,})(?:\(([\w,]+)\))?$/);
+  var strMove = m[1];
+  var strStonesTaken = m[2];
+
   var stone;
-  switch (s[0]) {
+  switch (strMove[0]) {
     case 'n': stone = NONE ; break;
     case 'b': stone = BLACK; break;
-    case 'w': stone = white; break;
-    default : throw "Illegal stringified move '" + s +"'"
+    case 'w': stone = WHITE; break;
+    default : throw "Illegal stringified move '" + strMove +"'"
   }
 
-  x = parseInt(s.substr(1, 2));
-  y = parseInt(s.substr(3, 2));
+  x = parseInt(strMove.substr(1, 2));
+  y = parseInt(strMove.substr(3, 2));
 
-  return [stone, x, y];
+  retval = [stone, x, y];
+  if (strStonesTaken) {
+    arrayOfStrStoneTaken = strStonesTaken.split(',');
+    retval = retval.concat(arrayOfStrStoneTaken.map(parseMove));
+  }
+
+  return retval;
 }
 
 var moveSet = new MoveSet();
@@ -134,6 +148,11 @@ function putStone(x, y) {
   }
 
   updateCanvasDisplay(x, y);
+}
+
+function removeLastMove() {
+  var moveStringifiedWithTaken = moveSet.popLastMove();
+
 }
 
 function displayMoveSet() {
