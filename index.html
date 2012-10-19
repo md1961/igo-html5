@@ -30,7 +30,6 @@
       div#panels {
         margin-top: 20px;
       }
-
       div.panel {
         margin-top: 5px;
       }
@@ -63,6 +62,8 @@
           <label for="radio_mode_init">置石</label>
           <input type="radio" name="mode" id="radio_mode_turn" value="turn" checked>
           <label for="radio_mode_turn">対戦</label>
+          <input type="radio" name="mode" id="radio_mode_play" value="play">
+          <label for="radio_mode_play">再現</label>
         </span>
       </div>
       <div class="panel">
@@ -74,5 +75,8 @@
         </span>
       </div>
     </div>
+
+    <textarea id="moves_display" cols="100" rows="24"> </textarea>
   </body>
 </html>
+

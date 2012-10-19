@@ -26,6 +26,24 @@ const RGB_BLACK = 'rgb(0, 0, 0)';
 const RGB_WHITE = 'rgb(255, 255, 255)';
 
 
+function MoveSet() {
+  this.inits = new Array();
+  this.moves = new Array();
+
+  this.writeMoves = function(stone, x, y) {
+    this.moves.push(formatMove(stone, x, y));
+  };
+  this.toJson = function() {
+    return JSON.stringify({"moves": this.moves});
+  };
+}
+
+function formatMove(stone, x, y) {
+  return stone.substr(0, 1) + KumaUtil.zeroLeftPad(x, 2) + KumaUtil.zeroLeftPad(y, 2);
+}
+
+var moveSet = new MoveSet();
+
 function initializeBoard(tableId) {
   var dim = boardDimension;
 
@@ -83,10 +101,17 @@ function gridClickHandler() {
       checkIfStoneTaken(xAdj, yAdj, currentTurn);
     }
 
+    moveSet.writeMoves(currentTurn, x, y);
+    displayMoveSet();
     toggleTurn();
   }
 
   updateCanvasDisplay(x, y);
+}
+
+function displayMoveSet() {
+  var moveDisplay = document.getElementById("moves_display");
+  moveDisplay.firstChild.nodeValue = moveSet.toJson();
 }
 
 function adjacentCoordsInArray(x, y) {
@@ -201,7 +226,7 @@ function getOpponent(stone) {
 }
 
 function getCanvasId(x, y) {
-  return 'g' + ('0' + x).substr(-2) + ('0' + y).substr(-2);
+  return 'g' + KumaUtil.zeroLeftPad(x, 2) + KumaUtil.zeroLeftPad(y, 2);
 }
 
 function getCanvas(x, y) {
@@ -286,12 +311,11 @@ function isRightmost(x, y) {
   return x == boardDimension.numGrids;
 }
 
-const STAR_COORDS_FOR_19_GRIDS = [4, 10, 16];
+const STAR_COORDS = [4, 10, 16];
 
 function isStar(x, y) {
   if (boardDimension.numGrids == 19) {
-    if (STAR_COORDS_FOR_19_GRIDS.indexOf(x) >= 0
-     && STAR_COORDS_FOR_19_GRIDS.indexOf(y) >= 0) {
+    if (STAR_COORDS.indexOf(x) >= 0 && STAR_COORDS.indexOf(y) >= 0) {
       return true;
     }
   }
