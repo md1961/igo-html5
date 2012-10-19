@@ -57,6 +57,9 @@
         </span>
       </div>
       <div class="panel">
+        <label>&nbsp;</label>
+      </div>
+      <div class="panel">
         <span class="panel bordered">
           <input type="radio" name="mode" id="radio_mode_init" value="init">
           <label for="radio_mode_init">置石</label>
@@ -74,9 +77,18 @@
           <label for="radio_turn_white">白番</label>
         </span>
       </div>
+      <div class="panel">
+        <span class="panel">
+          <input type="submit" value="直前手削除" onclick="removeLastMove();"></input>
+        </span>
+      </div>
+      <div class="panel">
+        <span class="panel">
+          <textarea id="moves_display" cols="100" rows="24">&shy;</textarea>
+        </span>
+      </div>
     </div>
 
-    <textarea id="moves_display" cols="100" rows="24"> </textarea>
   </body>
 </html>
 
