@@ -32,15 +32,30 @@ function MoveSet() {
   this.moves = new Array();
 
   this.writeMoves = function(stone, x, y) {
-    this.moves.push(formatMove(stone, x, y));
+    this.moves.push(stringifyMove(stone, x, y));
   };
   this.toJson = function() {
     return JSON.stringify({"moves": this.moves});
   };
 }
 
-function formatMove(stone, x, y) {
-  return stone.substr(0, 1) + KumaUtil.zeroLeftPad(x, 2) + KumaUtil.zeroLeftPad(y, 2);
+function stringifyMove(stone, x, y) {
+  return stone[0] + KumaUtil.zeroLeftPad(x, 2) + KumaUtil.zeroLeftPad(y, 2);
+}
+
+function parseMove(s) {
+  var stone;
+  switch (s[0]) {
+    case 'n': stone = NONE ; break;
+    case 'b': stone = BLACK; break;
+    case 'w': stone = white; break;
+    default : throw "Illegal stringified move '" + s +"'"
+  }
+
+  x = parseInt(s.substr(1, 2));
+  y = parseInt(s.substr(3, 2));
+
+  return [stone, x, y];
 }
 
 var moveSet = new MoveSet();
@@ -157,7 +172,7 @@ function takeStones() {
     for (x = 1; x <= dim.numGrids; x++) {
       if (isMarked(x, y)) {
         setStone(x, y, NONE);
-        /* TODO: Count up taken stones */
+        // TODO: Count up taken stones
 
         updateCanvasDisplay(x, y);
       }
