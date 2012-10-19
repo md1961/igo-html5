@@ -5,11 +5,11 @@ window.onload = function() {
 
 var boardDimension = {
   margin:    10,
-  gridPitch: 31,  // must be odd
+  gridPitch: 25,  // must be odd
   numGrids:  19,
   stoneDiameterShrinkage: 2,
   starDiameter:           3,
-}
+};
 
 const RADIO_MODE_INIT_ID  = "radio_mode_init";
 const RADIO_TURN_BLACK_ID = "radio_turn_black";
@@ -19,7 +19,7 @@ const NONE  = 'none';
 const BLACK = 'black';
 const WHITE = 'white';
 const STONES = [NONE, BLACK, WHITE];
-const OUT_OF_BOUNDS = 'out_of_bounds'
+const OUT_OF_BOUNDS = 'out_of_bounds';
 
 const DEFAULT_BOARD_COLOR = '#fb0';
 const RGB_BLACK = 'rgb(0, 0, 0)';
@@ -289,7 +289,8 @@ const STAR_COORDS_FOR_19_GRIDS = [4, 10, 16];
 
 function isStar(x, y) {
   if (boardDimension.numGrids == 19) {
-    if (STAR_COORDS_FOR_19_GRIDS.indexOf(x) >= 0 && STAR_COORDS.indexOf(y) >= 0) {
+    if (STAR_COORDS_FOR_19_GRIDS.indexOf(x) >= 0
+     && STAR_COORDS_FOR_19_GRIDS.indexOf(y) >= 0) {
       return true;
     }
   }
