@@ -30,6 +30,7 @@ function initializeBoard(tableId) {
   var dim = boardDimension;
 
   var table = document.getElementById(tableId);
+  table.style.backgroundColor = DEFAULT_BOARD_COLOR;
   for (y = 1; y <= dim.numGrids; y++) {
     var row = document.createElement('tr');
     table.appendChild(row);

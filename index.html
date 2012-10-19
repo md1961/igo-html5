@@ -19,14 +19,22 @@
     <style>
       table.board {
         border-spacing: 0px;
-        margin-bottom: 20px;
+        padding: 3px;
+        float: left;
       }
       table.board tr td {
+        float: left;
         padding: 0px;
       }
+
+      div#panels {
+        margin-top: 20px;
+      }
+
       span.panel {
         text-size: xx-small;
         border: solid 1px black;
+        margin-top: 20px;
         margin-left: 20px;
       }
     </style>
@@ -39,17 +47,20 @@
 
     <table id="main_board" class="board"></table>
 
-    <span class="panel">
-      <input type="radio" name="mode" id="radio_mode_init" value="init">
-      <label for="radio_mode_init">置石</label>
-      <input type="radio" name="mode" id="radio_mode_turn" value="turn" checked>
-      <label for="radio_mode_turn">対戦</label>
-    </span>
-    <span class="panel">
-      <input type="radio" name="turn" id="radio_turn_black" value="black" checked>
-      <label for="radio_turn_black">黒番</label>
-      <input type="radio" name="turn" id="radio_turn_white" value="white">
-      <label for="radio_turn_white">白番</label>
-    </span>
+    <div id="panels">
+      <span class="panel">
+        <input type="radio" name="mode" id="radio_mode_init" value="init">
+        <label for="radio_mode_init">置石</label>
+        <input type="radio" name="mode" id="radio_mode_turn" value="turn" checked>
+        <label for="radio_mode_turn">対戦</label>
+      </span>
+      <br />
+      <span class="panel">
+        <input type="radio" name="turn" id="radio_turn_black" value="black" checked>
+        <label for="radio_turn_black">黒番</label>
+        <input type="radio" name="turn" id="radio_turn_white" value="white">
+        <label for="radio_turn_white">白番</label>
+      </span>
+    </div>
   </body>
 </html>
