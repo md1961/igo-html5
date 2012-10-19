@@ -2,6 +2,7 @@ window.onload = function() {
   initializeBoard("main_board");
 };
 
+
 var boardDimension = {
   margin:    10,
   gridPitch: 31,  // must be odd
@@ -19,6 +20,11 @@ const BLACK = 'black';
 const WHITE = 'white';
 const STONES = [NONE, BLACK, WHITE];
 const OUT_OF_BOUNDS = 'out_of_bounds'
+
+const DEFAULT_BOARD_COLOR = '#fb0';
+const RGB_BLACK = 'rgb(0, 0, 0)';
+const RGB_WHITE = 'rgb(255, 255, 255)';
+
 
 function initializeBoard(tableId) {
   var dim = boardDimension;
@@ -38,7 +44,7 @@ function initializeBoard(tableId) {
       canvas.setAttribute('y_coord', y);
       canvas.width  = dim.gridPitch;
       canvas.height = dim.gridPitch;
-      canvas.style.backgroundColor = '#fb0';
+      canvas.style.backgroundColor = DEFAULT_BOARD_COLOR;
       canvas.onclick = gridClickHandler;
     }
   }
@@ -227,7 +233,7 @@ function updateCanvasDisplay(x, y) {
 
   var cxt = getCanvasContext(getCanvasId(x, y));
 
-  cxt.fillStyle = "rgb(255, 255, 255)";
+  cxt.fillStyle = RGB_WHITE;
   cxt.clearRect(0, 0, end, end);
   cxt.beginPath();
 
@@ -249,13 +255,13 @@ function updateCanvasDisplay(x, y) {
   if (stone == WHITE || stone == BLACK) {
     cxt.beginPath();
     cxt.arc(mid, mid, mid - dim.stoneDiameterShrinkage, 0, Math.PI * 2);
-    cxt.fillStyle = stone == BLACK ? "rgb(0, 0, 0)" : "rgb(255, 255, 255)";
+    cxt.fillStyle = stone == BLACK ? RGB_BLACK : RGB_WHITE;
     cxt.fill();
     cxt.closePath();
   } else if (isStar(x, y)) {
     cxt.beginPath();
     cxt.arc(mid, mid, dim.starDiameter, 0, Math.PI * 2);
-    cxt.fillStyle = "rgb(0, 0, 0)";
+    cxt.fillStyle = RGB_BLACK;
     cxt.fill();
     cxt.closePath();
   }
@@ -279,11 +285,11 @@ function isRightmost(x, y) {
   return x == boardDimension.numGrids;
 }
 
-const STAR_COORDS = [4, 10, 16];
+const STAR_COORDS_FOR_19_GRIDS = [4, 10, 16];
 
 function isStar(x, y) {
   if (boardDimension.numGrids == 19) {
-    if (STAR_COORDS.indexOf(x) >= 0 && STAR_COORDS.indexOf(y) >= 0) {
+    if (STAR_COORDS_FOR_19_GRIDS.indexOf(x) >= 0 && STAR_COORDS.indexOf(y) >= 0) {
       return true;
     }
   }
