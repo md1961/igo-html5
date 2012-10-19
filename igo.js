@@ -31,8 +31,12 @@ function MoveSet() {
   this.inits = new Array();
   this.moves = new Array();
 
-  this.writeMoves = function(stone, x, y) {
-    this.moves.push(stringifyMove(stone, x, y));
+  this.writeMoves = function(stone, x, y, stonesTaken) {
+    var move = stringifyMove(stone, x, y);
+    if (stonesTaken.length > 0) {
+      move += '(' + stonesTaken.join(',') + ')'
+    }
+    this.moves.push(move);
   };
   this.toJson = function() {
     return JSON.stringify({"moves": this.moves});
@@ -112,14 +116,16 @@ function gridClickHandler() {
     var currentTurn = getCurrentTurn();
     setStone(x, y, currentTurn);
 
+    var stonesTaken = new Array();
     var adjs = adjacentCoordsInArray(x, y);
     for (var i = 0; i < adjs.length; i++) {
       var xAdj = adjs[i][0];
       var yAdj = adjs[i][1];
-      checkIfStoneTaken(xAdj, yAdj, currentTurn);
+      var stonesTakenHere = checkIfStoneTaken(xAdj, yAdj, currentTurn);
+      stonesTaken = stonesTaken.concat(stonesTakenHere);
     }
 
-    moveSet.writeMoves(currentTurn, x, y);
+    moveSet.writeMoves(currentTurn, x, y, stonesTaken);
     displayMoveSet();
     toggleTurn();
   }
@@ -155,29 +161,36 @@ function checkIfStoneTaken(x, y, currentTurn) {
   var stone = getStone(x, y);
   var opponent = getOpponent(currentTurn);
   if (stone != opponent) {
-    return;
+    return new Array();
   }
 
+  var stonesTaken = new Array();
   if (isDead(x, y)) {
-    takeStones();
+    stonesTaken = takeStones();
   }
-
   unmarkAllStones();
+
+  return stonesTaken;
 }
 
 function takeStones() {
   var dim = boardDimension;
 
+  var stonesTaken = new Array();
   for (y = 1; y <= dim.numGrids; y++) {
     for (x = 1; x <= dim.numGrids; x++) {
       if (isMarked(x, y)) {
+        var stone = getStone(x, y);
         setStone(x, y, NONE);
+        stonesTaken.push(stringifyMove(stone, x, y));
         // TODO: Count up taken stones
 
         updateCanvasDisplay(x, y);
       }
     }
   }
+
+  return stonesTaken;
 }
 
 function isDead(x, y) {
