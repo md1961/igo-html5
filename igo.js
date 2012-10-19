@@ -107,10 +107,13 @@ function clearBoard() {
 function gridClickHandler() {
   var x = parseInt(this.getAttribute('x_coord'));
   var y = parseInt(this.getAttribute('y_coord'));
+  putStone(x, y);
+}
 
+function putStone(x, y) {
   if (isInitMode()) {
     var turnCycle = isBlackTurn() ? [NONE, BLACK, WHITE] : [NONE, WHITE, BLACK];
-    var stone = KumaUtil.nextInArray(this.class, turnCycle);
+    var stone = KumaUtil.nextInArray(getStone(x, y), turnCycle);
     setStone(x, y, stone);
   } else if (getStone(x, y) == NONE) {
     var currentTurn = getCurrentTurn();
