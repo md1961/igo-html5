@@ -14,6 +14,7 @@ var boardDimension = {
 const RADIO_MODE_INIT_ID  = "radio_mode_init";
 const RADIO_TURN_BLACK_ID = "radio_turn_black";
 const RADIO_TURN_WHITE_ID = "radio_turn_white";
+const ATTR_MARKED = 'marked';
 
 const NONE  = 'none';
 const BLACK = 'black';
@@ -80,6 +81,8 @@ function clearBoard() {
       updateCanvasDisplay(x, y);
     }
   }
+
+  //TODO: clear moveSet
 }
 
 function gridClickHandler() {
@@ -163,7 +166,7 @@ function takeStones() {
 }
 
 function isDead(x, y) {
-  markStone(x, y, 'true');
+  markStone(x, y);
   var stoneToBeTaken = getStone(x, y);
   var adjs = adjacentCoordsInArray(x, y);
   for (var i = 0; i < adjs.length; i++) {
@@ -183,11 +186,15 @@ function isDead(x, y) {
 }
 
 function isMarked(x, y) {
-  return getCanvas(x, y).getAttribute('marked') == 'true';
+  return getCanvas(x, y).hasAttribute(ATTR_MARKED);
 }
 
-function markStone(x, y, value) {
-  getCanvas(x, y).setAttribute('marked', value);
+function markStone(x, y) {
+  getCanvas(x, y).setAttribute(ATTR_MARKED);
+}
+
+function unmarkStone(x, y) {
+  getCanvas(x, y).removeAttribute(ATTR_MARKED);
 }
 
 function unmarkAllStones() {
@@ -195,7 +202,7 @@ function unmarkAllStones() {
 
   for (y = 1; y <= dim.numGrids; y++) {
     for (x = 1; x <= dim.numGrids; x++) {
-      markStone(x, y, 'false');
+      unmarkStone(x, y);
     }
   }
 }
