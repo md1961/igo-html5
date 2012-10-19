@@ -31,11 +31,15 @@
         margin-top: 20px;
       }
 
+      div.panel {
+        margin-top: 5px;
+      }
       span.panel {
-        text-size: xx-small;
-        border: solid 1px black;
-        margin-top: 20px;
         margin-left: 20px;
+        text-size: xx-small;
+      }
+      span.bordered {
+        border: solid 1px black;
       }
     </style>
   </head>
@@ -48,19 +52,27 @@
     <table id="main_board" class="board"></table>
 
     <div id="panels">
-      <span class="panel">
-        <input type="radio" name="mode" id="radio_mode_init" value="init">
-        <label for="radio_mode_init">置石</label>
-        <input type="radio" name="mode" id="radio_mode_turn" value="turn" checked>
-        <label for="radio_mode_turn">対戦</label>
-      </span>
-      <br />
-      <span class="panel">
-        <input type="radio" name="turn" id="radio_turn_black" value="black" checked>
-        <label for="radio_turn_black">黒番</label>
-        <input type="radio" name="turn" id="radio_turn_white" value="white">
-        <label for="radio_turn_white">白番</label>
-      </span>
+      <div class="panel">
+        <span class="panel">
+          <input type="submit" value="全消去" onclick="clearBoard();"></input>
+        </span>
+      </div>
+      <div class="panel">
+        <span class="panel bordered">
+          <input type="radio" name="mode" id="radio_mode_init" value="init">
+          <label for="radio_mode_init">置石</label>
+          <input type="radio" name="mode" id="radio_mode_turn" value="turn" checked>
+          <label for="radio_mode_turn">対戦</label>
+        </span>
+      </div>
+      <div class="panel">
+        <span class="panel bordered">
+          <input type="radio" name="turn" id="radio_turn_black" value="black" checked>
+          <label for="radio_turn_black">黒番</label>
+          <input type="radio" name="turn" id="radio_turn_white" value="white">
+          <label for="radio_turn_white">白番</label>
+        </span>
+      </div>
     </div>
   </body>
 </html>
