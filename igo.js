@@ -12,6 +12,7 @@ var boardDimension = {
 };
 
 const RADIO_MODE_INIT_ID  = "radio_mode_init";
+const RADIO_MODE_TURN_ID  = "radio_mode_turn";
 const RADIO_TURN_BLACK_ID = "radio_turn_black";
 const RADIO_TURN_WHITE_ID = "radio_turn_white";
 const ATTR_MARKED = 'marked';
@@ -31,6 +32,11 @@ function MoveSet() {
   this.inits = new Array();
   this.moves = new Array();
 
+  this.readInits = function(json) {
+    h = JSON.parse(json);
+    this.inits = h["inits"];
+    this.moves = new Array();
+  }
   this.writeInits = function(stone, x, y) {
     var init = stringifyMove(stone, x, y);
     this.inits = this.inits.filter(function(element, i, a) {
@@ -88,7 +94,19 @@ function parseMove(stringifiedMove) {
 
 function loadInits() {
   var moveDisplay = document.getElementById("moves_display");
-  alert(moveDisplay.value);
+  moveSet.readInits(moveDisplay.value);
+  setInitMode();
+  var inits = moveSet.inits;
+  for (var i = 0; i < inits.length; i++) {
+    var move = parseMove(inits[i]);
+    var stone = move[0];
+    var x     = move[1];
+    var y     = move[2];
+    setStone(x, y, stone);
+    updateCanvasDisplay(x, y);
+  }
+  setTurnMode();
+  displayMoveSet();
 }
 
 var moveSet = new MoveSet();
@@ -294,6 +312,14 @@ function unmarkAllStones() {
 
 function isInitMode() {
   return document.getElementById(RADIO_MODE_INIT_ID).checked;
+}
+
+function setInitMode() {
+  document.getElementById(RADIO_MODE_INIT_ID).checked = true;
+}
+
+function setTurnMode() {
+  document.getElementById(RADIO_MODE_TURN_ID).checked = true;
 }
 
 function isBlackTurn() {
