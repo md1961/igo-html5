@@ -86,6 +86,11 @@ function parseMove(stringifiedMove) {
   return retval;
 }
 
+function loadInits() {
+  var moveDisplay = document.getElementById("moves_display");
+  alert(moveDisplay.value);
+}
+
 var moveSet = new MoveSet();
 
 function initializeBoard(tableId) {
@@ -187,7 +192,7 @@ function removeLastMove() {
 
 function displayMoveSet() {
   var moveDisplay = document.getElementById("moves_display");
-  moveDisplay.firstChild.nodeValue = moveSet.toJson();
+  moveDisplay.value = moveSet.toJson();
 }
 
 function adjacentCoordsInArray(x, y) {
