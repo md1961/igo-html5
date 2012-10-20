@@ -159,9 +159,21 @@ function removeLastMove() {
   var x = lastMove[1];
   var y = lastMove[2];
   setStone(x, y, NONE);
+  updateCanvasDisplay(x, y);
+
+  if (moveWithTakens.length > 0) {
+    var movesTaken = moveWithTakens;
+    for (var i = 0; i < movesTaken.length; i++) {
+      var stone = movesTaken[i][0];
+      var x     = movesTaken[i][1];
+      var y     = movesTaken[i][2];
+      setStone(x, y, stone);
+      updateCanvasDisplay(x, y);
+    }
+  }
+
   toggleTurn();
 
-  updateCanvasDisplay(x, y);
   displayMoveSet();
 }
 
