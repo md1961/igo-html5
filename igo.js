@@ -31,6 +31,9 @@ function MoveSet() {
   this.inits = new Array();
   this.moves = new Array();
 
+  this.writeInits = function(stone, x, y) {
+    this.inits.push(stringifyMove(stone, x, y));
+  };
   this.writeMoves = function(stone, x, y, stonesTaken) {
     var move = stringifyMove(stone, x, y);
     if (stonesTaken.length > 0) {
@@ -43,7 +46,7 @@ function MoveSet() {
     return move;
   }
   this.toJson = function() {
-    return JSON.stringify({"moves": this.moves});
+    return JSON.stringify({"inits": this.inits, "moves": this.moves});
   };
 }
 
@@ -132,6 +135,7 @@ function putStone(x, y) {
     var turnCycle = isBlackTurn() ? [NONE, BLACK, WHITE] : [NONE, WHITE, BLACK];
     var stone = KumaUtil.nextInArray(getStone(x, y), turnCycle);
     setStone(x, y, stone);
+    moveSet.writeInits(stone, x, y);
   } else if (getStone(x, y) == NONE) {
     var currentTurn = getCurrentTurn();
     setStone(x, y, currentTurn);
@@ -146,11 +150,11 @@ function putStone(x, y) {
     }
 
     moveSet.writeMoves(currentTurn, x, y, stonesTaken);
-    displayMoveSet();
     toggleTurn();
   }
 
   updateCanvasDisplay(x, y);
+  displayMoveSet();
 }
 
 function removeLastMove() {
