@@ -53,6 +53,9 @@ function stringifyMove(stone, x, y) {
 
 function parseMove(stringifiedMove) {
   var m = stringifiedMove.match(/^([nbw]\d{2,})(?:\(([\w,]+)\))?$/);
+  if (! m) {
+    throw "Illegal stringified move '" + stringifiedMove + "'";
+  }
   var strMove = m[1];
   var strStonesTaken = m[2];
 
@@ -151,8 +154,15 @@ function putStone(x, y) {
 }
 
 function removeLastMove() {
-  var moveStringifiedWithTaken = moveSet.popLastMove();
+  moveWithTakens = parseMove(moveSet.popLastMove());
+  var lastMove = moveWithTakens.splice(0, 3);
+  var x = lastMove[1];
+  var y = lastMove[2];
+  setStone(x, y, NONE);
+  toggleTurn();
 
+  updateCanvasDisplay(x, y);
+  displayMoveSet();
 }
 
 function displayMoveSet() {
