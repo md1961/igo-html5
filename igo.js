@@ -5,9 +5,9 @@ window.onload = function() {
 
 var boardDimension = {
   margin:    10,
-  gridPitch: 25,  // must be odd
+  gridPitch: 24,  // recommended to be an even number
   numGrids:  19,
-  stoneDiameterShrinkage: 2,
+  stoneDiameterShrinkage: 1,
   starDiameter:           3,
 };
 
@@ -341,22 +341,23 @@ function setStone(x, y, stone) {
 function updateCanvasDisplay(x, y) {
   var dim = boardDimension;
 
+  var start = 0;
   var end = dim.gridPitch;
-  var mid = Math.floor(dim.gridPitch / 2) + 1;
+  var mid = Math.floor(dim.gridPitch / 2);
 
   var cxt = getCanvasContext(getCanvasId(x, y));
 
   cxt.fillStyle = RGB_WHITE;
-  cxt.clearRect(0, 0, end, end);
+  cxt.clearRect(start, start, end, end);
   cxt.beginPath();
 
   // horizontal line
-  var x0 = isLeftmost(x, y)  ? mid :   0;
+  var x0 = isLeftmost(x, y)  ? mid : start;
   var x1 = isRightmost(x, y) ? mid : end;
   cxt.moveTo(x0, mid);
   cxt.lineTo(x1, mid);
   // vertical line
-  var y0 = isTop(x, y)    ? mid :   0;
+  var y0 = isTop(x, y)    ? mid : start;
   var y1 = isBottom(x, y) ? mid : end;
   cxt.moveTo(mid, y0);
   cxt.lineTo(mid, y1);
