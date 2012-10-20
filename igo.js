@@ -32,7 +32,11 @@ function MoveSet() {
   this.moves = new Array();
 
   this.writeInits = function(stone, x, y) {
-    this.inits.push(stringifyMove(stone, x, y));
+    var init = stringifyMove(stone, x, y);
+    this.inits = this.inits.filter(function(element, i, a) {
+      return element.substr(1, 4) != init.substr(1, 4)
+    })
+    this.inits.push(init);
   };
   this.writeMoves = function(stone, x, y, stonesTaken) {
     var move = stringifyMove(stone, x, y);
