@@ -34,6 +34,7 @@ function MoveSet() {
 
   this.readInits = function(json) {
     h = JSON.parse(json);
+    this.title = h["title"];
     this.inits = h["inits"];
     this.moves = new Array();
   }
@@ -56,7 +57,11 @@ function MoveSet() {
     return move;
   }
   this.toJson = function() {
-    return JSON.stringify({"inits": this.inits, "moves": this.moves});
+    return JSON.stringify({
+      "title": this.title,
+      "inits": this.inits,
+      "moves": this.moves
+    });
   };
 }
 
@@ -96,6 +101,7 @@ function loadInits() {
   var moveDisplay = document.getElementById("moves_display");
   moveSet.readInits(moveDisplay.value);
   setInitMode();
+  displayTitle(moveSet.title);
   var inits = moveSet.inits;
   for (var i = 0; i < inits.length; i++) {
     var move = parseMove(inits[i]);
@@ -206,6 +212,12 @@ function removeLastMove() {
   toggleTurn();
 
   displayMoveSet();
+}
+
+function displayTitle(title) {
+  if (title) {
+    document.getElementById("title").innerText = title;
+  }
 }
 
 function displayMoveSet() {
