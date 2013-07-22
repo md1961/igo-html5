@@ -40,6 +40,10 @@
       span.bordered {
         border: solid 1px black;
       }
+
+      div#buttons_to_play {
+        display: none;
+      }
     </style>
   </head>
 
@@ -63,11 +67,11 @@
       </div>
       <div class="panel">
         <span class="panel bordered">
-          <input type="radio" name="mode" id="radio_mode_init" value="init">
+          <input type="radio" name="mode" id="radio_mode_init" value="init" onclick="radioModeHandler(this);">
           <label for="radio_mode_init">置石</label>
-          <input type="radio" name="mode" id="radio_mode_turn" value="turn" checked>
+          <input type="radio" name="mode" id="radio_mode_turn" value="turn" onclick="radioModeHandler(this);" checked>
           <label for="radio_mode_turn">対戦</label>
-          <input type="radio" name="mode" id="radio_mode_play" value="play">
+          <input type="radio" name="mode" id="radio_mode_play" value="play" onclick="radioModeHandler(this);">
           <label for="radio_mode_play">再現</label>
         </span>
       </div>
@@ -79,9 +83,16 @@
           <label for="radio_turn_white">白番</label>
         </span>
       </div>
-      <div class="panel">
-        <span id="numMoves" class="panel">
+      <div id="buttons_to_play" class="panel">
+        <span class="panel">
+          <input type="button" id="button_to_first"  value="|<">
+          <input type="button" id="button_prev_move" value="<" >
+          <input type="button" id="button_next_move" value=">" >
+          <input type="button" id="button_to_last"   value=">|">
         </span>
+      </div>
+      <div class="panel">
+        <span id="numMoves" class="panel" />
       </div>
       <div class="panel">
         <span class="panel">

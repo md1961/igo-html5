@@ -13,6 +13,7 @@ var boardDimension = {
 
 const RADIO_MODE_INIT_ID  = "radio_mode_init";
 const RADIO_MODE_TURN_ID  = "radio_mode_turn";
+const RADIO_MODE_PLAY_ID  = "radio_mode_play";
 const RADIO_TURN_BLACK_ID = "radio_turn_black";
 const RADIO_TURN_WHITE_ID = "radio_turn_white";
 const ATTR_MARKED = 'marked';
@@ -36,7 +37,7 @@ function MoveSet() {
     h = JSON.parse(json);
     this.title = h["title"];
     this.inits = h["inits"];
-    this.moves = new Array();
+    this.moves = h["moves"];
   }
   this.writeInits = function(stone, x, y) {
     var init = stringifyMove(stone, x, y);
@@ -332,6 +333,14 @@ function isInitMode() {
   return document.getElementById(RADIO_MODE_INIT_ID).checked;
 }
 
+function isTurnMode() {
+  return document.getElementById(RADIO_MODE_TURN_ID).checked;
+}
+
+function isPlayMode() {
+  return document.getElementById(RADIO_MODE_PLAY_ID).checked;
+}
+
 function setInitMode() {
   document.getElementById(RADIO_MODE_INIT_ID).checked = true;
 }
@@ -455,6 +464,15 @@ function isStar(x, y) {
     if (STAR_COORDS.indexOf(x) >= 0 && STAR_COORDS.indexOf(y) >= 0) {
       return true;
     }
+  }
+}
+
+function radioModeHandler(radioMode) {
+  var buttons_to_play = document.getElementById("buttons_to_play");
+  if (isPlayMode()) {
+    buttons_to_play.style.display = 'inline';
+  } else {
+    buttons_to_play.style.display = 'none';
   }
 }
 
