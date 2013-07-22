@@ -187,6 +187,7 @@ function putStone(x, y) {
   }
 
   updateCanvasDisplay(x, y);
+  updateNumMoves(moveSet.moves.length);
   displayMoveSet();
 }
 
@@ -197,6 +198,7 @@ function removeLastMove() {
   var y = lastMove[2];
   setStone(x, y, NONE);
   updateCanvasDisplay(x, y);
+  updateNumMoves(moveSet.moves.length);
 
   if (moveWithTakens.length > 0) {
     var movesTaken = moveWithTakens;
@@ -212,6 +214,10 @@ function removeLastMove() {
   toggleTurn();
 
   displayMoveSet();
+}
+
+function updateNumMoves(numMoves) {
+  document.getElementById("numMoves").innerText = numMoves;
 }
 
 function displayTitle(title) {
