@@ -7,7 +7,7 @@ var boardDimension = {
   margin:    10,
   gridPitch: 24,  // recommended to be an even number
   numGrids:  19,
-  stoneDiameterShrinkage: 1,
+  stoneDiameterShrinkage: 1.5,
   starDiameter:           3,
 };
 
@@ -23,7 +23,7 @@ const WHITE = 'white';
 const STONES = [NONE, BLACK, WHITE];
 const OUT_OF_BOUNDS = 'out_of_bounds';
 
-const DEFAULT_BOARD_COLOR = '#fb0';
+const DEFAULT_BOARD_COLOR = '#fff'; //'#fb0';
 const RGB_BLACK = 'rgb(0, 0, 0)';
 const RGB_WHITE = 'rgb(255, 255, 255)';
 
@@ -384,9 +384,9 @@ function setStone(x, y, stone) {
 function updateCanvasDisplay(x, y) {
   var dim = boardDimension;
 
-  var start = 0;
-  var end = dim.gridPitch;
-  var mid = Math.floor(dim.gridPitch / 2);
+  var start = 0 + 0.5;
+  var end = dim.gridPitch + 0.5;
+  var mid = Math.floor(dim.gridPitch / 2) + 0.5;
 
   var cxt = getCanvasContext(getCanvasId(x, y));
 
