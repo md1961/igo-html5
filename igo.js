@@ -8,7 +8,7 @@ var boardDimension = {
   gridPitch: 24,  // recommended to be an even number
   numGrids:  19,
   stoneDiameterShrinkage: 1.5,
-  starDiameter:           3,
+  starDiameter:           2.0,
 };
 
 const RADIO_MODE_INIT_ID  = "radio_mode_init";
