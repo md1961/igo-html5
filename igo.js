@@ -106,14 +106,18 @@ function loadInits() {
   var inits = moveSet.inits;
   for (var i = 0; i < inits.length; i++) {
     var move = parseMove(inits[i]);
-    var stone = move[0];
-    var x     = move[1];
-    var y     = move[2];
-    setStone(x, y, stone);
-    updateCanvasDisplay(x, y);
+    setStoneByMove(move);
   }
   setTurnMode();
   displayMoveSet();
+}
+
+function setStoneByMove(move) {
+  var stone = move[0];
+  var x     = move[1];
+  var y     = move[2];
+  setStone(x, y, stone);
+  updateCanvasDisplay(x, y);
 }
 
 var moveSet = new MoveSet();
@@ -155,7 +159,7 @@ function clearBoard() {
     }
   }
 
-  //TODO: clear moveSet
+  //TODO: clear moveSet, or create another function?
 }
 
 function gridClickHandler() {
@@ -204,11 +208,8 @@ function removeLastMove() {
   if (moveWithTakens.length > 0) {
     var movesTaken = moveWithTakens;
     for (var i = 0; i < movesTaken.length; i++) {
-      var stone = movesTaken[i][0];
-      var x     = movesTaken[i][1];
-      var y     = movesTaken[i][2];
-      setStone(x, y, stone);
-      updateCanvasDisplay(x, y);
+      var moveTaken = movesTaken[i];
+      setStoneByMove(moveTaken);
     }
   }
 
@@ -470,9 +471,25 @@ function isStar(x, y) {
 function radioModeHandler(radioMode) {
   var buttons_to_play = document.getElementById("buttons_to_play");
   if (isPlayMode()) {
-    buttons_to_play.style.display = 'inline';
+    initializeForPlayMode();
   } else {
     buttons_to_play.style.display = 'none';
   }
+}
+
+var indexPlay;
+
+function initializeForPlayMode() {
+  buttons_to_play.style.display = 'inline';
+
+  clearBoard();
+  loadInits();
+
+  indexPlay = 0;
+}
+
+function playNext() {
+  var move = moveSet.moves[indexPlay++];
+  setStoneByMove(move);
 }
 
