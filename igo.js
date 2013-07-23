@@ -108,7 +108,6 @@ function loadInits() {
     var move = parseMove(inits[i]);
     setStoneByMove(move);
   }
-  setTurnMode();
   displayMoveSet();
 }
 
@@ -350,6 +349,10 @@ function setTurnMode() {
   document.getElementById(RADIO_MODE_TURN_ID).checked = true;
 }
 
+function setPlayMode() {
+  document.getElementById(RADIO_MODE_PLAY_ID).checked = true;
+}
+
 function isBlackTurn() {
   return document.getElementById(RADIO_TURN_BLACK_ID).checked;
 }
@@ -484,12 +487,16 @@ function initializeForPlayMode() {
 
   clearBoard();
   loadInits();
+  setPlayMode();
 
   indexPlay = 0;
 }
 
 function playNext() {
-  var move = moveSet.moves[indexPlay++];
-  setStoneByMove(move);
+  if (indexPlay < moveSet.moves.length) {
+    var strMove = moveSet.moves[indexPlay++];
+    var move = parseMove(strMove);
+    setStoneByMove(move);
+  }
 }
 
