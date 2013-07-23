@@ -111,14 +111,6 @@ function loadInits() {
   displayMoveSet();
 }
 
-function setStoneByMove(move) {
-  var stone = move[0];
-  var x     = move[1];
-  var y     = move[2];
-  setStone(x, y, stone);
-  updateCanvasDisplay(x, y);
-}
-
 var moveSet = new MoveSet();
 
 function initializeBoard(tableId) {
@@ -196,13 +188,18 @@ function putStone(x, y) {
 }
 
 function removeLastMove() {
-  moveWithTakens = parseMove(moveSet.popLastMove());
-  var lastMove = moveWithTakens.splice(0, 3);
-  var x = lastMove[1];
-  var y = lastMove[2];
-  setStone(x, y, NONE);
-  updateCanvasDisplay(x, y);
+  removeMove(moveSet.popLastMove());
+
+  toggleTurn();
+
   updateNumMoves(moveSet.moves.length);
+  displayMoveSet();
+}
+
+function removeMove(strMove) {
+  moveWithTakens = parseMove(strMove);
+  var move = moveWithTakens.splice(0, 3);
+  removeStoneByMove(move);
 
   if (moveWithTakens.length > 0) {
     var movesTaken = moveWithTakens;
@@ -211,10 +208,35 @@ function removeLastMove() {
       setStoneByMove(moveTaken);
     }
   }
+}
 
-  toggleTurn();
+function putMove(strMove) {
+  moveWithTakens = parseMove(strMove);
+  var move = moveWithTakens.splice(0, 3);
+  setStoneByMove(move);
 
-  displayMoveSet();
+  if (moveWithTakens.length > 0) {
+    var movesTaken = moveWithTakens;
+    for (var i = 0; i < movesTaken.length; i++) {
+      var moveTaken = movesTaken[i];
+      removeStoneByMove(moveTaken);
+    }
+  }
+}
+
+function setStoneByMove(move) {
+  var stone = move[0];
+  var x     = move[1];
+  var y     = move[2];
+  setStone(x, y, stone);
+  updateCanvasDisplay(x, y);
+}
+
+function removeStoneByMove(move) {
+  var x = move[1];
+  var y = move[2];
+  setStone(x, y, NONE);
+  updateCanvasDisplay(x, y);
 }
 
 function updateNumMoves(numMoves) {
@@ -474,7 +496,7 @@ function isStar(x, y) {
 function radioModeHandler(radioMode) {
   var buttons_to_play = document.getElementById("buttons_to_play");
   if (isPlayMode()) {
-    initializeForPlayMode();
+    prepareForPlayMode();
   } else {
     buttons_to_play.style.display = 'none';
   }
@@ -482,7 +504,7 @@ function radioModeHandler(radioMode) {
 
 var indexPlay;
 
-function initializeForPlayMode() {
+function prepareForPlayMode() {
   buttons_to_play.style.display = 'inline';
 
   clearBoard();
@@ -492,11 +514,29 @@ function initializeForPlayMode() {
   indexPlay = 0;
 }
 
+function prepareForTurnMode() {
+  buttons_to_play.style.display = 'none';
+
+  clearBoard();
+  loadInits();
+
+  indexPlay = 0;
+  playToLast();
+
+  setTurnMode();
+}
+
 function playNext() {
-  if (indexPlay < moveSet.moves.length) {
-    var strMove = moveSet.moves[indexPlay++];
-    var move = parseMove(strMove);
-    setStoneByMove(move);
+  if (indexPlay >= moveSet.moves.length) {
+    return false;
   }
+
+  var strMove = moveSet.moves[indexPlay++];
+  putMove(strMove);
+  return true;
+}
+
+function playToLast() {
+  while (playNext()) {}
 }
 
