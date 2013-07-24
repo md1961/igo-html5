@@ -668,7 +668,7 @@ function putMovesToLast() {
 
 function playNext() {
   if (indexPlay >= moveSet.moves.length) {
-    indexPlay = moveSet.moves.length - 1;
+    indexPlay = moveSet.moves.length;
     return false;
   }
 
