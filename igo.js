@@ -33,12 +33,17 @@ function MoveSet() {
   this.inits = new Array();
   this.moves = new Array();
 
+  this.clear = function() {
+    this.title = "";
+    this.inits = new Array();
+    this.moves = new Array();
+  };
   this.readInits = function(json) {
     h = JSON.parse(json);
     this.title = h["title"];
     this.inits = h["inits"];
     this.moves = h["moves"];
-  }
+  };
   this.writeInits = function(stone, x, y) {
     var init = stringifyMove(stone, x, y);
     this.inits = this.inits.filter(function(element, i, a) {
@@ -56,7 +61,7 @@ function MoveSet() {
   this.popLastMove = function() {
     var move = this.moves.pop();
     return move;
-  }
+  };
   this.toJson = function() {
     return JSON.stringify({
       "title": this.title,
@@ -149,8 +154,13 @@ function clearBoard() {
       updateCanvasDisplay(x, y);
     }
   }
+}
 
-  //TODO: clear moveSet, or create another function?
+function clearAll() {
+  moveSet.clear();
+  displayMoveSet();
+
+  clearBoard();
 }
 
 function gridClickHandler() {
