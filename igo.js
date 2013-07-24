@@ -38,7 +38,7 @@ function MoveSet() {
     this.inits = new Array();
     this.moves = new Array();
   };
-  this.readInits = function(json) {
+  this.readDataInJson = function(json) {
     h = JSON.parse(json);
     this.title = h["title"];
     this.inits = h["inits"];
@@ -61,6 +61,18 @@ function MoveSet() {
   this.popLastMove = function() {
     var move = this.moves.pop();
     return move;
+  };
+  this.nextTurn = function() {
+    if (this.moves.length == 0) {
+      return null;  // TODO: Need to have next turn value
+    }
+    var lastStrMove = this.moves[this.moves.length - 1];
+    switch (lastStrMove[0]) {
+      case 'n': return null;
+      case 'b': return WHITE;
+      case 'w': return BLACK;
+      default : throw "Illegal stringified move '" + lastStrMove +"'"
+    }
   };
   this.toJson = function() {
     return JSON.stringify({
@@ -103,9 +115,7 @@ function parseMove(stringifiedMove) {
   return retval;
 }
 
-function loadInits() {
-  var moveDisplay = document.getElementById("moves_display");
-  moveSet.readInits(moveDisplay.value);
+function putInits() {
   setInitMode();
   displayTitle(moveSet.title);
   var inits = moveSet.inits;
@@ -113,6 +123,18 @@ function loadInits() {
     var move = parseMove(inits[i]);
     setStoneByMove(move);
   }
+}
+
+function readData() {
+  var moveDisplay = document.getElementById("moves_display");
+  moveSet.readDataInJson(moveDisplay.value);
+
+  putInits();
+  putMovesToLast();
+
+  setTurnMode();
+  setTurn(moveSet.nextTurn());
+
   displayMoveSet();
 }
 
@@ -273,14 +295,21 @@ function adjacentCoordsInArray(x, y) {
   ];
 }
 
+function isBlackTurn() {
+  return document.getElementById(RADIO_TURN_BLACK_ID).checked;
+}
+
 function toggleTurn() {
-  var radio_black = document.getElementById(RADIO_TURN_BLACK_ID);
-  var radio_white = document.getElementById(RADIO_TURN_WHITE_ID);
-  if (radio_black.checked) {
-    radio_white.checked = true;
-  } else {
-    radio_black.checked = true;
+  setTurn(isBlackTurn() ? WHITE : BLACK);
+}
+
+function setTurn(stone) {
+  if (stone != BLACK && stone != WHITE) {
+    throw "setTurn(): Argument stone must be BLACK or WHITE";
   }
+
+  var radioId = stone == BLACK ? RADIO_TURN_BLACK_ID : RADIO_TURN_WHITE_ID;
+  document.getElementById(radioId).checked = true;
 }
 
 function checkIfStoneTaken(x, y, currentTurn) {
@@ -383,10 +412,6 @@ function setTurnMode() {
 
 function setPlayMode() {
   document.getElementById(RADIO_MODE_PLAY_ID).checked = true;
-}
-
-function isBlackTurn() {
-  return document.getElementById(RADIO_TURN_BLACK_ID).checked;
 }
 
 function getCurrentTurn() {
@@ -518,7 +543,7 @@ function prepareForPlayMode() {
   buttons_to_play.style.display = 'inline';
 
   clearBoard();
-  loadInits();
+  putInits();
   setPlayMode();
 
   indexPlay = 0;
@@ -529,12 +554,16 @@ function prepareForTurnMode() {
   buttons_to_play.style.display = 'none';
 
   clearBoard();
-  loadInits();
-
-  indexPlay = 0;
-  playToLast();
+  putInits();
+  putMovesToLast();
 
   setTurnMode();
+  setTurn(moveSet.nextTurn());
+}
+
+function putMovesToLast() {
+  indexPlay = 0;
+  playToLast();
 }
 
 function playNext() {
