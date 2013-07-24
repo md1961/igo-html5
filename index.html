@@ -48,8 +48,6 @@
   </head>
 
   <body>
-    <div id="title">&nbsp;</div>
-
     <table id="main_board" class="board"></table>
 
     <div id="panels">
@@ -61,9 +59,6 @@
         <span class="panel">
           <input type="submit" value="全消去" onclick="clearAll();"></input>
         </span>
-      </div>
-      <div class="panel">
-        <label>&nbsp;</label>
       </div>
       <div class="panel">
         <span class="panel bordered">
@@ -89,18 +84,19 @@
           <input type="button" id="button_prev_move" value="<"  onclick="playPrev();">
           <input type="button" id="button_next_move" value=">"  onclick="playNext();">
           <input type="button" id="button_to_last"   value=">|" onclick="playToLast();">
+          &nbsp;&nbsp;
+          <input type="text"   id="num_move_to_go"   size="1">
+          手目へ
+          <input type="button" id="button_to_go"     value="GO" onclick="goToMove();">
         </span>
       </div>
       <div class="panel">
+        <span id="title" class="panel">&nbsp;</span>
         <span id="numMoves" class="panel" />
       </div>
       <div class="panel">
         <span class="panel">
           <textarea id="moves_display" cols="100" rows="24"></textarea>
-        </span>
-      </div>
-      <div class="panel">
-        <span class="panel">
           <input type="submit" value="盤面へ読込" onclick="readData();"></input>
         </span>
       </div>

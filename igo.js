@@ -116,12 +116,34 @@ function parseMove(stringifiedMove) {
 }
 
 function putInits() {
+  saveMode();
+
   setInitMode();
   displayTitle(moveSet.title);
   var inits = moveSet.inits;
   for (var i = 0; i < inits.length; i++) {
     var move = parseMove(inits[i]);
     setStoneByMove(move);
+  }
+
+  restoreMode();
+}
+
+var modeSaved;
+
+function saveMode() {
+  modeSaved = isInitMode() ? "init"
+            : isTurnMode() ? "turn"
+                           : "play";
+}
+
+function restoreMode() {
+  if (modeSaved == "init") {
+    setInitMode();
+  } else if (modeSaved == "turn") {
+    setTurnMode();
+  } else {
+    setPlayMode();
   }
 }
 
@@ -272,7 +294,8 @@ function removeStoneByMove(move) {
 }
 
 function updateNumMoves(numMoves) {
-  document.getElementById("numMoves").innerText = numMoves;
+  document.getElementById("numMoves").innerText
+      = numMoves + "手目 / 全" + moveSet.moves.length + "手";
 }
 
 function displayTitle(title) {
@@ -568,6 +591,7 @@ function putMovesToLast() {
 
 function playNext() {
   if (indexPlay >= moveSet.moves.length) {
+    indexPlay = moveSet.moves.length - 1;
     return false;
   }
 
@@ -580,6 +604,7 @@ function playNext() {
 
 function playPrev() {
   if (indexPlay <= 0) {
+    indexPlay = 0;
     return false;
   }
 
@@ -596,5 +621,17 @@ function playToLast() {
 
 function playToFirst() {
   while (playPrev()) {}
+}
+
+function goToMove() {
+  var num_move_to_go = parseInt(document.getElementById("num_move_to_go").value);
+
+  clearBoard();
+  putInits();
+
+  indexPlay = 0;
+  for (i = 0; i < num_move_to_go; i++) {
+    playNext();
+  }
 }
 
