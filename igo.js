@@ -33,6 +33,8 @@ const RGB_WHITE = 'rgb(255, 255, 255)';
 function MoveSet() {
   this.inits = new Array();
   this.moves = new Array();
+  this.isTempMode = false;
+  this.tempMoves = new Array();
 
   this.clear = function() {
     this.title = "";
@@ -60,12 +62,16 @@ function MoveSet() {
     if (stonesTaken.length > 0) {
       move += '(' + stonesTaken.join(',') + ')'
     }
-    this.moves.push(move);
+    var moves = this.isTempMode ? this.tempMoves : this.moves;
+    moves.push(move);
   };
 
   this.popLastMove = function() {
-    var move = this.moves.pop();
-    return move;
+    var moves = this.isTempMode ? this.tempMoves : this.moves;
+    if (moves.length == 0) {
+      return null;
+    }
+    return moves.pop();
   };
 
   this.nextTurn = function() {
@@ -78,6 +84,13 @@ function MoveSet() {
       case 'b': return WHITE;
       case 'w': return BLACK;
       default : throw "Illegal stringified move '" + lastStrMove +"'"
+    }
+  };
+
+  this.setTempMode = function(isTempMode) {
+    this.isTempMode = isTempMode;
+    if (isTempMode) {
+      this.tempMoves = this.moves.slice(0);
     }
   };
 
@@ -253,10 +266,7 @@ function putStone(x, y) {
       stonesTaken = stonesTaken.concat(stonesTakenHere);
     }
 
-    if (isTurnMode()) {
-      moveSet.writeMoves(currentTurn, x, y, stonesTaken);
-    }
-
+    moveSet.writeMoves(currentTurn, x, y, stonesTaken);
     toggleTurn();
 
     disableRadioToInitMode(true);
@@ -274,9 +284,7 @@ function disableRadioToInitMode(toBeDisabled) {
 
 function removeLastMove() {
   var moveToRemove = moveSet.moves[moveSet.moves.length - 1];
-  if (isTurnMode()) {
-    moveToRemove = moveSet.popLastMove();
-  }
+  moveToRemove = moveSet.popLastMove();
   removeMove(moveToRemove);
 
   toggleTurn();
@@ -627,6 +635,8 @@ function prepareForPlayMode() {
 }
 
 function prepareForTurnMode() {
+  moveSet.setTempMode(false);
+
   clearBoard();
   putInits();
   putMovesToLast();
@@ -643,6 +653,7 @@ var indexMovesToRestoreFromTempMode = null;
 
 function prepareForTempMode() {
   indexMovesToRestoreFromTempMode = indexPlay;
+  moveSet.setTempMode(true);
    
   setTempMode();
   setTurn(moveSet.nextTurn());
