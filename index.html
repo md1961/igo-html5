@@ -70,6 +70,8 @@
           <label for="radio_mode_turn">対戦</label>
           <input type="radio" name="mode" id="radio_mode_play" value="play" onclick="radioModeHandler(this);">
           <label for="radio_mode_play">再現</label>
+          <input type="radio" name="mode" id="radio_mode_temp" value="temp" onclick="radioModeHandler(this);">
+          <label for="radio_mode_temp">検討</label>
         </span>
       </div>
       <div class="panel">
@@ -92,7 +94,7 @@
           <input type="button" id="button_to_go"     value="GO" onclick="goToMove();">
         </span>
       </div>
-      <div class="panel">
+      <div id="info" class="panel">
         <span id="title" class="panel">&nbsp;</span>
         <span id="numMoves" class="panel" />
       </div>

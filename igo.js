@@ -14,6 +14,7 @@ var boardDimension = {
 const RADIO_MODE_INIT_ID  = "radio_mode_init";
 const RADIO_MODE_TURN_ID  = "radio_mode_turn";
 const RADIO_MODE_PLAY_ID  = "radio_mode_play";
+const RADIO_MODE_TEMP_ID  = "radio_mode_temp";
 const RADIO_TURN_BLACK_ID = "radio_turn_black";
 const RADIO_TURN_WHITE_ID = "radio_turn_white";
 const ATTR_MARKED = 'marked';
@@ -135,12 +136,13 @@ function putInits() {
   restoreMode();
 }
 
-var modeSaved;
+var modeSaved = null;
 
 function saveMode() {
   modeSaved = isInitMode() ? "init"
             : isTurnMode() ? "turn"
-                           : "play";
+            : isPlayMode() ? "play"
+                           : "temp";
 }
 
 function restoreMode() {
@@ -148,9 +150,15 @@ function restoreMode() {
     setInitMode();
   } else if (modeSaved == "turn") {
     setTurnMode();
-  } else {
+  } else if (modeSaved == "play") {
     setPlayMode();
+  } else if (modeSaved == "temp") {
+    setTempMode();
+  } else {
+    throw "Cannot call restoreMode() unless saveMode() was called in advance";
   }
+
+  modeSaved = null;
 }
 
 function readData() {
@@ -214,6 +222,7 @@ function clearBoard() {
 function clearAll() {
   moveSet.clear();
   setTurnMode();
+  setTurn(BLACK);
 
   clearBoard();
   disableRadioToInitMode(false);
@@ -244,7 +253,10 @@ function putStone(x, y) {
       stonesTaken = stonesTaken.concat(stonesTakenHere);
     }
 
-    moveSet.writeMoves(currentTurn, x, y, stonesTaken);
+    if (isTurnMode()) {
+      moveSet.writeMoves(currentTurn, x, y, stonesTaken);
+    }
+
     toggleTurn();
 
     disableRadioToInitMode(true);
@@ -261,7 +273,11 @@ function disableRadioToInitMode(toBeDisabled) {
 }
 
 function removeLastMove() {
-  removeMove(moveSet.popLastMove());
+  var moveToRemove = moveSet.moves[moveSet.moves.length - 1];
+  if (isTurnMode()) {
+    moveToRemove = moveSet.popLastMove();
+  }
+  removeMove(moveToRemove);
 
   toggleTurn();
 
@@ -313,6 +329,10 @@ function removeStoneByMove(move) {
 }
 
 function updateNumMoves(numMoves) {
+  if (isTempMode()) {
+    return;
+  }
+
   document.getElementById("numMoves").innerText
       = numMoves + "手目 / 全" + moveSet.moves.length + "手";
 }
@@ -444,6 +464,10 @@ function isPlayMode() {
   return document.getElementById(RADIO_MODE_PLAY_ID).checked;
 }
 
+function isTempMode() {
+  return document.getElementById(RADIO_MODE_TEMP_ID).checked;
+}
+
 function setInitMode() {
   document.getElementById(RADIO_MODE_INIT_ID).checked = true;
 }
@@ -454,6 +478,10 @@ function setTurnMode() {
 
 function setPlayMode() {
   document.getElementById(RADIO_MODE_PLAY_ID).checked = true;
+}
+
+function setTempMode() {
+  document.getElementById(RADIO_MODE_TEMP_ID).checked = true;
 }
 
 function getCurrentTurn() {
@@ -571,36 +599,66 @@ function isStar(x, y) {
 }
 
 function radioModeHandler(radioMode) {
-  var buttons_to_play = document.getElementById("buttons_to_play");
   if (isPlayMode()) {
     prepareForPlayMode();
   } else if (isTurnMode()) {
     prepareForTurnMode();
+  } else if (isTempMode()) {
+    prepareForTempMode();
   }
 }
 
 var indexPlay;
 
 function prepareForPlayMode() {
-  buttons_to_play.style.display = 'inline';
-
   clearBoard();
   putInits();
   setPlayMode();
 
   indexPlay = 0;
+  if (indexMovesToRestoreFromTempMode != null) {
+    goToMoveNumberOf(indexMovesToRestoreFromTempMode);
+    indexMovesToRestoreFromTempMode = null;
+  }
   updateNumMoves(indexPlay);
+
+  hideButtonsToPlay(false);
+  hideInfoDisplay(false);
 }
 
 function prepareForTurnMode() {
-  buttons_to_play.style.display = 'none';
-
   clearBoard();
   putInits();
   putMovesToLast();
 
   setTurnMode();
   setTurn(moveSet.nextTurn());
+
+  displayMoveSet();
+  hideButtonsToPlay(true);
+  hideInfoDisplay(false);
+}
+
+var indexMovesToRestoreFromTempMode = null;
+
+function prepareForTempMode() {
+  indexMovesToRestoreFromTempMode = indexPlay;
+   
+  setTempMode();
+  setTurn(moveSet.nextTurn());
+
+  hideButtonsToPlay(true);
+  hideInfoDisplay(true);
+}
+
+function hideButtonsToPlay(toBeHidden) {
+  var buttons_to_play = document.getElementById("buttons_to_play");
+  buttons_to_play.style.display = toBeHidden ? 'none' : 'inline';
+}
+
+function hideInfoDisplay(toBeHidden) {
+  var info = document.getElementById("info");
+  info.style.display = toBeHidden ? 'none' : 'block';
 }
 
 function putMovesToLast() {
@@ -644,12 +702,15 @@ function playToFirst() {
 
 function goToMove() {
   var num_move_to_go = parseInt(document.getElementById("num_move_to_go").value);
+  goToMoveNumberOf(num_move_to_go);
+}
 
+function goToMoveNumberOf(numMove) {
   clearBoard();
   putInits();
 
   indexPlay = 0;
-  for (i = 0; i < num_move_to_go; i++) {
+  for (i = 0; i < numMove; i++) {
     playNext();
   }
 }
