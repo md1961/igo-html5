@@ -497,8 +497,8 @@ function radioModeHandler(radioMode) {
   var buttons_to_play = document.getElementById("buttons_to_play");
   if (isPlayMode()) {
     prepareForPlayMode();
-  } else {
-    buttons_to_play.style.display = 'none';
+  } else if (isTurnMode()) {
+    prepareForTurnMode();
   }
 }
 
@@ -512,6 +512,7 @@ function prepareForPlayMode() {
   setPlayMode();
 
   indexPlay = 0;
+  updateNumMoves(indexPlay);
 }
 
 function prepareForTurnMode() {
@@ -533,10 +534,28 @@ function playNext() {
 
   var strMove = moveSet.moves[indexPlay++];
   putMove(strMove);
+  updateNumMoves(indexPlay);
+
+  return true;
+}
+
+function playPrev() {
+  if (indexPlay <= 0) {
+    return false;
+  }
+
+  var strMove = moveSet.moves[--indexPlay];
+  removeMove(strMove);
+  updateNumMoves(indexPlay);
+
   return true;
 }
 
 function playToLast() {
   while (playNext()) {}
+}
+
+function playToFirst() {
+  while (playPrev()) {}
 }
 
