@@ -38,12 +38,14 @@ function MoveSet() {
     this.inits = new Array();
     this.moves = new Array();
   };
+
   this.readDataInJson = function(json) {
     h = JSON.parse(json);
     this.title = h["title"];
     this.inits = h["inits"];
     this.moves = h["moves"];
   };
+
   this.writeInits = function(stone, x, y) {
     var init = stringifyMove(stone, x, y);
     this.inits = this.inits.filter(function(element, i, a) {
@@ -51,6 +53,7 @@ function MoveSet() {
     })
     this.inits.push(init);
   };
+
   this.writeMoves = function(stone, x, y, stonesTaken) {
     var move = stringifyMove(stone, x, y);
     if (stonesTaken.length > 0) {
@@ -58,10 +61,12 @@ function MoveSet() {
     }
     this.moves.push(move);
   };
+
   this.popLastMove = function() {
     var move = this.moves.pop();
     return move;
   };
+
   this.nextTurn = function() {
     if (this.moves.length == 0) {
       return null;  // TODO: Need to have next turn value
@@ -74,6 +79,7 @@ function MoveSet() {
       default : throw "Illegal stringified move '" + lastStrMove +"'"
     }
   };
+
   this.toJson = function() {
     return JSON.stringify({
       "title": this.title,
@@ -158,6 +164,7 @@ function readData() {
   setTurn(moveSet.nextTurn());
 
   displayMoveSet();
+  disableRadioToInitMode(true);
 }
 
 var moveSet = new MoveSet();
@@ -203,6 +210,7 @@ function clearBoard() {
 function clearAll() {
   moveSet.clear();
   displayMoveSet();
+  disableRadioToInitMode(false);
 
   clearBoard();
 }
@@ -234,11 +242,18 @@ function putStone(x, y) {
 
     moveSet.writeMoves(currentTurn, x, y, stonesTaken);
     toggleTurn();
+
+    disableRadioToInitMode(true);
   }
 
   updateCanvasDisplay(x, y);
   updateNumMoves(moveSet.moves.length);
   displayMoveSet();
+}
+
+function disableRadioToInitMode(toBeDisabled) {
+  var radioToInit = document.getElementById("radio_mode_init_with_label");
+  radioToInit.style.display = toBeDisabled ? 'none' : 'inline';
 }
 
 function removeLastMove() {
