@@ -205,14 +205,18 @@ function clearBoard() {
       updateCanvasDisplay(x, y);
     }
   }
+
+  document.getElementById("title").innerText = null;
+  document.getElementById("moves_display").value = null;
+  updateNumMoves(0);
 }
 
 function clearAll() {
   moveSet.clear();
-  displayMoveSet();
-  disableRadioToInitMode(false);
+  setTurnMode();
 
   clearBoard();
+  disableRadioToInitMode(false);
 }
 
 function gridClickHandler() {
