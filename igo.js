@@ -115,16 +115,9 @@ function parseMove(stringifiedMove) {
   var strMove = m[1];
   var strStonesTaken = m[2];
 
-  var stone;
-  switch (strMove[0]) {
-    case 'n': stone = NONE ; break;
-    case 'b': stone = BLACK; break;
-    case 'w': stone = WHITE; break;
-    default : throw "Illegal stringified move '" + strMove +"'"
-  }
-
-  x = parseInt(strMove.substr(1, 2));
-  y = parseInt(strMove.substr(3, 2));
+  var stone = getColorOfStone(strMove)
+  var x = parseInt(strMove.substr(1, 2));
+  var y = parseInt(strMove.substr(3, 2));
 
   retval = [stone, x, y];
   if (strStonesTaken) {
@@ -133,6 +126,15 @@ function parseMove(stringifiedMove) {
   }
 
   return retval;
+}
+
+function getColorOfStone(strMove) {
+  switch (strMove[0]) {
+    case 'n': return NONE ;
+    case 'b': return BLACK;
+    case 'w': return WHITE;
+    default : throw "Illegal stringified move '" + strMove +"'"
+  }
 }
 
 function putInits() {
@@ -628,6 +630,7 @@ function prepareForPlayMode() {
     goToMoveNumberOf(indexMovesToRestoreFromTempMode);
     indexMovesToRestoreFromTempMode = null;
   }
+  setTurn(getColorOfStone(moveSet.moves[indexPlay]));
   updateNumMoves(indexPlay);
 
   hideButtonsToPlay(false);
@@ -656,7 +659,6 @@ function prepareForTempMode() {
   moveSet.setTempMode(true);
    
   setTempMode();
-  setTurn(moveSet.nextTurn());
 
   hideButtonsToPlay(true);
   hideInfoDisplay(true);
@@ -685,6 +687,7 @@ function playNext() {
 
   var strMove = moveSet.moves[indexPlay++];
   putMove(strMove);
+  setTurn(getOpponent(getColorOfStone(strMove)));
   updateNumMoves(indexPlay);
 
   return true;
@@ -698,6 +701,7 @@ function playPrev() {
 
   var strMove = moveSet.moves[--indexPlay];
   removeMove(strMove);
+  setTurn(getColorOfStone(strMove));
   updateNumMoves(indexPlay);
 
   return true;
