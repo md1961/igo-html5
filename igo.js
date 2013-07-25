@@ -715,6 +715,14 @@ function playToFirst() {
   while (playPrev()) {}
 }
 
+function playToNextOf(step) {
+  for (i = 0; i < step && playNext(); i++) {}
+}
+
+function playToPrevOf(step) {
+  for (i = 0; i < step && playPrev(); i++) {}
+}
+
 function goToMove() {
   var num_move_to_go = parseInt(document.getElementById("num_move_to_go").value);
   goToMoveNumberOf(num_move_to_go);

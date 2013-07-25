@@ -85,10 +85,14 @@
       </div>
       <div id="buttons_to_play" class="panel">
         <span class="panel">
-          <input type="button" id="button_to_first"  value="|<" onclick="playToFirst();">
-          <input type="button" id="button_prev_move" value="<"  onclick="playPrev();">
-          <input type="button" id="button_next_move" value=">"  onclick="playNext();">
-          <input type="button" id="button_to_last"   value=">|" onclick="playToLast();">
+          <input type="button" id="button_to_first"  value="|<"  onclick="playToFirst();">
+          <input type="button" id="button_prev_ten"  value="<<<" onclick="playToPrevOf(10);">
+          <input type="button" id="button_prev_five" value="<<"  onclick="playToPrevOf(5);">
+          <input type="button" id="button_prev_move" value="<"   onclick="playPrev();">
+          <input type="button" id="button_next_move" value=">"   onclick="playNext();">
+          <input type="button" id="button_next_five" value=">>"  onclick="playToNextOf(5);">
+          <input type="button" id="button_next_ten"  value=">>>" onclick="playToNextOf(10);">
+          <input type="button" id="button_to_last"   value=">|"  onclick="playToLast();">
           &nbsp;&nbsp;
           <input type="text"   id="num_move_to_go"   size="1">
           手目へ
