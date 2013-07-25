@@ -62,16 +62,17 @@
       </div>
       <div class="panel">
         <span class="panel bordered">
-          <span id="radio_mode_init_with_label">
-            <input type="radio" name="mode" id="radio_mode_init" value="init" onclick="radioModeHandler(this);">
-            <label for="radio_mode_init">置石</label>
-          </span>
           <input type="radio" name="mode" id="radio_mode_turn" value="turn" onclick="radioModeHandler(this);" checked>
           <label for="radio_mode_turn">対戦</label>
           <input type="radio" name="mode" id="radio_mode_play" value="play" onclick="radioModeHandler(this);">
           <label for="radio_mode_play">再現</label>
           <input type="radio" name="mode" id="radio_mode_temp" value="temp" onclick="radioModeHandler(this);">
           <label for="radio_mode_temp">検討</label>
+          <span id="radio_mode_init_with_label">
+            &nbsp;
+            <input type="radio" name="mode" id="radio_mode_init" value="init" onclick="radioModeHandler(this);">
+            <label for="radio_mode_init">置石</label>
+          </span>
         </span>
       </div>
       <div class="panel">
