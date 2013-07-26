@@ -30,6 +30,33 @@ const RGB_BLACK = 'rgb(0, 0, 0)';
 const RGB_WHITE = 'rgb(255, 255, 255)';
 
 
+function MoveBook() {
+  this.moveSets = new Array();
+  this.cursor = null;
+
+  this.add = function(moveSet) {
+    this.moveSets.push(moveSet);
+  };
+
+  this.next = function() {
+    if (this.moveSets.length == 0) {
+      return null;
+    }
+
+    if (this.cursor == null) {
+      this.cursor = 0;
+    }
+
+    var retval = this.moveSets[this.cursor++];
+
+    if (this.cursor >= this.moveSets.length) {
+      this.cursor = 0;
+    }
+
+    return retval;
+  };
+}
+
 function MoveSet() {
   this.inits = new Array();
   this.moves = new Array();
@@ -103,10 +130,13 @@ function MoveSet() {
   };
 }
 
+// "b1604" などの文字列に変換
 function stringifyMove(stone, x, y) {
   return stone[0] + KumaUtil.zeroLeftPad(x, 2) + KumaUtil.zeroLeftPad(y, 2);
 }
 
+// (BLACK, 16, 4 [, ((WHITE, 17, 4), ...)]) などの配列に変換
+// 第四要素は取られた石の配列
 function parseMove(stringifiedMove) {
   var m = stringifiedMove.match(/^([nbw]\d{2,})(?:\(([\w,]+)\))?$/);
   if (! m) {
@@ -142,6 +172,7 @@ function putInits() {
 
   setInitMode();
   displayTitle(moveSet.title);
+
   var inits = moveSet.inits;
   for (var i = 0; i < inits.length; i++) {
     var move = parseMove(inits[i]);
@@ -224,7 +255,7 @@ function clearBoard() {
 
   for (y = 1; y <= dim.numGrids; y++) {
     for (x = 1; x <= dim.numGrids; x++) {
-      setStone(x, y, NONE);
+      drawStone(x, y, NONE);
       updateCanvasDisplay(x, y);
     }
   }
@@ -253,11 +284,11 @@ function putStone(x, y) {
   if (isInitMode()) {
     var turnCycle = isBlackTurn() ? [NONE, BLACK, WHITE] : [NONE, WHITE, BLACK];
     var stone = KumaUtil.nextInArray(getStone(x, y), turnCycle);
-    setStone(x, y, stone);
+    drawStone(x, y, stone);
     moveSet.writeInits(stone, x, y);
   } else if (getStone(x, y) == NONE) {
     var currentTurn = getCurrentTurn();
-    setStone(x, y, currentTurn);
+    drawStone(x, y, currentTurn);
 
     var stonesTaken = new Array();
     var adjs = adjacentCoordsInArray(x, y);
@@ -327,14 +358,14 @@ function setStoneByMove(move) {
   var stone = move[0];
   var x     = move[1];
   var y     = move[2];
-  setStone(x, y, stone);
+  drawStone(x, y, stone);
   updateCanvasDisplay(x, y);
 }
 
 function removeStoneByMove(move) {
   var x = move[1];
   var y = move[2];
-  setStone(x, y, NONE);
+  drawStone(x, y, NONE);
   updateCanvasDisplay(x, y);
 }
 
@@ -408,7 +439,7 @@ function takeStones() {
     for (x = 1; x <= dim.numGrids; x++) {
       if (isMarked(x, y)) {
         var stone = getStone(x, y);
-        setStone(x, y, NONE);
+        drawStone(x, y, NONE);
         stonesTaken.push(stringifyMove(stone, x, y));
         // TODO: Count up taken stones
 
@@ -528,9 +559,9 @@ function getStone(x, y) {
   return getCanvas(x, y).class;
 }
 
-function setStone(x, y, stone) {
+function drawStone(x, y, stone) {
   if (STONES.indexOf(stone) < 0) {
-    throw "setStone(): Argument stone must be NONE, BLACK or WHITE";
+    throw "drawStone(): Argument stone must be NONE, BLACK or WHITE";
   }
 
   var canvas = getCanvas(x, y);
