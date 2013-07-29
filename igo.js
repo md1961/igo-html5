@@ -275,6 +275,10 @@ function clearAll() {
 }
 
 function gridClickHandler() {
+  if (isPlayMode()) {
+    return;
+  }
+
   var x = parseInt(this.getAttribute('x_coord'));
   var y = parseInt(this.getAttribute('y_coord'));
   putStone(x, y);
