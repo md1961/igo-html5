@@ -117,7 +117,7 @@ function MoveSet() {
   this.setTempMode = function(isTempMode) {
     this.isTempMode = isTempMode;
     if (isTempMode) {
-      this.tempMoves = this.moves.slice(0);
+      this.tempMoves = new Array();
     }
   };
 
@@ -320,8 +320,11 @@ function disableRadioToInitMode(toBeDisabled) {
 }
 
 function removeLastMove() {
-  var moveToRemove = moveSet.moves[moveSet.moves.length - 1];
-  moveToRemove = moveSet.popLastMove();
+  var moveToRemove = moveSet.popLastMove();
+  if (moveToRemove == null) {
+    return;
+  }
+
   removeMove(moveToRemove);
 
   toggleTurn();
