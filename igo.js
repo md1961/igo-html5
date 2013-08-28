@@ -127,7 +127,7 @@ function MoveSet() {
     }
 
     var move = this.moves[index];
-    move = move.replace(/\[[^]]*\]/, '');
+    move = move.replace(/\[[^\]]*\]/, '');
     move += '[' + comment + ']';
     this.moves[index] = move;
   };
@@ -149,24 +149,27 @@ function stringifyMove(stone, x, y) {
 // (BLACK, 16, 4 [, ((WHITE, 17, 4), ...)]) などの配列に変換
 // 第四要素は取られた石の配列
 function parseMove(stringifiedMove) {
-  var m = stringifiedMove.match(/^([nbw]\d{2,})(?:\(([\w,]+)\))?$/);
+  var m = stringifiedMove.match(/^([nbw]\d{2,})(?:\(([\w,]+)\))?(?:\[([^\]]*)\])?$/);
   if (! m) {
     throw "Illegal stringified move '" + stringifiedMove + "'";
   }
-  var strMove = m[1];
+  var strMove        = m[1];
   var strStonesTaken = m[2];
+  var comment        = m[3];
 
   var stone = getColorOfStone(strMove)
   var x = parseInt(strMove.substr(1, 2));
   var y = parseInt(strMove.substr(3, 2));
 
   retval = [stone, x, y];
+
+  arrayOfStonesTaken = [];
   if (strStonesTaken) {
     arrayOfStrStoneTaken = strStonesTaken.split(',');
-    retval = retval.concat(arrayOfStrStoneTaken.map(parseMove));
+    arrayOfStonesTaken = arrayOfStrStoneTaken.map(parseMove);
   }
 
-  return retval;
+  return [stone, x, y, arrayOfStonesTaken, comment];
 }
 
 function getColorOfStone(strMove) {
@@ -350,12 +353,10 @@ function removeMove(strMove) {
   var move = moveWithTakens.splice(0, 3);
   removeStoneByMove(move);
 
-  if (moveWithTakens.length > 0) {
-    var movesTaken = moveWithTakens;
-    for (var i = 0; i < movesTaken.length; i++) {
-      var moveTaken = movesTaken[i];
-      setStoneByMove(moveTaken);
-    }
+  var movesTaken = moveWithTakens[0];
+  for (var i = 0; i < movesTaken.length; i++) {
+    var moveTaken = movesTaken[i];
+    setStoneByMove(moveTaken);
   }
 }
 
@@ -364,20 +365,23 @@ function putMove(strMove) {
   var move = moveWithTakens.splice(0, 3);
   setStoneByMove(move);
 
-  if (moveWithTakens.length > 0) {
-    var movesTaken = moveWithTakens;
-    for (var i = 0; i < movesTaken.length; i++) {
-      var moveTaken = movesTaken[i];
-      removeStoneByMove(moveTaken);
-    }
+  var movesTaken = moveWithTakens[0];
+  for (var i = 0; i < movesTaken.length; i++) {
+    var moveTaken = movesTaken[i];
+    removeStoneByMove(moveTaken);
   }
+
+  var comment = moveWithTakens[1];
+  displayComment(comment);
 }
 
 function setStoneByMove(move) {
-  var stone = move[0];
-  var x     = move[1];
-  var y     = move[2];
+  var stone   = move[0];
+  var x       = move[1];
+  var y       = move[2];
+  var comment = move[4];
   drawStone(x, y, stone);
+  displayComment(comment);
   updateCanvasDisplay(x, y);
 }
 
@@ -416,8 +420,12 @@ function addComment() {
 }
 
 function clearComment() {
+  displayComment(null);
+}
+
+function displayComment(_comment) {
   var comment = document.getElementById("comment");
-  comment.value = null;
+  comment.value = _comment == undefined ? null : _comment;
 }
 
 function adjacentCoordsInArray(x, y) {
