@@ -105,6 +105,12 @@
       </div>
       <div class="panel">
         <span class="panel">
+          <input type="text" id="comment" size="80" />
+          <input type="button" id="button_to_add_comment" value="コメント記入" onclick="addComment();">
+        </span>
+      </div>
+      <div class="panel">
+        <span class="panel">
           <textarea id="moves_display" cols="100" rows="24"></textarea>
           <input type="submit" value="盤面へ読込" onclick="readData();"></input>
         </span>
