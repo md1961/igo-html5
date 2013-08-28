@@ -132,6 +132,15 @@ function MoveSet() {
     this.moves[index] = move;
   };
 
+  this.getComment = function(index) {
+    if (index < 0 || index >= this.moves.length) {
+      index = this.moves.length - 1;
+    }
+
+    var move = this.moves[index];
+    return parseMove(move)[4];
+  };
+
   this.toJson = function() {
     return JSON.stringify({
       "title": this.title,
@@ -769,9 +778,12 @@ function playPrev() {
     return false;
   }
 
-  var strMove = moveSet.moves[--indexPlay];
+  indexPlay--;
+  var strMove = moveSet.moves[indexPlay];
+  var comment = moveSet.getComment(indexPlay - 1);
   removeMove(strMove);
   setTurn(getColorOfStone(strMove));
+  displayComment(comment);
   updateNumMoves(indexPlay);
 
   return true;
