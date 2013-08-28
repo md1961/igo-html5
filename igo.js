@@ -121,6 +121,17 @@ function MoveSet() {
     }
   };
 
+  this.addComment = function(comment, index) {
+    if (index < 0 || index >= this.moves.length) {
+      index = this.moves.length - 1;
+    }
+
+    var move = this.moves[index];
+    move = move.replace(/\[[^]]*\]/, '');
+    move += '[' + comment + ']';
+    this.moves[index] = move;
+  };
+
   this.toJson = function() {
     return JSON.stringify({
       "title": this.title,
@@ -305,6 +316,7 @@ function putStone(x, y) {
 
     moveSet.writeMoves(currentTurn, x, y, stonesTaken);
     toggleTurn();
+    clearComment();
 
     disableRadioToInitMode(true);
   }
@@ -394,6 +406,18 @@ function displayTitle(title) {
 function displayMoveSet() {
   var moveDisplay = document.getElementById("moves_display");
   moveDisplay.value = moveSet.toJson();
+}
+
+function addComment() {
+  var comment = document.getElementById("comment");
+  moveSet.addComment(comment.value, -1);
+
+  displayMoveSet();
+}
+
+function clearComment() {
+  var comment = document.getElementById("comment");
+  comment.value = null;
 }
 
 function adjacentCoordsInArray(x, y) {
