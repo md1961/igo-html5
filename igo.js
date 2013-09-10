@@ -133,7 +133,9 @@ function MoveSet() {
   };
 
   this.getComment = function(index) {
-    if (index < 0 || index >= this.moves.length) {
+    if (index < 0) {
+      return null;
+    } else if (index >= this.moves.length) {
       index = this.moves.length - 1;
     }
 
@@ -702,6 +704,7 @@ var indexPlay;
 
 function prepareForPlayMode() {
   clearBoard();
+  clearComment();
   putInits();
   setPlayMode();
 
