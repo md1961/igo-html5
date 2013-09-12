@@ -57,7 +57,13 @@
         </span>
         &nbsp;&nbsp;&nbsp;&nbsp;
         <span class="panel">
-          <input type="submit" value="全消去" onclick="clearAll();"></input>
+          <input type="submit" value="全消去" onclick="clearAll();" disabled></input>
+        </span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span id="buttons_to_browze_move_sets" class="panel">
+          <input type="button" id="button_to_prev_move_set" value="< 前譜" onclick="prevMoveSet();" disabled>
+          &nbsp;&nbsp;
+          <input type="button" id="button_to_next_move_set" value="次譜 >" onclick="nextMoveSet();" disabled>
         </span>
       </div>
       <div class="panel">
@@ -83,6 +89,12 @@
           <label for="radio_turn_white">白番</label>
         </span>
       </div>
+      <div id="info" class="panel">
+        <span class="panel">
+          <span id="title">(No Title)</span>
+          <span id="numMoves" />
+        </span>
+      </div>
       <div id="buttons_to_play" class="panel">
         <span class="panel">
           <input type="button" id="button_to_first"  value="|<"  onclick="playToFirst();">
@@ -99,10 +111,6 @@
           手目へ
           <input type="button" id="button_to_go"     value="GO" onclick="goToMove();">
         </span>
-      </div>
-      <div id="info" class="panel">
-        <span id="title" class="panel">&nbsp;</span>
-        <span id="numMoves" class="panel" />
       </div>
       <div class="panel">
         <span class="panel">
