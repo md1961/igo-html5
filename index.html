@@ -121,7 +121,10 @@
       <div class="panel">
         <span class="panel">
           <textarea id="moves_display" cols="100" rows="24"></textarea>
-          <input type="submit" value="盤面へ読込" onclick="readData();"></input>
+          <input type="button" value="盤面へ読込" onclick="readData();"></input>
+          &nbsp;&nbsp;
+          <input type="button" value="Localへ書込"   onclick="writeDataToLocalStorage();"></input>
+          <input type="button" value="Localから読込" onclick="readDataFromLocalStorage();"></input>
         </span>
       </div>
     </div>

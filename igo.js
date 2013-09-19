@@ -29,6 +29,8 @@ const DEFAULT_BOARD_COLOR = '#fff'; //'#fb0';
 const RGB_BLACK = 'rgb(0, 0, 0)';
 const RGB_WHITE = 'rgb(255, 255, 255)';
 
+const KEY_FOR_DATA_IN_LOCAL_STORAGE = 'igoHtml5_keyForData';
+
 
 function MoveBook() {
   this.moveSets = new Array();
@@ -244,6 +246,28 @@ function readData() {
 
   displayMoveSet();
   disableRadioToInitMode(true);
+}
+
+function readDataFromLocalStorage() {
+  if (isLocalStorageAvailable()) {
+    var moveDisplay = document.getElementById("moves_display");
+    var data = localStorage.getItem(KEY_FOR_DATA_IN_LOCAL_STORAGE);
+
+    moveDisplay.value = data;
+    readData();
+  }
+}
+
+function writeDataToLocalStorage() {
+  if (isLocalStorageAvailable()) {
+    var moveDisplay = document.getElementById("moves_display");
+
+    localStorage.setItem(KEY_FOR_DATA_IN_LOCAL_STORAGE, moveDisplay.value);
+  }
+}
+
+function isLocalStorageAvailable() {
+  return (typeof localStorage !== 'undefined');
 }
 
 var moveSet = new MoveSet();
