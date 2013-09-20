@@ -260,6 +260,11 @@ function readDataFromLocalStorage() {
 
 function writeDataToLocalStorage() {
   if (isLocalStorageAvailable()) {
+    var data = localStorage.getItem(KEY_FOR_DATA_IN_LOCAL_STORAGE);
+    if (data != null && ! confirm("いま保存されているデータを上書きしていいですか？")) {
+      return;
+    }
+
     var moveDisplay = document.getElementById("moves_display");
 
     localStorage.setItem(KEY_FOR_DATA_IN_LOCAL_STORAGE, moveDisplay.value);
