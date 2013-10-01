@@ -265,9 +265,7 @@ function writeDataToLocalStorage() {
       return;
     }
 
-    var moveDisplay = document.getElementById("moves_display");
-
-    localStorage.setItem(KEY_FOR_DATA_IN_LOCAL_STORAGE, moveDisplay.value);
+    localStorage.setItem(KEY_FOR_DATA_IN_LOCAL_STORAGE, moveSet.toJson());
   }
 }
 
