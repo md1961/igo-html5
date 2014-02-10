@@ -60,16 +60,16 @@ function MoveBook() {
 }
 
 function MoveSet() {
-  this.inits = new Array();
-  this.moves = new Array();
-  this.isTempMode = false;
-  this.tempMoves = new Array();
 
   this.clear = function() {
     this.title = "";
     this.inits = new Array();
     this.moves = new Array();
   };
+
+  this.clear();
+  this.isTempMode = false;
+  this.tempMoves = new Array();
 
   this.readDataInJson = function(json) {
     h = JSON.parse(json);
