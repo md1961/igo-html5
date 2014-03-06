@@ -554,7 +554,7 @@ function isMarked(x, y) {
 }
 
 function markStone(x, y) {
-  getCanvas(x, y).setAttribute(ATTR_MARKED);
+  getCanvas(x, y).setAttribute(ATTR_MARKED, ATTR_MARKED);
 }
 
 function unmarkStone(x, y) {
