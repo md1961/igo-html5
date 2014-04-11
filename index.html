@@ -19,8 +19,6 @@
     <style>
       table.board {
         border-spacing: 0px;
-        padding: 3px;
-        float: left;
       }
       table.board tr td {
         float: left;
@@ -28,7 +26,6 @@
       }
 
       div#panels {
-        margin-top: 20px;
       }
       div.panel {
         margin-top: 5px;
@@ -109,7 +106,9 @@
           <input type="button" id="button_next_five" value="5>"  onclick="playToNextOf(5);">
           <input type="button" id="button_next_ten"  value="10>" onclick="playToNextOf(10);">
           <input type="button" id="button_to_last"   value=">|"  onclick="playToLast();">
-          &nbsp;&nbsp;
+        </span>
+        <br />
+        <span class="panel">
           <input type="text"   id="num_move_to_go"   size="1">
           手目へ
           <input type="button" id="button_to_go"     value="GO" onclick="goToMove();">
@@ -117,13 +116,16 @@
       </div>
       <div class="panel">
         <span class="panel">
-          <input type="text" id="comment" size="80" />
+          <input type="text" id="comment" size="60" />
           <input type="button" id="button_to_add_comment" value="コメント記入" onclick="addComment();">
         </span>
       </div>
       <div class="panel">
         <span class="panel">
-          <textarea id="moves_display" cols="100" rows="24"></textarea>
+          <textarea id="moves_display" cols="55" rows="10"></textarea>
+        </span>
+        <br />
+        <span class="panel">
           <input type="button" value="盤面へ読込" onclick="readData();"></input>
           &nbsp;&nbsp;
           <input type="button" value="Localへ書込"   onclick="writeDataToLocalStorage();"></input>
