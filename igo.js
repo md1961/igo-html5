@@ -740,7 +740,13 @@ function prepareForPlayMode() {
     goToMoveNumberOf(indexMovesToRestoreFromTempMode);
     indexMovesToRestoreFromTempMode = null;
   }
-  setTurn(getColorOfStone(moveSet.moves[indexPlay]));
+  var nextTurn;
+  if (indexPlay < moveSet.moves.length) {
+    nextTurn = getColorOfStone(moveSet.moves[indexPlay]);
+  } else {
+    nextTurn = getOpponent(getColorOfStone(moveSet.moves[indexPlay - 1]));
+  }
+  setTurn(nextTurn);
   updateNumMoves(indexPlay);
 
   hideButtonsToPlay(false);
