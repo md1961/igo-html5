@@ -174,8 +174,6 @@ function parseMove(stringifiedMove) {
   var x = parseInt(strMove.substr(1, 2));
   var y = parseInt(strMove.substr(3, 2));
 
-  retval = [stone, x, y];
-
   arrayOfStonesTaken = [];
   if (strStonesTaken) {
     arrayOfStrStoneTaken = strStonesTaken.split(',');
