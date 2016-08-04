@@ -38,7 +38,19 @@ function MoveBook() {
 
   this.add = function(moveSet) {
     this.moveSets.push(moveSet);
+
+    if (this.cursor == null) {
+      this.cursor = 0;
+    }
   };
+
+  this.current = function() {
+    if (this.cursor == null) {
+      return null;
+    }
+
+    return this.moveSets[this.cursor];
+  }
 
   this.next = function() {
     if (this.moveSets.length == 0) {
@@ -49,13 +61,13 @@ function MoveBook() {
       this.cursor = 0;
     }
 
-    var retval = this.moveSets[this.cursor++];
+    var nextSet = this.moveSets[this.cursor++];
 
     if (this.cursor >= this.moveSets.length) {
       this.cursor = 0;
     }
 
-    return retval;
+    return nextSet;
   };
 }
 
@@ -153,6 +165,13 @@ function MoveSet() {
     });
   };
 }
+
+
+var moveSet = new MoveSet();
+
+var moveBook = new MoveBook();
+moveBook.add(moveSet);
+
 
 // "b1604" などの文字列に変換
 function stringifyMove(stone, x, y) {
@@ -270,8 +289,6 @@ function writeDataToLocalStorage() {
 function isLocalStorageAvailable() {
   return (typeof localStorage !== 'undefined');
 }
-
-var moveSet = new MoveSet();
 
 function initializeBoard(tableId) {
   var dim = boardDimension;
