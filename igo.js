@@ -33,7 +33,7 @@ const KEY_FOR_DATA_IN_LOCAL_STORAGE = 'igoHtml5_keyForData';
 
 
 function MoveBook() {
-  this.moveSets = new Array();
+  this.moveSets = [];
   this.cursor = null;
 
   this.add = function(moveSet) {
@@ -98,13 +98,13 @@ function MoveSet() {
 
   this.clear = function() {
     this.title = "";
-    this.inits = new Array();
-    this.moves = new Array();
+    this.inits = [];
+    this.moves = [];
   };
 
   this.clear();
   this.isTempMode = false;
-  this.tempMoves = new Array();
+  this.tempMoves = [];
 
   this.writeInits = function(stone, x, y) {
     var init = stringifyMove(stone, x, y);
@@ -147,7 +147,7 @@ function MoveSet() {
   this.setTempMode = function(isTempMode) {
     this.isTempMode = isTempMode;
     if (isTempMode) {
-      this.tempMoves = new Array();
+      this.tempMoves = [];
     }
   };
 
@@ -383,7 +383,7 @@ function putStone(x, y) {
     var currentTurn = getCurrentTurn();
     drawStone(x, y, currentTurn);
 
-    var stonesTaken = new Array();
+    var stonesTaken = [];
     var adjs = adjacentCoordsInArray(x, y);
     for (var i = 0; i < adjs.length; i++) {
       var xAdj = adjs[i][0];
@@ -534,10 +534,10 @@ function checkIfStoneTaken(x, y, currentTurn) {
   var stone = getStone(x, y);
   var opponent = getOpponent(currentTurn);
   if (stone != opponent) {
-    return new Array();
+    return [];
   }
 
-  var stonesTaken = new Array();
+  var stonesTaken = [];
   if (isDead(x, y)) {
     stonesTaken = takeStones();
   }
@@ -549,7 +549,7 @@ function checkIfStoneTaken(x, y, currentTurn) {
 function takeStones() {
   var dim = boardDimension;
 
-  var stonesTaken = new Array();
+  var stonesTaken = [];
   for (y = 1; y <= dim.numGrids; y++) {
     for (x = 1; x <= dim.numGrids; x++) {
       if (isMarked(x, y)) {
