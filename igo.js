@@ -41,6 +41,7 @@ function MoveBook() {
     if (this.cursor === null) {
       this.cursor = 0;
     }
+    return this.current();
   };
 
   this.current = function() {
@@ -199,8 +200,24 @@ function MoveSet() {
 
 
 var moveBook = new MoveBook();
-moveBook.add(new MoveSet());
-var moveSet = moveBook.current();
+var moveSet;
+
+
+function newMoveSet() {
+  moveSet = moveBook.add(new MoveSet());
+}
+
+
+newMoveSet();
+
+
+function prevMoveSet() {
+  moveSet = moveBook.prev();
+}
+
+function nextMoveSet() {
+  moveSet = moveBook.next();
+}
 
 
 // "b1604" などの文字列に変換
