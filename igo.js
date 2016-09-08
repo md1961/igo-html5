@@ -109,15 +109,15 @@ function MoveSet() {
   this.writeInits = function(stone, x, y) {
     var init = stringifyMove(stone, x, y);
     this.inits = this.inits.filter(function(element, i, a) {
-      return element.substr(1, 4) != init.substr(1, 4)
-    })
+      return element.substr(1, 4) != init.substr(1, 4);
+    });
     this.inits.push(init);
   };
 
   this.writeMoves = function(stone, x, y, stonesTaken) {
     var move = stringifyMove(stone, x, y);
     if (stonesTaken.length > 0) {
-      move += '(' + stonesTaken.join(',') + ')'
+      move += '(' + stonesTaken.join(',') + ')';
     }
     var moves = this.isTempMode ? this.tempMoves : this.moves;
     moves.push(move);
@@ -140,7 +140,7 @@ function MoveSet() {
       case 'n': return null;
       case 'b': return WHITE;
       case 'w': return BLACK;
-      default : throw "Illegal stringified move '" + lastStrMove +"'"
+      default : throw "Illegal stringified move '" + lastStrMove +"'";
     }
   };
 
@@ -211,7 +211,7 @@ function parseMove(stringifiedMove) {
   var strStonesTaken = m[2];
   var comment        = m[3];
 
-  var stone = getColorOfStone(strMove)
+  var stone = getColorOfStone(strMove);
   var x = parseInt(strMove.substr(1, 2));
   var y = parseInt(strMove.substr(3, 2));
 
@@ -229,7 +229,7 @@ function getColorOfStone(strMove) {
     case 'n': return NONE ;
     case 'b': return BLACK;
     case 'w': return WHITE;
-    default : throw "Illegal stringified move '" + strMove +"'"
+    default : throw "Illegal stringified move '" + strMove +"'";
   }
 }
 
