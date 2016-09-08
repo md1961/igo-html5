@@ -62,6 +62,22 @@ function MoveBook() {
     }
     return nextSet;
   };
+
+  this.readDataInJson = function(json) {
+    var arrayOfHash = JSON.parse(json);
+    for (h in arrayOfHash) {
+      var _moveSet = new MoveSet();
+      _moveSet.readDataInJson(JSON.stringify(h));
+      this.add(_moveSet);
+    }
+  };
+
+  this.toJson = function() {
+    var arrayOfHash = this.moveSets.map(function(moveSet) {
+      JSON.parse(moveSet.toJson());
+    });
+    return JSON.stringify(arrayOfHash);
+  };
 }
 
 function MoveSet() {
