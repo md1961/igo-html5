@@ -174,7 +174,7 @@ function MoveSet() {
   };
 
   this.readDataInJson = function(json) {
-    h = JSON.parse(json);
+    var h = JSON.parse(json);
     this.title = h["title"];
     this.inits = h["inits"];
     this.moves = h["moves"];
