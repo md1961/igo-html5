@@ -38,7 +38,6 @@ function MoveBook() {
 
   this.add = function(moveSet) {
     this.moveSets.push(moveSet);
-
     if (this.cursor == null) {
       this.cursor = 0;
     }
@@ -48,25 +47,19 @@ function MoveBook() {
     if (this.cursor == null) {
       return null;
     }
-
     return this.moveSets[this.cursor];
   }
 
   this.next = function() {
     if (this.moveSets.length == 0) {
       return null;
-    }
-
-    if (this.cursor == null) {
+    } else if (this.cursor == null) {
       this.cursor = 0;
     }
-
     var nextSet = this.moveSets[this.cursor++];
-
     if (this.cursor >= this.moveSets.length) {
       this.cursor = 0;
     }
-
     return nextSet;
   };
 }
@@ -82,13 +75,6 @@ function MoveSet() {
   this.clear();
   this.isTempMode = false;
   this.tempMoves = new Array();
-
-  this.readDataInJson = function(json) {
-    h = JSON.parse(json);
-    this.title = h["title"];
-    this.inits = h["inits"];
-    this.moves = h["moves"];
-  };
 
   this.writeInits = function(stone, x, y) {
     var init = stringifyMove(stone, x, y);
@@ -157,6 +143,13 @@ function MoveSet() {
     return parseMove(move)[4];
   };
 
+  this.readDataInJson = function(json) {
+    h = JSON.parse(json);
+    this.title = h["title"];
+    this.inits = h["inits"];
+    this.moves = h["moves"];
+  };
+
   this.toJson = function() {
     return JSON.stringify({
       "title": this.title,
@@ -167,10 +160,9 @@ function MoveSet() {
 }
 
 
-var moveSet = new MoveSet();
-
 var moveBook = new MoveBook();
-moveBook.add(moveSet);
+moveBook.add(new MoveSet());
+var moveSet = moveBook.current();
 
 
 // "b1604" などの文字列に変換
