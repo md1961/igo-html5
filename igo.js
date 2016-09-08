@@ -215,9 +215,9 @@ function parseMove(stringifiedMove) {
   var x = parseInt(strMove.substr(1, 2));
   var y = parseInt(strMove.substr(3, 2));
 
-  arrayOfStonesTaken = [];
+  var arrayOfStonesTaken = [];
   if (strStonesTaken) {
-    arrayOfStrStoneTaken = strStonesTaken.split(',');
+    var arrayOfStrStoneTaken = strStonesTaken.split(',');
     arrayOfStonesTaken = arrayOfStrStoneTaken.map(parseMove);
   }
 
@@ -317,10 +317,10 @@ function initializeBoard(tableId) {
 
   var table = document.getElementById(tableId);
   table.style.backgroundColor = DEFAULT_BOARD_COLOR;
-  for (y = 1; y <= dim.numGrids; y++) {
+  for (var y = 1; y <= dim.numGrids; y++) {
     var row = document.createElement('tr');
     table.appendChild(row);
-    for (x = 1; x <= dim.numGrids; x++) {
+    for (var x = 1; x <= dim.numGrids; x++) {
       var cell = document.createElement('td');
       row.appendChild(cell);
       var canvas = document.createElement('canvas');
@@ -342,8 +342,8 @@ function initializeBoard(tableId) {
 function clearBoard() {
   var dim = boardDimension;
 
-  for (y = 1; y <= dim.numGrids; y++) {
-    for (x = 1; x <= dim.numGrids; x++) {
+  for (var y = 1; y <= dim.numGrids; y++) {
+    for (var x = 1; x <= dim.numGrids; x++) {
       drawStone(x, y, NONE);
       updateCanvasDisplay(x, y);
     }
@@ -424,7 +424,7 @@ function removeLastMove() {
 }
 
 function removeMove(strMove) {
-  moveWithTakens = parseMove(strMove);
+  var moveWithTakens = parseMove(strMove);
   var move = moveWithTakens.splice(0, 3);
   removeStoneByMove(move);
 
@@ -436,7 +436,7 @@ function removeMove(strMove) {
 }
 
 function putMove(strMove) {
-  moveWithTakens = parseMove(strMove);
+  var moveWithTakens = parseMove(strMove);
   var move = moveWithTakens.splice(0, 3);
   setStoneByMove(move);
 
@@ -550,8 +550,8 @@ function takeStones() {
   var dim = boardDimension;
 
   var stonesTaken = [];
-  for (y = 1; y <= dim.numGrids; y++) {
-    for (x = 1; x <= dim.numGrids; x++) {
+  for (var y = 1; y <= dim.numGrids; y++) {
+    for (var x = 1; x <= dim.numGrids; x++) {
       if (isMarked(x, y)) {
         var stone = getStone(x, y);
         drawStone(x, y, NONE);
@@ -601,8 +601,8 @@ function unmarkStone(x, y) {
 function unmarkAllStones() {
   var dim = boardDimension;
 
-  for (y = 1; y <= dim.numGrids; y++) {
-    for (x = 1; x <= dim.numGrids; x++) {
+  for (var y = 1; y <= dim.numGrids; y++) {
+    for (var x = 1; x <= dim.numGrids; x++) {
       unmarkStone(x, y);
     }
   }
@@ -878,11 +878,11 @@ function playToFirst() {
 }
 
 function playToNextOf(step) {
-  for (i = 0; i < step && playNext(); i++) {}
+  for (var i = 0; i < step && playNext(); i++) {}
 }
 
 function playToPrevOf(step) {
-  for (i = 0; i < step && playPrev(); i++) {}
+  for (var i = 0; i < step && playPrev(); i++) {}
 }
 
 function goToMove() {
@@ -895,7 +895,7 @@ function goToMoveNumberOf(numMove) {
   putInits();
 
   indexPlay = 0;
-  for (i = 0; i < numMove; i++) {
+  for (var i = 0; i < numMove; i++) {
     playNext();
   }
 }
