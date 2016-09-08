@@ -648,10 +648,8 @@ function getOpponent(stone) {
   switch (stone) {
     case BLACK:
       return WHITE;
-      break;
     case WHITE:
       return BLACK;
-      break;
     default:
       throw "getOpponent(): Argument stone must be BLACK or WHITE";
   }
