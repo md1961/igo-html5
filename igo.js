@@ -79,16 +79,16 @@ function MoveBook() {
     if (typeof arrayOfHash === "object") {
       arrayOfHash = [arrayOfHash];
     }
-    for (var h in arrayOfHash) {
+    for (var hash in arrayOfHash) {
       var _moveSet = new MoveSet();
-      _moveSet.readDataInJson(JSON.stringify(h));
+      _moveSet.readDataInHash(hash);
       this.add(_moveSet);
     }
   };
 
   this.toJson = function() {
     var arrayOfHash = this.moveSets.map(function(moveSet) {
-      JSON.parse(moveSet.toJson());
+      moveSet.toHash();
     });
     return JSON.stringify(arrayOfHash);
   };
@@ -173,19 +173,27 @@ function MoveSet() {
     return parseMove(move)[4];
   };
 
-  this.readDataInJson = function(json) {
-    var h = JSON.parse(json);
-    this.title = h["title"];
-    this.inits = h["inits"];
-    this.moves = h["moves"];
+  this.readDataInHash = function(hash) {
+    this.title = hash["title"];
+    this.inits = hash["inits"];
+    this.moves = hash["moves"];
   };
 
-  this.toJson = function() {
-    return JSON.stringify({
+  this.readDataInJson = function(json) {
+    var hash = JSON.parse(json);
+    this.readDataInHash(hash);
+  };
+
+  this.toHash = function() {
+    return {
       "title": this.title,
       "inits": this.inits,
       "moves": this.moves
-    });
+    };
+  };
+
+  this.toJson = function() {
+    return JSON.stringify(this.toHash());
   };
 }
 
