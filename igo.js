@@ -65,6 +65,9 @@ function MoveBook() {
 
   this.readDataInJson = function(json) {
     var arrayOfHash = JSON.parse(json);
+    if (typeof arrayOfHash === "object") {
+      arrayOfHash = [arrayOfHash];
+    }
     for (h in arrayOfHash) {
       var _moveSet = new MoveSet();
       _moveSet.readDataInJson(JSON.stringify(h));
