@@ -38,13 +38,13 @@ function MoveBook() {
 
   this.add = function(moveSet) {
     this.moveSets.push(moveSet);
-    if (this.cursor == null) {
+    if (this.cursor === null) {
       this.cursor = 0;
     }
   };
 
   this.current = function() {
-    if (this.cursor == null) {
+    if (this.cursor === null) {
       return null;
     }
     return this.moveSets[this.cursor];
@@ -59,9 +59,9 @@ function MoveBook() {
   };
 
   this.changeSet = function(step) {
-    if (this.moveSets.length == 0) {
+    if (this.moveSets.length === 0) {
       return null;
-    } else if (this.cursor == null) {
+    } else if (this.cursor === null) {
       this.cursor = 0;
     }
     this.cursor += step;
@@ -125,14 +125,14 @@ function MoveSet() {
 
   this.popLastMove = function() {
     var moves = this.isTempMode ? this.tempMoves : this.moves;
-    if (moves.length == 0) {
+    if (moves.length === 0) {
       return null;
     }
     return moves.pop();
   };
 
   this.nextTurn = function() {
-    if (this.moves.length == 0) {
+    if (this.moves.length === 0) {
       return null;  // TODO: Need to have next turn value
     }
     var lastStrMove = this.moves[this.moves.length - 1];
@@ -308,7 +308,7 @@ function readDataFromLocalStorage() {
 function writeDataToLocalStorage() {
   if (isLocalStorageAvailable()) {
     var data = localStorage.getItem(KEY_FOR_DATA_IN_LOCAL_STORAGE);
-    if (data != null && ! confirm("いま保存されているデータを上書きしていいですか？")) {
+    if (data !== null && ! confirm("いま保存されているデータを上書きしていいですか？")) {
       return;
     }
 
@@ -419,7 +419,7 @@ function disableRadioToInitMode(toBeDisabled) {
 
 function removeLastMove() {
   var moveToRemove = moveSet.popLastMove();
-  if (moveToRemove == null) {
+  if (moveToRemove === null) {
     return;
   }
 
@@ -509,7 +509,7 @@ function clearComment() {
 
 function displayComment(_comment) {
   var comment = document.getElementById("comment");
-  comment.value = _comment == undefined ? null : _comment;
+  comment.value = _comment === undefined ? null : _comment;
 }
 
 function adjacentCoordsInArray(x, y) {
@@ -779,7 +779,7 @@ function prepareForPlayMode() {
   setPlayMode();
 
   indexPlay = 0;
-  if (indexMovesToRestoreFromTempMode != null) {
+  if (indexMovesToRestoreFromTempMode !== null) {
     goToMoveNumberOf(indexMovesToRestoreFromTempMode);
     indexMovesToRestoreFromTempMode = null;
   }
