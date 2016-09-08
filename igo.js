@@ -48,18 +48,29 @@ function MoveBook() {
       return null;
     }
     return this.moveSets[this.cursor];
-  }
+  };
+
+  this.prev = function() {
+    this.changeSet(-1);
+  };
 
   this.next = function() {
+    this.changeSet(1);
+  };
+
+  this.changeSet = function(step) {
     if (this.moveSets.length == 0) {
       return null;
     } else if (this.cursor == null) {
       this.cursor = 0;
     }
-    var nextSet = this.moveSets[this.cursor++];
+    this.cursor += step;
     if (this.cursor >= this.moveSets.length) {
       this.cursor = 0;
+    } else if (this.cursor < 0) {
+      this.cursor = this.moveSets.length - 1;
     }
+    var nextSet = this.moveSets[this.cursor];
     return nextSet;
   };
 
@@ -68,7 +79,7 @@ function MoveBook() {
     if (typeof arrayOfHash === "object") {
       arrayOfHash = [arrayOfHash];
     }
-    for (h in arrayOfHash) {
+    for (var h in arrayOfHash) {
       var _moveSet = new MoveSet();
       _moveSet.readDataInJson(JSON.stringify(h));
       this.add(_moveSet);
