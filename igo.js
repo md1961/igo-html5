@@ -85,6 +85,7 @@ function MoveBook() {
       _moveSet.readDataInHash(hash);
       this.add(_moveSet);
     }
+    this.cursor = 0;
   };
 
   this.toJson = function() {
@@ -205,6 +206,7 @@ var moveSet;
 
 function newMoveSet() {
   moveSet = moveBook.add(new MoveSet());
+  clearAll();
 }
 
 
@@ -213,10 +215,12 @@ newMoveSet();
 
 function prevMoveSet() {
   moveSet = moveBook.prev();
+  updateBoardByMoveSet();
 }
 
 function nextMoveSet() {
   moveSet = moveBook.next();
+  updateBoardByMoveSet();
 }
 
 
@@ -298,10 +302,16 @@ function restoreMode() {
   modeSaved = null;
 }
 
-function readData() {
+function readDataIntoMoveBook() {
   var moveDisplay = document.getElementById("moves_display");
+  moveBook = new MoveBook();
   moveBook.readDataInJson(moveDisplay.value);
 
+  moveSet = moveBook.current();
+  updateBoardByMoveSet();
+}
+
+function updateBoardByMoveSet() {
   putInits();
   putMovesToLast();
 
@@ -318,7 +328,7 @@ function readDataFromLocalStorage() {
     var data = localStorage.getItem(KEY_FOR_DATA_IN_LOCAL_STORAGE);
 
     moveDisplay.value = data;
-    readData();
+    readDataIntoMoveBook();
   }
 }
 

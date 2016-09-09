@@ -60,6 +60,8 @@
           <input type="button" id="button_to_prev_move_set" value="< 前譜" onclick="prevMoveSet();" disabled>
           &nbsp;&nbsp;
           <input type="button" id="button_to_next_move_set" value="次譜 >" onclick="nextMoveSet();" disabled>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <input type="button" id="button_to_new_move_set" value="新譜" onclick="newMoveSet();" disabled>
         </span>
       </div>
       <br />
@@ -130,7 +132,7 @@
         </span>
         <br />
         <span class="panel">
-          <input type="button" value="盤面へ読込" onclick="readData();"></input>
+          <input type="button" value="盤面へ読込" onclick="readDataIntoMoveBook();"></input>
           &nbsp;&nbsp;
           <input type="button" value="Localへ書込"   onclick="writeDataToLocalStorage();"></input>
           <input type="button" value="Localから読込" onclick="readDataFromLocalStorage();"></input>
