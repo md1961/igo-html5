@@ -300,7 +300,7 @@ function restoreMode() {
 
 function readData() {
   var moveDisplay = document.getElementById("moves_display");
-  moveSet.readDataInJson(moveDisplay.value);
+  moveBook.readDataInJson(moveDisplay.value);
 
   putInits();
   putMovesToLast();
@@ -329,7 +329,7 @@ function writeDataToLocalStorage() {
       return;
     }
 
-    localStorage.setItem(KEY_FOR_DATA_IN_LOCAL_STORAGE, moveSet.toJson());
+    localStorage.setItem(KEY_FOR_DATA_IN_LOCAL_STORAGE, moveBook.toJson());
   }
 }
 
@@ -509,7 +509,7 @@ function displayTitle(title) {
 
 function displayMoveSet() {
   var moveDisplay = document.getElementById("moves_display");
-  moveDisplay.value = moveSet.toJson();
+  moveDisplay.value = moveBook.toJson();
 }
 
 function addComment() {
