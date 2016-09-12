@@ -206,7 +206,8 @@ var moveSet;
 
 function newMoveSet() {
   moveSet = moveBook.add(new MoveSet());
-  clearAll();
+  //TODO: Investigate what causes undrawn board in below function.
+  //clearAll();
 }
 
 
