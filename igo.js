@@ -1,5 +1,6 @@
 window.onload = function() {
   initializeBoard("main_board");
+  is_board_initialized = true;
 };
 
 
@@ -202,12 +203,14 @@ function MoveSet() {
 
 var moveBook = new MoveBook();
 var moveSet;
+var is_board_initialized = false;
 
 
 function newMoveSet() {
   moveSet = moveBook.add(new MoveSet());
-  //TODO: Investigate what causes undrawn board in below function.
-  //clearAll();
+  if (is_board_initialized) {
+    clearAll();
+  }
 }
 
 
