@@ -90,7 +90,7 @@ function MoveBook() {
 
   this.toJson = function() {
     var arrayOfHash = this.moveSets.map(function(moveSet) {
-      moveSet.toHash();
+      return moveSet.toHash();
     });
     return JSON.stringify(arrayOfHash);
   };
