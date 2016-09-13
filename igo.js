@@ -53,11 +53,11 @@ function MoveBook() {
   };
 
   this.prev = function() {
-    this.changeSet(-1);
+    return this.changeSet(-1);
   };
 
   this.next = function() {
-    this.changeSet(1);
+    return this.changeSet(1);
   };
 
   this.changeSet = function(step) {
@@ -65,8 +65,9 @@ function MoveBook() {
       return null;
     } else if (this.cursor === null) {
       this.cursor = 0;
+    } else {
+      this.cursor += step;
     }
-    this.cursor += step;
     if (this.cursor >= this.moveSets.length) {
       this.cursor = 0;
     } else if (this.cursor < 0) {
@@ -317,6 +318,7 @@ function readDataIntoMoveBook() {
 }
 
 function updateBoardByMoveSet() {
+  clearBoard();
   putInits();
   putMovesToLast();
 
