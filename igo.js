@@ -1,7 +1,19 @@
 window.onload = function() {
-  initializeBoard("main_board");
+  var boardColor = DEFAULT_BOARD_COLOR;
+  if (getQueryString() == 'real_color') {
+    boardColor = REAL_BOARD_COLOR;
+  }
+
+  initializeBoard("main_board", boardColor);
   is_board_initialized = true;
 };
+
+function getQueryString() {
+  if (document.location.search.length <= 1) {
+    return null;
+  }
+  return document.location.search.substring(1);
+}
 
 
 var boardDimension = {
@@ -26,7 +38,8 @@ const WHITE = 'white';
 const STONES = [NONE, BLACK, WHITE];
 const OUT_OF_BOUNDS = 'out_of_bounds';
 
-const DEFAULT_BOARD_COLOR = '#fff'; //'#fb0';
+const DEFAULT_BOARD_COLOR = '#fff';
+const REAL_BOARD_COLOR    = '#fb0';
 const RGB_BLACK = 'rgb(0, 0, 0)';
 const RGB_WHITE = 'rgb(255, 255, 255)';
 
@@ -356,11 +369,11 @@ function isLocalStorageAvailable() {
   return (typeof localStorage !== 'undefined');
 }
 
-function initializeBoard(tableId) {
+function initializeBoard(tableId, boardColor) {
   var dim = boardDimension;
 
   var table = document.getElementById(tableId);
-  table.style.backgroundColor = DEFAULT_BOARD_COLOR;
+  table.style.backgroundColor = boardColor;
   for (var y = 1; y <= dim.numGrids; y++) {
     var row = document.createElement('tr');
     table.appendChild(row);
@@ -375,7 +388,7 @@ function initializeBoard(tableId) {
       canvas.setAttribute('y_coord', y);
       canvas.width  = dim.gridPitch;
       canvas.height = dim.gridPitch;
-      canvas.style.backgroundColor = DEFAULT_BOARD_COLOR;
+      canvas.style.backgroundColor = boardColor;
       canvas.onclick = gridClickHandler;
     }
   }
