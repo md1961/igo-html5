@@ -136,9 +136,11 @@ function MoveSet() {
     return moves.pop();
   };
 
+  this.DEFAULT_NEXT_TURN = BLACK;
+
   this.nextTurn = function() {
     if (this.moves.length === 0) {
-      return null;  // TODO: Need to have next turn value
+      return this.DEFAULT_NEXT_TURN;
     }
     var lastStrMove = this.moves[this.moves.length - 1];
     switch (lastStrMove[0]) {
