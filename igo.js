@@ -820,7 +820,9 @@ function prepareForPlayMode() {
     indexMovesToRestoreFromTempMode = null;
   }
   var nextTurn;
-  if (indexPlay < moveSet.moves.length) {
+  if (moveSet.moves.length === 0) {
+    nextTurn = moveSet.DEFAULT_NEXT_TURN;
+  } else if (indexPlay < moveSet.moves.length) {
     nextTurn = getColorOfStone(moveSet.moves[indexPlay]);
   } else {
     nextTurn = getOpponent(getColorOfStone(moveSet.moves[indexPlay - 1]));
