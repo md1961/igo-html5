@@ -78,10 +78,11 @@ function MoveBook() {
 
   this.readDataInJson = function(json) {
     var arrayOfHash = JSON.parse(json);
-    if (typeof arrayOfHash === "object") {
+    if (! Array.isArray(arrayOfHash)) {
       arrayOfHash = [arrayOfHash];
     }
-    for (var hash in arrayOfHash) {
+    this.moveSets = [];
+    for (var hash of arrayOfHash) {
       var _moveSet = new MoveSet();
       _moveSet.readDataInHash(hash);
       this.add(_moveSet);
