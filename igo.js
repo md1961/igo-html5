@@ -531,8 +531,13 @@ function updateNumMoves(numMoves) {
     return;
   }
 
+  var totalMoves = 0;
+  if (moveSet !== null) {
+    totalMoves = moveSet.moves.length;
+  }
+
   document.getElementById("numMoves").innerText
-      = numMoves + "手目 / 全" + moveSet.moves.length + "手";
+      = numMoves + "手目 / 全" + totalMoves + "手";
 }
 
 function displayTitle() {
