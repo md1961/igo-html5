@@ -91,7 +91,14 @@
       <div id="info" class="panel">
         <span class="panel">
           <span id="set_num" style="font-size: small">[1/1]</span>
-          <span id="title">(No Title)</span>
+          <span id="title_holder">
+            <span id="title">(No Title)</span>
+            <span style="font-size: x-small; cursor: pointer" onclick="showTitleInput();">&lt;=</span>
+          </span>
+          <span id="title_input_holder" hidden>
+            <input type="text" id="title_input">
+            <input type="button" value="入力" onclick="inputTitle();">
+          </span>
           &nbsp;&nbsp;
           <span id="numMoves" />
         </span>

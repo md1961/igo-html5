@@ -550,6 +550,18 @@ function displayMoveSet() {
   moveDisplay.value = moveBook.toJson();
 }
 
+function showTitleInput() {
+  document.getElementById("title_holder"      ).style.display = 'none';
+  document.getElementById("title_input_holder").style.display = 'inline';
+  document.getElementById("title_input").value = document.getElementById("title").innerText;
+}
+
+function inputTitle() {
+  document.getElementById("title_input_holder").style.display = 'none';
+  document.getElementById("title_holder"      ).style.display = 'inline';
+  document.getElementById("title").innerText = document.getElementById("title_input").value;
+}
+
 function addComment() {
   var comment = document.getElementById("comment");
   var index = isTurnMode() ? -1 : indexPlay - 1;
