@@ -40,6 +40,15 @@
       div#buttons_to_play {
         display: none;
       }
+
+      span.small_button {
+        font-size: x-small;
+        background-color: lightgrey;
+        border-right:  solid 1px black;
+        border-bottom: solid 1px black;
+        padding: 0px 2px;
+        cursor: pointer;
+      }
     </style>
   </head>
 
@@ -93,7 +102,7 @@
           <span id="set_num" style="font-size: small">[1/1]</span>
           <span id="title_holder">
             <span id="title">(No Title)</span>
-            <span style="font-size: x-small; cursor: pointer" onclick="showTitleInput();">&lt;=</span>
+            <span class="small_button" onclick="showTitleInput();">&lt;=</span>
           </span>
           <span id="title_input_holder" hidden>
             <input type="text" id="title_input">
