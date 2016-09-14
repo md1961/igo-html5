@@ -88,6 +88,10 @@ function MoveBook() {
     return nextSet;
   };
 
+  this.setNumber = function() {
+    return '[' + (this.cursor + 1) + '/' + this.moveSets.length + ']';
+  }
+
   this.readDataInJson = function(json) {
     var arrayOfHash = JSON.parse(json);
     if (! Array.isArray(arrayOfHash)) {
@@ -285,7 +289,7 @@ function putInits() {
   saveMode();
 
   setInitMode();
-  displayTitle(moveSet.title);
+  displayTitle();
 
   var inits = moveSet.inits;
   for (var i = 0; i < inits.length; i++) {
@@ -531,10 +535,9 @@ function updateNumMoves(numMoves) {
       = numMoves + "手目 / 全" + moveSet.moves.length + "手";
 }
 
-function displayTitle(title) {
-  if (title) {
-    document.getElementById("title").innerText = title;
-  }
+function displayTitle() {
+  document.getElementById("set_num").innerText = moveBook.setNumber();
+  document.getElementById("title"  ).innerText = moveSet.title;
 }
 
 function displayMoveSet() {
