@@ -90,7 +90,7 @@ function MoveBook() {
 
   this.setNumber = function() {
     return '[' + (this.cursor + 1) + '/' + this.moveSets.length + ']';
-  }
+  };
 
   this.readDataInJson = function(json) {
     var arrayOfHash = JSON.parse(json);
@@ -196,9 +196,9 @@ function MoveSet() {
   };
 
   this.readDataInHash = function(hash) {
-    this.title = hash["title"];
-    this.inits = hash["inits"];
-    this.moves = hash["moves"];
+    this.title = hash.title;
+    this.inits = hash.inits;
+    this.moves = hash.moves;
   };
 
   this.readDataInJson = function(json) {
