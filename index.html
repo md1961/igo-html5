@@ -112,6 +112,18 @@
           <span id="numMoves" />
         </span>
       </div>
+      <div class="panel">
+        <span class="panel">
+          <span id="comment_holder">
+            <span id="comment"></span>
+            <span class="small_button" onclick="showCommentInput();">&lt;=</span>
+          </span>
+          <span id="comment_input_holder" hidden>
+            <input type="text" id="comment_input" size="40">
+            <input type="button" value="コメント記入" onclick="inputComment();">
+          </span>
+        </span>
+      </div>
       <div id="buttons_to_play" class="panel">
         <span class="panel">
           <input type="button" id="button_prev_move" value="  <  "   onclick="playPrev();">
@@ -136,12 +148,6 @@
           <input type="text"   id="num_move_to_go"   size="1">
           手目へ
           <input type="button" id="button_to_go"     value="GO" onclick="goToMove();">
-        </span>
-      </div>
-      <div class="panel">
-        <span class="panel">
-          <input type="text" id="comment" size="40" />
-          <input type="button" id="button_to_add_comment" value="コメント記入" onclick="addComment();">
         </span>
       </div>
       <div class="panel">

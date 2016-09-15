@@ -562,8 +562,18 @@ function inputTitle() {
   document.getElementById("title").innerText = document.getElementById("title_input").value;
 }
 
-function addComment() {
-  var comment = document.getElementById("comment");
+function showCommentInput() {
+  document.getElementById("comment_holder"      ).style.display = 'none';
+  document.getElementById("comment_input_holder").style.display = 'inline';
+  document.getElementById("comment_input").value = document.getElementById("comment").innerText;
+}
+
+function inputComment() {
+  document.getElementById("comment_input_holder").style.display = 'none';
+  document.getElementById("comment_holder"      ).style.display = 'inline';
+  document.getElementById("comment").innerText = document.getElementById("comment_input").value;
+
+  var comment = document.getElementById("comment_input");
   var index = isTurnMode() ? -1 : indexPlay - 1;
   moveSet.addComment(comment.value, index);
 
@@ -576,7 +586,7 @@ function clearComment() {
 
 function displayComment(_comment) {
   var comment = document.getElementById("comment");
-  comment.value = _comment === undefined ? null : _comment;
+  comment.innerText = _comment === undefined ? null : _comment;
 }
 
 function adjacentCoordsInArray(x, y) {
@@ -906,8 +916,11 @@ function hideInfoDisplay(toBeHidden) {
 }
 
 function disableButtonToAddComment(toBeDisabled) {
+  //TODO: Correct "button_to_add_comment", or remove the function
+  /*
   var button = document.getElementById("button_to_add_comment");
   button.disabled = toBeDisabled;
+  */
 }
 
 function putMovesToLast() {
