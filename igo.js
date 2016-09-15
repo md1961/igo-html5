@@ -559,7 +559,9 @@ function showTitleInput() {
 function inputTitle() {
   document.getElementById("title_input_holder").style.display = 'none';
   document.getElementById("title_holder"      ).style.display = 'inline';
-  document.getElementById("title").innerText = document.getElementById("title_input").value;
+  var title = document.getElementById("title_input").value;
+  document.getElementById("title").innerText = title;
+  moveSet.title = title;
 }
 
 function showCommentInput() {
