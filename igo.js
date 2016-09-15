@@ -52,7 +52,7 @@ function MoveBook() {
 
   this.add = function(moveSet) {
     this.moveSets.push(moveSet);
-    this.cursor === this.moveSets.length - 1;
+    this.cursor = this.moveSets.length - 1;
     return this.current();
   };
 
