@@ -1,7 +1,7 @@
 var KumaUtil = {
 
   nextInArray: function(_element, _array) {
-    index = _array.indexOf(_element);
+    var index = _array.indexOf(_element);
     if (index < 0) {
       return null;
     }

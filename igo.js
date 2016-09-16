@@ -32,9 +32,9 @@ const RADIO_TURN_BLACK_ID = "radio_turn_black";
 const RADIO_TURN_WHITE_ID = "radio_turn_white";
 const ATTR_MARKED = 'marked';
 
-const NONE  = 'none';
-const BLACK = 'black';
-const WHITE = 'white';
+const NONE  = 'NONE';
+const BLACK = 'BLACK';
+const WHITE = 'WHITE';
 const STONES = [NONE, BLACK, WHITE];
 const OUT_OF_BOUNDS = 'out_of_bounds';
 
@@ -49,6 +49,7 @@ const KEY_FOR_DATA_IN_LOCAL_STORAGE = 'igoHtml5_keyForData';
 function MoveBook() {
   this.moveSets = [];
   this.cursor = null;
+  this.usesSGF = true;
 
   this.add = function(moveSet) {
     this.moveSets.push(moveSet);
@@ -158,10 +159,10 @@ function MoveSet() {
       return this.DEFAULT_NEXT_TURN;
     }
     var lastStrMove = this.moves[this.moves.length - 1];
-    switch (lastStrMove[0]) {
-      case 'n': return null;
-      case 'b': return WHITE;
-      case 'w': return BLACK;
+    switch (lastStrMove[0].toUpperCase()) {
+      case  NONE[0]: return null;
+      case BLACK[0]: return WHITE;
+      case WHITE[0]: return BLACK;
       default : throw "Illegal stringified move '" + lastStrMove +"'";
     }
   };
@@ -247,25 +248,49 @@ function nextMoveSet() {
 }
 
 
-// "b1604" などの文字列に変換
+function coordToChar(x) {
+  return String.fromCharCode('a'.charCodeAt(0) + x - 1);
+}
+
+function charToCoord(c) {
+  return c.charCodeAt(0) - 'a'.charCodeAt(0) + 1;
+}
+
+// "bpd" あるいは "b1604" などの文字列に変換
 function stringifyMove(stone, x, y) {
+  if (moveBook.usesSGF) {
+    return stone[0] + coordToChar(x) + coordToChar(y);
+  }
   return stone[0] + KumaUtil.zeroLeftPad(x, 2) + KumaUtil.zeroLeftPad(y, 2);
 }
+
+const RE_MOVE_FORMAT_ORIGINAL =   /^([NBWnbw]\d{2,})(?:\(([\w,]+)\))?(?:\[([^\]]*)\])?$/;
+const RE_MOVE_FORMAT_SGF      = /^([NBWnbw][a-s]{2})(?:\(([\w,]+)\))?(?:\[([^\]]*)\])?$/;
 
 // (BLACK, 16, 4 [, ((WHITE, 17, 4), ...)]) などの配列に変換
 // 第四要素は取られた石の配列
 function parseMove(stringifiedMove) {
-  var m = stringifiedMove.match(/^([nbw]\d{2,})(?:\(([\w,]+)\))?(?:\[([^\]]*)\])?$/);
-  if (! m) {
+  var m  = stringifiedMove.match(RE_MOVE_FORMAT_SGF);
+  var m2 = stringifiedMove.match(RE_MOVE_FORMAT_ORIGINAL);
+  if (! m && ! m2) {
     throw "Illegal stringified move '" + stringifiedMove + "'";
+  }
+  var usesSGF = m;
+  if (m2) {
+    m = m2;
   }
   var strMove        = m[1];
   var strStonesTaken = m[2];
   var comment        = m[3];
 
   var stone = getColorOfStone(strMove);
-  var x = parseInt(strMove.substr(1, 2));
-  var y = parseInt(strMove.substr(3, 2));
+  if (usesSGF) {
+    var x = charToCoord(strMove[1]);
+    var y = charToCoord(strMove[2]);
+  } else {
+    var x = parseInt(strMove.substr(1, 2));
+    var y = parseInt(strMove.substr(3, 2));
+  }
 
   var arrayOfStonesTaken = [];
   if (strStonesTaken) {
@@ -277,10 +302,10 @@ function parseMove(stringifiedMove) {
 }
 
 function getColorOfStone(strMove) {
-  switch (strMove[0]) {
-    case 'n': return NONE ;
-    case 'b': return BLACK;
-    case 'w': return WHITE;
+  switch (strMove[0].toUpperCase()) {
+    case  NONE[0]: return  NONE;
+    case BLACK[0]: return BLACK;
+    case WHITE[0]: return WHITE;
     default : throw "Illegal stringified move '" + strMove +"'";
   }
 }
