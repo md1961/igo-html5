@@ -248,6 +248,15 @@ function nextMoveSet() {
 }
 
 
+function convertToSGF() {
+  var movesDisplay = document.getElementById("moves_display");
+  movesDisplay.value = movesDisplay.value.replace(/([BW])(\d{2})(\d{2})/gi, function(m, p1, p2, p3) {
+    var x = coordToChar(parseInt(p2));
+    var y = coordToChar(parseInt(p3));
+    return p1.toUpperCase() + x + y;
+  });
+}
+
 function coordToChar(x) {
   return String.fromCharCode('a'.charCodeAt(0) + x - 1);
 }
