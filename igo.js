@@ -909,7 +909,6 @@ function prepareForPlayMode() {
 
   hideButtonsToPlay(false);
   hideInfoDisplay(false);
-  disableButtonToAddComment(false);
 }
 
 function prepareForTurnMode() {
@@ -925,7 +924,6 @@ function prepareForTurnMode() {
   displayMoveSet();
   hideButtonsToPlay(true);
   hideInfoDisplay(false);
-  disableButtonToAddComment(false);
 }
 
 var indexMovesToRestoreFromTempMode = null;
@@ -938,7 +936,6 @@ function prepareForTempMode() {
 
   hideButtonsToPlay(true);
   hideInfoDisplay(true);
-  disableButtonToAddComment(true);
 }
 
 function hideButtonsToPlay(toBeHidden) {
@@ -949,14 +946,6 @@ function hideButtonsToPlay(toBeHidden) {
 function hideInfoDisplay(toBeHidden) {
   var info = document.getElementById("info");
   info.style.display = toBeHidden ? 'none' : 'block';
-}
-
-function disableButtonToAddComment(toBeDisabled) {
-  //TODO: Correct "button_to_add_comment", or remove the function
-  /*
-  var button = document.getElementById("button_to_add_comment");
-  button.disabled = toBeDisabled;
-  */
 }
 
 function putMovesToLast() {
