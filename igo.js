@@ -886,6 +886,8 @@ function radioModeHandler(radioMode) {
 var indexPlay;
 
 function prepareForPlayMode() {
+  moveSet.setTempMode(false);
+
   clearBoard();
   clearComment();
   putInits();
