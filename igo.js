@@ -171,6 +171,9 @@ function MoveSet() {
     this.isTempMode = isTempMode;
     if (isTempMode) {
       this.tempMoves = [];
+    } else if (this.tempMoves.length > 0) {
+      alert(this.tempMoves);
+      this.tempMoves = [];
     }
   };
 
