@@ -293,12 +293,13 @@ function parseMove(stringifiedMove) {
   var comment        = m[3];
 
   var stone = getColorOfStone(strMove);
+  var x, y;
   if (usesSGF) {
-    var x = charToCoord(strMove[1]);
-    var y = charToCoord(strMove[2]);
+    x = charToCoord(strMove[1]);
+    y = charToCoord(strMove[2]);
   } else {
-    var x = parseInt(strMove.substr(1, 2));
-    var y = parseInt(strMove.substr(3, 2));
+    x = parseInt(strMove.substr(1, 2));
+    y = parseInt(strMove.substr(3, 2));
   }
 
   var arrayOfStonesTaken = [];
@@ -570,8 +571,7 @@ function updateNumMoves(numMoves) {
     totalMoves = moveSet.moves.length;
   }
 
-  document.getElementById("numMoves").innerText
-      = numMoves + "手目 / 全" + totalMoves + "手";
+  document.getElementById("numMoves").innerText = numMoves + "手目 / 全" + totalMoves + "手";
 }
 
 function displayTitle() {
