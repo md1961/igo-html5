@@ -124,8 +124,12 @@ function MoveSet() {
   };
 
   this.clear();
+  //TODO: Rename to indexNext or indexMoves ?
+  this.indexPlay = 0;
+  this.isPlayMode = false;
   this.isTempMode = false;
   this.tempMoves = [];
+  this.indexMovesToRestoreFromTempMode = null;
 
   this.writeInits = function(stone, x, y) {
     var init = stringifyMove(stone, x, y);
@@ -152,18 +156,51 @@ function MoveSet() {
     return moves.pop();
   };
 
+  this.prepareForPlayMode = function() {
+    this.isPlayMode = true;
+    this.setTempMode(false);
+    this.indexPlay = 0;
+
+    var indexPlayToRestore = this.indexMovesToRestoreFromTempMode;
+    this.indexMovesToRestoreFromTempMode = null;
+    return indexPlayToRestore;
+  };
+
+  this.playNext = function() {
+    if (this.indexPlay >= this.moves.length) {
+      this.indexPlay = this.moves.length;
+      return null;
+    }
+    return this.moves[this.indexPlay++];
+  };
+
+  this.playPrev = function() {
+    if (this.indexPlay <= 0) {
+      this.indexPlay = 0;
+      return null;
+    }
+    this.indexPlay--;
+    return this.moves[this.indexPlay];
+  };
+
   this.DEFAULT_NEXT_TURN = BLACK;
 
   this.nextTurn = function() {
     if (this.moves.length === 0) {
       return this.DEFAULT_NEXT_TURN;
-    }
-    var lastStrMove = this.moves[this.moves.length - 1];
-    switch (lastStrMove[0].toUpperCase()) {
-      case  NONE[0]: return null;
-      case BLACK[0]: return WHITE;
-      case WHITE[0]: return BLACK;
-      default : throw "Illegal stringified move '" + lastStrMove +"'";
+    } else if (this.isPlayMode) {
+      if (this.indexPlay < this.moves.length) {
+        return getColorOfStone(this.moves[this.indexPlay]);
+      }
+      return getOpponent(getColorOfStone(this.moves[this.indexPlay - 1]));
+    } else {
+      var lastStrMove = this.moves[this.moves.length - 1];
+      switch (lastStrMove[0].toUpperCase()) {
+        case  NONE[0]: return null;
+        case BLACK[0]: return WHITE;
+        case WHITE[0]: return BLACK;
+        default : throw "Illegal stringified move '" + lastStrMove +"'";
+      }
     }
   };
 
@@ -171,6 +208,8 @@ function MoveSet() {
     this.isTempMode = isTempMode;
     if (isTempMode) {
       this.tempMoves = [];
+      this.isPlayMode = false;
+      this.indexMovesToRestoreFromTempMode = this.indexPlay;
     } else if (this.tempMoves.length > 0) {
       alert(this.tempMoves);
       this.tempMoves = [];
@@ -188,14 +227,13 @@ function MoveSet() {
     this.moves[index] = move;
   };
 
-  this.getComment = function(index) {
-    if (index < 0) {
+  this.getCurrentComment = function() {
+    if (this.indexPlay <= 0) {
       return null;
-    } else if (index >= this.moves.length) {
-      index = this.moves.length - 1;
+    } else if (this.indexPlay > this.moves.length) {
+      this.indexPlay = this.moves.length;
     }
-
-    var move = this.moves[index];
+    var move = this.moves[this.indexPlay - 1];
     return parseMove(move)[4];
   };
 
@@ -388,6 +426,9 @@ function readDataFromLocalStorage() {
   if (isLocalStorageAvailable()) {
     var moveDisplay = document.getElementById("moves_display");
     var data = localStorage.getItem(KEY_FOR_DATA_IN_LOCAL_STORAGE);
+    if (data === null || ! confirm("いま表示されているデータを上書きしていいですか？")) {
+      return;
+    }
 
     moveDisplay.value = data;
     readDataIntoMoveBook();
@@ -448,7 +489,7 @@ function clearBoard() {
 
   document.getElementById("title").innerText = null;
   document.getElementById("moves_display").value = null;
-  updateNumMoves(0);
+  updateNumMovesDisplay(0);
 }
 
 function clearAll() {
@@ -497,7 +538,7 @@ function putStone(x, y) {
   }
 
   updateCanvasDisplay(x, y);
-  updateNumMoves(moveSet.moves.length);
+  updateNumMovesDisplay(moveSet.moves.length);
   displayMoveSet();
 }
 
@@ -516,7 +557,7 @@ function removeLastMove() {
 
   toggleTurn();
 
-  updateNumMoves(moveSet.moves.length);
+  updateNumMovesDisplay(moveSet.moves.length);
   displayMoveSet();
 }
 
@@ -564,7 +605,7 @@ function removeStoneByMove(move) {
   updateCanvasDisplay(x, y);
 }
 
-function updateNumMoves(numMoves) {
+function updateNumMovesDisplay(numMoves) {
   if (isTempMode()) {
     return;
   }
@@ -613,7 +654,7 @@ function inputComment() {
   document.getElementById("comment").innerText = document.getElementById("comment_input").value;
 
   var comment = document.getElementById("comment_input");
-  var index = isTurnMode() ? -1 : indexPlay - 1;
+  var index = isTurnMode() ? -1 : moveSet.indexPlay - 1;
   moveSet.addComment(comment.value, index);
 
   displayMoveSet();
@@ -680,7 +721,7 @@ function takeStones() {
         var stone = getStone(x, y);
         drawStone(x, y, NONE);
         stonesTaken.push(stringifyMove(stone, x, y));
-        // TODO: Count up taken stones
+        //TODO: Count up taken stones
 
         updateCanvasDisplay(x, y);
       }
@@ -886,31 +927,19 @@ function radioModeHandler(radioMode) {
   }
 }
 
-var indexPlay;
-
 function prepareForPlayMode() {
-  moveSet.setTempMode(false);
-
   clearBoard();
   clearComment();
   putInits();
   setPlayMode();
 
-  indexPlay = 0;
-  if (indexMovesToRestoreFromTempMode !== null) {
-    goToMoveNumberOf(indexMovesToRestoreFromTempMode);
-    indexMovesToRestoreFromTempMode = null;
+  var indexPlayToRestore = moveSet.prepareForPlayMode();
+  if (indexPlayToRestore !== null) {
+    playToNextOf(indexPlayToRestore);
   }
-  var nextTurn;
-  if (moveSet.moves.length === 0) {
-    nextTurn = moveSet.DEFAULT_NEXT_TURN;
-  } else if (indexPlay < moveSet.moves.length) {
-    nextTurn = getColorOfStone(moveSet.moves[indexPlay]);
-  } else {
-    nextTurn = getOpponent(getColorOfStone(moveSet.moves[indexPlay - 1]));
-  }
-  setTurn(nextTurn);
-  updateNumMoves(indexPlay);
+
+  setTurn(moveSet.nextTurn());
+  updateNumMovesDisplay(moveSet.indexPlay);
 
   hideButtonsToPlay(false);
   hideInfoDisplay(false);
@@ -931,10 +960,7 @@ function prepareForTurnMode() {
   hideInfoDisplay(false);
 }
 
-var indexMovesToRestoreFromTempMode = null;
-
 function prepareForTempMode() {
-  indexMovesToRestoreFromTempMode = indexPlay;
   moveSet.setTempMode(true);
    
   setTempMode();
@@ -954,38 +980,31 @@ function hideInfoDisplay(toBeHidden) {
 }
 
 function putMovesToLast() {
-  indexPlay = 0;
+  moveSet.prepareForPlayMode();
   playToLast();
 }
 
 function playNext() {
-  if (indexPlay >= moveSet.moves.length) {
-    indexPlay = moveSet.moves.length;
+  var strMove = moveSet.playNext();
+  if (strMove === null) {
     return false;
   }
-
-  var strMove = moveSet.moves[indexPlay++];
   putMove(strMove);
+  //TODO: Should be moveSet.nextTurn() ?
   setTurn(getOpponent(getColorOfStone(strMove)));
-  updateNumMoves(indexPlay);
-
+  updateNumMovesDisplay(moveSet.indexPlay);
   return true;
 }
 
 function playPrev() {
-  if (indexPlay <= 0) {
-    indexPlay = 0;
+  var strMove = moveSet.playPrev();
+  if (strMove === null) {
     return false;
   }
-
-  indexPlay--;
-  var strMove = moveSet.moves[indexPlay];
-  var comment = moveSet.getComment(indexPlay - 1);
   removeMove(strMove);
   setTurn(getColorOfStone(strMove));
-  displayComment(comment);
-  updateNumMoves(indexPlay);
-
+  displayComment(moveSet.getCurrentComment());
+  updateNumMovesDisplay(this.indexPlay);
   return true;
 }
 
@@ -1006,17 +1025,10 @@ function playToPrevOf(step) {
 }
 
 function goToMove() {
-  var num_move_to_go = parseInt(document.getElementById("num_move_to_go").value);
-  goToMoveNumberOf(num_move_to_go);
-}
-
-function goToMoveNumberOf(numMove) {
+  var numMoveToGo = parseInt(document.getElementById("num_move_to_go").value);
   clearBoard();
   putInits();
-
-  indexPlay = 0;
-  for (var i = 0; i < numMove; i++) {
-    playNext();
-  }
+  moveSet.prepareForPlayMode();
+  playToNextOf(numMoveToGo);
 }
 
