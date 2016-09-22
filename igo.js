@@ -120,7 +120,7 @@ function MoveSet() {
   this.clear = function() {
     this.title = "";
     this.inits = [];
-    this.moves = [];
+    this.moves = new Moves([]);
   };
 
   this.clear();
@@ -130,6 +130,10 @@ function MoveSet() {
   this.isTempMode = false;
   this.tempMoves = [];
   this.indexMovesToRestoreFromTempMode = null;
+
+  this.length = function() {
+    return this.moves.length();
+  };
 
   this.writeInits = function(stone, x, y) {
     var init = stringifyMove(stone, x, y);
@@ -167,11 +171,11 @@ function MoveSet() {
   };
 
   this.playNext = function() {
-    if (this.indexPlay >= this.moves.length) {
-      this.indexPlay = this.moves.length;
+    if (this.indexPlay >= this.moves.length()) {
+      this.indexPlay = this.moves.length();
       return null;
     }
-    return this.moves[this.indexPlay++];
+    return this.moves.get(this.indexPlay++);
   };
 
   this.playPrev = function() {
@@ -180,21 +184,21 @@ function MoveSet() {
       return null;
     }
     this.indexPlay--;
-    return this.moves[this.indexPlay];
+    return this.moves.get(this.indexPlay);
   };
 
   this.DEFAULT_NEXT_TURN = BLACK;
 
   this.nextTurn = function() {
-    if (this.moves.length === 0) {
+    if (this.moves.length() === 0) {
       return this.DEFAULT_NEXT_TURN;
     } else if (this.isPlayMode) {
-      if (this.indexPlay < this.moves.length) {
-        return getColorOfStone(this.moves[this.indexPlay]);
+      if (this.indexPlay < this.moves.length()) {
+        return getColorOfStone(this.moves.get(this.indexPlay));
       }
-      return getOpponent(getColorOfStone(this.moves[this.indexPlay - 1]));
+      return getOpponent(getColorOfStone(this.moves.get(this.indexPlay - 1)));
     } else {
-      var lastStrMove = this.moves[this.moves.length - 1];
+      var lastStrMove = this.moves.get(this.moves.length() - 1);
       switch (lastStrMove[0].toUpperCase()) {
         case  NONE[0]: return null;
         case BLACK[0]: return WHITE;
@@ -211,36 +215,38 @@ function MoveSet() {
       this.isPlayMode = false;
       this.indexMovesToRestoreFromTempMode = this.indexPlay;
     } else if (this.tempMoves.length > 0) {
-      alert(this.tempMoves);
+      if (confirm("Save this branch?")) {
+        this.moves.insert(this.indexMovesToRestoreFromTempMode - 1, this.tempMoves);
+      }
       this.tempMoves = [];
     }
   };
 
   this.addComment = function(comment, index) {
-    if (index < 0 || index >= this.moves.length) {
-      index = this.moves.length - 1;
+    if (index < 0 || index >= this.moves.length()) {
+      index = this.moves.length() - 1;
     }
 
-    var move = this.moves[index];
+    var move = this.moves.get(index);
     move = move.replace(/\[[^\]]*\]/, '');
     move += '[' + comment + ']';
-    this.moves[index] = move;
+    this.moves.set(index, move);
   };
 
   this.getCurrentComment = function() {
     if (this.indexPlay <= 0) {
       return null;
-    } else if (this.indexPlay > this.moves.length) {
-      this.indexPlay = this.moves.length;
+    } else if (this.indexPlay > this.moves.length()) {
+      this.indexPlay = this.moves.length();
     }
-    var move = this.moves[this.indexPlay - 1];
+    var move = this.moves.get(this.indexPlay - 1);
     return parseMove(move)[4];
   };
 
   this.readDataInHash = function(hash) {
     this.title = hash.title;
     this.inits = hash.inits;
-    this.moves = hash.moves;
+    this.moves = new Moves(hash.moves);
   };
 
   this.readDataInJson = function(json) {
@@ -252,12 +258,63 @@ function MoveSet() {
     return {
       "title": this.title,
       "inits": this.inits,
-      "moves": this.moves
+      "moves": this.moves.to_array()
     };
   };
 
   this.toJson = function() {
     return JSON.stringify(this.toHash());
+  };
+}
+
+function Moves(moves) {
+  this._moves = moves;
+
+  this.to_array = function() {
+    return this._moves;
+  };
+
+  this.trunkMoves = function() {
+    return this._moves.filter(function(move) {
+      return typeof move == 'string';
+    });
+  };
+
+  this.indexInMoves = function(index) {
+    var numNonMovesUptoIndex = this._moves.slice(0, index + 1).filter(function(move) {
+      return typeof move != 'string';
+    }).length;
+    return index + numNonMovesUptoIndex;
+  };
+
+  this.length = function() {
+    return this.trunkMoves().length;
+  };
+
+  this.get = function(index) {
+    return this.trunkMoves()[index];
+  };
+
+  this.set = function(index, move) {
+    this._moves[this.indexInMoves(index)] = move;
+  };
+
+  this.push = function(move) {
+    this._moves.push(move);
+  };
+
+  this.pop = function() {
+    do {
+      var move = this._moves.pop();
+      if (typeof move == 'string') {
+        return move;
+      }
+    } while (this._moves.length > 0);
+    return null;
+  };
+
+  this.insert = function(index, move) {
+    this._moves.splice(this.indexInMoves(index), 0, move);
   };
 }
 
@@ -538,7 +595,7 @@ function putStone(x, y) {
   }
 
   updateCanvasDisplay(x, y);
-  updateNumMovesDisplay(moveSet.moves.length);
+  updateNumMovesDisplay(moveSet.length());
   displayMoveSet();
 }
 
@@ -557,7 +614,7 @@ function removeLastMove() {
 
   toggleTurn();
 
-  updateNumMovesDisplay(moveSet.moves.length);
+  updateNumMovesDisplay(moveSet.trunkMoves().length);
   displayMoveSet();
 }
 
@@ -612,7 +669,7 @@ function updateNumMovesDisplay(numMoves) {
 
   var totalMoves = 0;
   if (moveSet !== null) {
-    totalMoves = moveSet.moves.length;
+    totalMoves = moveSet.length();
   }
 
   document.getElementById("numMoves").innerText = numMoves + "手目 / 全" + totalMoves + "手";
@@ -1004,7 +1061,7 @@ function playPrev() {
   removeMove(strMove);
   setTurn(getColorOfStone(strMove));
   displayComment(moveSet.getCurrentComment());
-  updateNumMovesDisplay(this.indexPlay);
+  updateNumMovesDisplay(moveSet.indexPlay);
   return true;
 }
 
