@@ -5,7 +5,7 @@ window.onload = function() {
   }
 
   initializeBoard("main_board", boardColor);
-  is_board_initialized = true;
+  isBoardInitialized = true;
 };
 
 function getQueryString() {
@@ -199,6 +199,7 @@ function MoveSet() {
       return getOpponent(getColorOfStone(this.moves.get(this.indexPlay - 1)));
     } else {
       var lastStrMove = this.moves.get(this.moves.length() - 1);
+      //TODO: Use getOpponent()?
       switch (lastStrMove[0].toUpperCase()) {
         case  NONE[0]: return null;
         case BLACK[0]: return WHITE;
@@ -206,6 +207,10 @@ function MoveSet() {
         default : throw "Illegal stringified move '" + lastStrMove +"'";
       }
     }
+  };
+
+  this.branches = function() {
+    return this.moves.branches(this.indexPlay);
   };
 
   this.setTempMode = function(isTempMode) {
@@ -216,7 +221,7 @@ function MoveSet() {
       this.indexMovesToRestoreFromTempMode = this.indexPlay;
     } else if (this.tempMoves.length > 0) {
       if (confirm("Save this branch?")) {
-        this.moves.insert(this.indexMovesToRestoreFromTempMode - 1, this.tempMoves);
+        this.moves.insert(this.indexMovesToRestoreFromTempMode, this.tempMoves);
       }
       this.tempMoves = [];
     }
@@ -274,13 +279,13 @@ function Moves(moves) {
     return this._moves;
   };
 
-  this.trunkMoves = function() {
+  this._trunkMoves = function() {
     return this._moves.filter(function(move) {
       return typeof move == 'string';
     });
   };
 
-  this.indexInMoves = function(index) {
+  this._indexInMoves = function(index) {
     var numNonMovesUptoIndex = this._moves.slice(0, index + 1).filter(function(move) {
       return typeof move != 'string';
     }).length;
@@ -288,15 +293,26 @@ function Moves(moves) {
   };
 
   this.length = function() {
-    return this.trunkMoves().length;
+    return this._trunkMoves().length;
   };
 
   this.get = function(index) {
-    return this.trunkMoves()[index];
+    return this._trunkMoves()[index];
+  };
+
+  this.branches = function(index) {
+    var branches = [];
+    for (var move of this._moves.slice(0, this._indexInMoves(index)).reverse()) {
+      if (typeof move == 'string') {
+        break;
+      }
+      branches.unshift(move);
+    }
+    return branches;
   };
 
   this.set = function(index, move) {
-    this._moves[this.indexInMoves(index)] = move;
+    this._moves[this._indexInMoves(index)] = move;
   };
 
   this.push = function(move) {
@@ -314,19 +330,19 @@ function Moves(moves) {
   };
 
   this.insert = function(index, move) {
-    this._moves.splice(this.indexInMoves(index), 0, move);
+    this._moves.splice(this._indexInMoves(index), 0, move);
   };
 }
 
 
 var moveBook = new MoveBook();
 var moveSet;
-var is_board_initialized = false;
+var isBoardInitialized = false;
 
 
 function newMoveSet() {
   moveSet = moveBook.add(new MoveSet());
-  if (is_board_initialized) {
+  if (isBoardInitialized) {
     clearAll();
   }
 }
@@ -614,7 +630,7 @@ function removeLastMove() {
 
   toggleTurn();
 
-  updateNumMovesDisplay(moveSet.trunkMoves().length);
+  updateNumMovesDisplay(moveSet.length());
   displayMoveSet();
 }
 
@@ -984,6 +1000,11 @@ function radioModeHandler(radioMode) {
   }
 }
 
+function updateBranchSelectDisplay() {
+  var branch_select = document.getElementById("branch_select");
+  branch_select.style.display = moveSet.branches().length == 0 ? 'none' : 'inline';
+}
+
 function prepareForPlayMode() {
   clearBoard();
   clearComment();
@@ -996,6 +1017,7 @@ function prepareForPlayMode() {
   }
 
   setTurn(moveSet.nextTurn());
+  updateBranchSelectDisplay();
   updateNumMovesDisplay(moveSet.indexPlay);
 
   hideButtonsToPlay(false);
@@ -1049,6 +1071,7 @@ function playNext() {
   putMove(strMove);
   //TODO: Should be moveSet.nextTurn() ?
   setTurn(getOpponent(getColorOfStone(strMove)));
+  updateBranchSelectDisplay();
   updateNumMovesDisplay(moveSet.indexPlay);
   return true;
 }
@@ -1061,6 +1084,7 @@ function playPrev() {
   removeMove(strMove);
   setTurn(getColorOfStone(strMove));
   displayComment(moveSet.getCurrentComment());
+  updateBranchSelectDisplay();
   updateNumMovesDisplay(moveSet.indexPlay);
   return true;
 }
