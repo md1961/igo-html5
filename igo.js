@@ -127,8 +127,12 @@ function MoveSet() {
   //TODO: Rename to indexNext or indexMoves ?
   this.indexPlay = 0;
   this.isPlayMode = false;
+  this.onBranch = false;
   this.isTempMode = false;
   this.tempMoves = [];
+  this.indexPlaySaved = null;
+  //TODO: Remove these two
+  this.indexPlayOnTrunk = null;
   this.indexMovesToRestoreFromTempMode = null;
 
   this.length = function() {
@@ -165,8 +169,8 @@ function MoveSet() {
     this.setTempMode(false);
     this.indexPlay = 0;
 
-    var indexPlayToRestore = this.indexMovesToRestoreFromTempMode;
-    this.indexMovesToRestoreFromTempMode = null;
+    var indexPlayToRestore = this.indexPlaySaved;
+    this.indexPlaySaved = null;
     return indexPlayToRestore;
   };
 
@@ -213,15 +217,39 @@ function MoveSet() {
     return this.moves.branches(this.indexPlay);
   };
 
+  this.branchTo = function(numBranch) {
+    this._strMovesToRewind = this.moves.branches(this.indexPlay)[numBranch];
+    this.moves.branchTo(this.indexPlay, numBranch);
+    //TODO: Handle branch on branch...
+    this.indexPlaySaved = this.indexPlay;
+    this.indexPlay = 0;
+    this.onBranch = true;
+  };
+
+  this.backToTrunk = function() {
+    if (this.indexPlaySaved === null) {
+      return;
+    }
+    this.moves.backToTrunk();
+    this._strMovesToRewind = this._strMovesToRewind.slice(0, this.indexPlay);
+    this.indexPlay = this.indexPlaySaved;
+    this.indexPlaySaved = null;
+    this.onBranch = false;
+  };
+
+  this.strMovesToRewind = function() {
+    return this._strMovesToRewind;
+  };
+
   this.setTempMode = function(isTempMode) {
     this.isTempMode = isTempMode;
     if (isTempMode) {
       this.tempMoves = [];
       this.isPlayMode = false;
-      this.indexMovesToRestoreFromTempMode = this.indexPlay;
+      this.indexPlaySaved = this.indexPlay;
     } else if (this.tempMoves.length > 0) {
       if (confirm("Save this branch?")) {
-        this.moves.insert(this.indexMovesToRestoreFromTempMode, this.tempMoves);
+        this.moves.insert(this.indexPlaySaved, this.tempMoves);
       }
       this.tempMoves = [];
     }
@@ -263,7 +291,7 @@ function MoveSet() {
     return {
       "title": this.title,
       "inits": this.inits,
-      "moves": this.moves.to_array()
+      "moves": this.moves.strMoves()
     };
   };
 
@@ -272,24 +300,38 @@ function MoveSet() {
   };
 }
 
-function Moves(moves) {
-  this._moves = moves;
+function Moves(strMoves) {
+  this._moves = strMoves;
 
-  this.to_array = function() {
+  this.strMoves = function() {
     return this._moves;
   };
 
+  this._isTrunkMove = function(move) {
+    return typeof move == 'string';
+  };
+
   this._trunkMoves = function() {
+    var _isTrunkMove = this._isTrunkMove;
     return this._moves.filter(function(move) {
-      return typeof move == 'string';
+      return _isTrunkMove(move);
     });
   };
 
   this._indexInMoves = function(index) {
-    var numNonMovesUptoIndex = this._moves.slice(0, index + 1).filter(function(move) {
-      return typeof move != 'string';
-    }).length;
-    return index + numNonMovesUptoIndex;
+    var countTrunkMoves = 0;
+    var countBranches   = 0;
+    for (var move of this._moves) {
+      if (this._isTrunkMove(move)) {
+        countTrunkMoves++;
+        if (countTrunkMoves >= index + 1) {
+          break;
+        }
+      } else {
+        countBranches++;
+      }
+    }
+    return index + countBranches;
   };
 
   this.length = function() {
@@ -303,7 +345,7 @@ function Moves(moves) {
   this.branches = function(index) {
     var branches = [];
     for (var move of this._moves.slice(0, this._indexInMoves(index)).reverse()) {
-      if (typeof move == 'string') {
+      if (this._isTrunkMove(move)) {
         break;
       }
       branches.unshift(move);
@@ -322,7 +364,7 @@ function Moves(moves) {
   this.pop = function() {
     do {
       var move = this._moves.pop();
-      if (typeof move == 'string') {
+      if (this._isTrunkMove(move)) {
         return move;
       }
     } while (this._moves.length > 0);
@@ -331,6 +373,15 @@ function Moves(moves) {
 
   this.insert = function(index, move) {
     this._moves.splice(this._indexInMoves(index), 0, move);
+  };
+
+  this.branchTo = function(index, numBranch) {
+    this._moves_trunk = this._moves;
+    this._moves = this.branches(index)[numBranch];
+  };
+
+  this.backToTrunk = function() {
+    this._moves = this._moves_trunk;
   };
 }
 
@@ -1000,9 +1051,43 @@ function radioModeHandler(radioMode) {
   }
 }
 
+function branchSelectChangeHandler(branch_select) {
+  if (branch_select.value == 'trunk') {
+    moveSet.backToTrunk();
+    for (var strMove of moveSet.strMovesToRewind().reverse()) {
+      removeMove(strMove);
+    }
+  } else {
+    var numBranch = parseInt(branch_select.value);
+    moveSet.branchTo(numBranch);
+  }
+}
+
 function updateBranchSelectDisplay() {
+  if (moveSet.onBranch) {
+    return;
+  }
   var branch_select = document.getElementById("branch_select");
-  branch_select.style.display = moveSet.branches().length == 0 ? 'none' : 'inline';
+  removeAllChildren(branch_select);
+  branch_select.appendChild(createOption('本譜', 'trunk'));
+  var branches = moveSet.branches();
+  for (var index in branches) {
+    branch_select.appendChild(createOption('変化' + index, index));
+  }
+  branch_select.style.display = branches.length === 0 ? 'none' : 'inline';
+}
+
+function createOption(label, value) {
+  var option = document.createElement('option');
+  option.setAttribute('value', value);
+  option.innerText = label;
+  return option;
+}
+
+function removeAllChildren(node) {
+  while (node.firstChild) {
+    node.removeChild(node.firstChild);
+  }
 }
 
 function prepareForPlayMode() {

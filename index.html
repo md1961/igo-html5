@@ -131,7 +131,7 @@
           <input type="button" id="button_next_move" value="    >    "   onclick="playNext();"
                  style="font-size: x-large;">
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <select id="branch_select" hidden>
+          <select id="branch_select" onchange="branchSelectChangeHandler(this);" hidden>
             <option value="trunk">本譜</option>
           </select>
         </span>
