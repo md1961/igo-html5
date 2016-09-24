@@ -1057,24 +1057,37 @@ function branchSelectChangeHandler(branch_select) {
     for (var strMove of moveSet.strMovesToRewind().reverse()) {
       removeMove(strMove);
     }
+    updateBranchSelectDisplay();
   } else {
     var numBranch = parseInt(branch_select.value);
     moveSet.branchTo(numBranch);
+    var branch_select = replaceBranchSelect([['変化' + numBranch, numBranch]]);
+    branch_select.value = numBranch;
   }
+  updateNumMovesDisplay(moveSet.indexPlay);
 }
 
 function updateBranchSelectDisplay() {
   if (moveSet.onBranch) {
     return;
   }
+  var options = moveSet.branches().map(function(branch, index) {
+    return ['変化' + index, index];
+  });
+  var branch_select = replaceBranchSelect(options);
+  branch_select.style.display = moveSet.branches().length === 0 ? 'none' : 'inline';
+}
+
+function replaceBranchSelect(options) {
   var branch_select = document.getElementById("branch_select");
   removeAllChildren(branch_select);
   branch_select.appendChild(createOption('本譜', 'trunk'));
-  var branches = moveSet.branches();
-  for (var index in branches) {
-    branch_select.appendChild(createOption('変化' + index, index));
+  for (var label_and_value of options) {
+    var label = label_and_value[0];
+    var value = label_and_value[1];
+    branch_select.appendChild(createOption(label, value));
   }
-  branch_select.style.display = branches.length === 0 ? 'none' : 'inline';
+  return branch_select;
 }
 
 function createOption(label, value) {
