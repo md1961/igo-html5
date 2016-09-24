@@ -5,7 +5,7 @@ window.onload = function() {
   }
 
   initializeBoard("main_board", boardColor);
-  is_board_initialized = true;
+  isBoardInitialized = true;
 };
 
 function getQueryString() {
@@ -120,12 +120,24 @@ function MoveSet() {
   this.clear = function() {
     this.title = "";
     this.inits = [];
-    this.moves = [];
+    this.moves = new Moves([]);
   };
 
   this.clear();
+  //TODO: Rename to indexNext or indexMoves ?
+  this.indexPlay = 0;
+  this.isPlayMode = false;
+  this.onBranch = false;
   this.isTempMode = false;
   this.tempMoves = [];
+  this.indexPlaySaved = null;
+  //TODO: Remove these two
+  this.indexPlayOnTrunk = null;
+  this.indexMovesToRestoreFromTempMode = null;
+
+  this.length = function() {
+    return this.moves.length();
+  };
 
   this.writeInits = function(stone, x, y) {
     var init = stringifyMove(stone, x, y);
@@ -152,54 +164,122 @@ function MoveSet() {
     return moves.pop();
   };
 
+  this.prepareForPlayMode = function() {
+    this.isPlayMode = true;
+    this.setTempMode(false);
+    this.indexPlay = 0;
+
+    var indexPlayToRestore = this.indexPlaySaved;
+    this.indexPlaySaved = null;
+    return indexPlayToRestore;
+  };
+
+  this.playNext = function() {
+    if (this.indexPlay >= this.moves.length()) {
+      this.indexPlay = this.moves.length();
+      return null;
+    }
+    return this.moves.get(this.indexPlay++);
+  };
+
+  this.playPrev = function() {
+    if (this.indexPlay <= 0) {
+      this.indexPlay = 0;
+      return null;
+    }
+    this.indexPlay--;
+    return this.moves.get(this.indexPlay);
+  };
+
   this.DEFAULT_NEXT_TURN = BLACK;
 
   this.nextTurn = function() {
-    if (this.moves.length === 0) {
+    if (this.moves.length() === 0) {
       return this.DEFAULT_NEXT_TURN;
+    } else if (this.isPlayMode) {
+      if (this.indexPlay < this.moves.length()) {
+        return getColorOfStone(this.moves.get(this.indexPlay));
+      }
+      return getOpponent(getColorOfStone(this.moves.get(this.indexPlay - 1)));
+    } else {
+      var lastStrMove = this.moves.get(this.moves.length() - 1);
+      //TODO: Use getOpponent()?
+      switch (lastStrMove[0].toUpperCase()) {
+        case  NONE[0]: return null;
+        case BLACK[0]: return WHITE;
+        case WHITE[0]: return BLACK;
+        default : throw "Illegal stringified move '" + lastStrMove +"'";
+      }
     }
-    var lastStrMove = this.moves[this.moves.length - 1];
-    switch (lastStrMove[0].toUpperCase()) {
-      case  NONE[0]: return null;
-      case BLACK[0]: return WHITE;
-      case WHITE[0]: return BLACK;
-      default : throw "Illegal stringified move '" + lastStrMove +"'";
+  };
+
+  this.branches = function() {
+    return this.moves.branches(this.indexPlay);
+  };
+
+  this.branchTo = function(numBranch) {
+    this._strMovesToRewind = this.moves.branches(this.indexPlay)[numBranch];
+    this.moves.branchTo(this.indexPlay, numBranch);
+    //TODO: Handle branch on branch...
+    this.indexPlaySaved = this.indexPlay;
+    this.indexPlay = 0;
+    this.onBranch = true;
+  };
+
+  this.backToTrunk = function() {
+    if (this.indexPlaySaved === null) {
+      return;
     }
+    this.moves.backToTrunk();
+    this._strMovesToRewind = this._strMovesToRewind.slice(0, this.indexPlay);
+    this.indexPlay = this.indexPlaySaved;
+    this.indexPlaySaved = null;
+    this.onBranch = false;
+  };
+
+  this.strMovesToRewind = function() {
+    return this._strMovesToRewind;
   };
 
   this.setTempMode = function(isTempMode) {
     this.isTempMode = isTempMode;
     if (isTempMode) {
       this.tempMoves = [];
+      this.isPlayMode = false;
+      this.indexPlaySaved = this.indexPlay;
+    } else if (this.tempMoves.length > 0) {
+      if (confirm("Save this branch?")) {
+        this.moves.insert(this.indexPlaySaved, this.tempMoves);
+      }
+      this.tempMoves = [];
     }
   };
 
   this.addComment = function(comment, index) {
-    if (index < 0 || index >= this.moves.length) {
-      index = this.moves.length - 1;
+    if (index < 0 || index >= this.moves.length()) {
+      index = this.moves.length() - 1;
     }
 
-    var move = this.moves[index];
+    var move = this.moves.get(index);
     move = move.replace(/\[[^\]]*\]/, '');
     move += '[' + comment + ']';
-    this.moves[index] = move;
+    this.moves.set(index, move);
   };
 
-  this.getComment = function(index) {
-    if (index < 0) {
+  this.getCurrentComment = function() {
+    if (this.indexPlay <= 0) {
       return null;
-    } else if (index >= this.moves.length) {
-      index = this.moves.length - 1;
+    } else if (this.indexPlay > this.moves.length()) {
+      this.indexPlay = this.moves.length();
     }
-
-    var move = this.moves[index];
+    var move = this.moves.get(this.indexPlay - 1);
     return parseMove(move)[4];
   };
 
   this.readDataInHash = function(hash) {
     this.title = hash.title;
     this.inits = hash.inits;
-    this.moves = hash.moves;
+    this.moves = new Moves(hash.moves);
   };
 
   this.readDataInJson = function(json) {
@@ -211,7 +291,7 @@ function MoveSet() {
     return {
       "title": this.title,
       "inits": this.inits,
-      "moves": this.moves
+      "moves": this.moves.strMoves()
     };
   };
 
@@ -220,15 +300,100 @@ function MoveSet() {
   };
 }
 
+function Moves(strMoves) {
+  this._moves = strMoves;
+
+  this.strMoves = function() {
+    return this._moves;
+  };
+
+  this._isTrunkMove = function(move) {
+    return typeof move == 'string';
+  };
+
+  this._trunkMoves = function() {
+    var _isTrunkMove = this._isTrunkMove;
+    return this._moves.filter(function(move) {
+      return _isTrunkMove(move);
+    });
+  };
+
+  this._indexInMoves = function(index) {
+    var countTrunkMoves = 0;
+    var countBranches   = 0;
+    for (var move of this._moves) {
+      if (this._isTrunkMove(move)) {
+        countTrunkMoves++;
+        if (countTrunkMoves >= index + 1) {
+          break;
+        }
+      } else {
+        countBranches++;
+      }
+    }
+    return index + countBranches;
+  };
+
+  this.length = function() {
+    return this._trunkMoves().length;
+  };
+
+  this.get = function(index) {
+    return this._trunkMoves()[index];
+  };
+
+  this.branches = function(index) {
+    var branches = [];
+    for (var move of this._moves.slice(0, this._indexInMoves(index)).reverse()) {
+      if (this._isTrunkMove(move)) {
+        break;
+      }
+      branches.unshift(move);
+    }
+    return branches;
+  };
+
+  this.set = function(index, move) {
+    this._moves[this._indexInMoves(index)] = move;
+  };
+
+  this.push = function(move) {
+    this._moves.push(move);
+  };
+
+  this.pop = function() {
+    do {
+      var move = this._moves.pop();
+      if (this._isTrunkMove(move)) {
+        return move;
+      }
+    } while (this._moves.length > 0);
+    return null;
+  };
+
+  this.insert = function(index, move) {
+    this._moves.splice(this._indexInMoves(index), 0, move);
+  };
+
+  this.branchTo = function(index, numBranch) {
+    this._moves_trunk = this._moves;
+    this._moves = this.branches(index)[numBranch];
+  };
+
+  this.backToTrunk = function() {
+    this._moves = this._moves_trunk;
+  };
+}
+
 
 var moveBook = new MoveBook();
 var moveSet;
-var is_board_initialized = false;
+var isBoardInitialized = false;
 
 
 function newMoveSet() {
   moveSet = moveBook.add(new MoveSet());
-  if (is_board_initialized) {
+  if (isBoardInitialized) {
     clearAll();
   }
 }
@@ -385,6 +550,9 @@ function readDataFromLocalStorage() {
   if (isLocalStorageAvailable()) {
     var moveDisplay = document.getElementById("moves_display");
     var data = localStorage.getItem(KEY_FOR_DATA_IN_LOCAL_STORAGE);
+    if (data === null || ! confirm("いま表示されているデータを上書きしていいですか？")) {
+      return;
+    }
 
     moveDisplay.value = data;
     readDataIntoMoveBook();
@@ -445,7 +613,7 @@ function clearBoard() {
 
   document.getElementById("title").innerText = null;
   document.getElementById("moves_display").value = null;
-  updateNumMoves(0);
+  updateNumMovesDisplay(0);
 }
 
 function clearAll() {
@@ -494,7 +662,7 @@ function putStone(x, y) {
   }
 
   updateCanvasDisplay(x, y);
-  updateNumMoves(moveSet.moves.length);
+  updateNumMovesDisplay(moveSet.length());
   displayMoveSet();
 }
 
@@ -513,7 +681,7 @@ function removeLastMove() {
 
   toggleTurn();
 
-  updateNumMoves(moveSet.moves.length);
+  updateNumMovesDisplay(moveSet.length());
   displayMoveSet();
 }
 
@@ -561,14 +729,14 @@ function removeStoneByMove(move) {
   updateCanvasDisplay(x, y);
 }
 
-function updateNumMoves(numMoves) {
+function updateNumMovesDisplay(numMoves) {
   if (isTempMode()) {
     return;
   }
 
   var totalMoves = 0;
   if (moveSet !== null) {
-    totalMoves = moveSet.moves.length;
+    totalMoves = moveSet.length();
   }
 
   document.getElementById("numMoves").innerText = numMoves + "手目 / 全" + totalMoves + "手";
@@ -610,7 +778,7 @@ function inputComment() {
   document.getElementById("comment").innerText = document.getElementById("comment_input").value;
 
   var comment = document.getElementById("comment_input");
-  var index = isTurnMode() ? -1 : indexPlay - 1;
+  var index = isTurnMode() ? -1 : moveSet.indexPlay - 1;
   moveSet.addComment(comment.value, index);
 
   displayMoveSet();
@@ -677,7 +845,7 @@ function takeStones() {
         var stone = getStone(x, y);
         drawStone(x, y, NONE);
         stonesTaken.push(stringifyMove(stone, x, y));
-        // TODO: Count up taken stones
+        //TODO: Count up taken stones
 
         updateCanvasDisplay(x, y);
       }
@@ -883,31 +1051,72 @@ function radioModeHandler(radioMode) {
   }
 }
 
-var indexPlay;
+function branchSelectChangeHandler(branch_select) {
+  if (branch_select.value == 'trunk') {
+    moveSet.backToTrunk();
+    for (var strMove of moveSet.strMovesToRewind().reverse()) {
+      removeMove(strMove);
+    }
+    updateBranchSelectDisplay();
+  } else {
+    var numBranch = parseInt(branch_select.value);
+    moveSet.branchTo(numBranch);
+    var branch_select = replaceBranchSelect([['変化' + numBranch, numBranch]]);
+    branch_select.value = numBranch;
+  }
+  updateNumMovesDisplay(moveSet.indexPlay);
+}
+
+function updateBranchSelectDisplay() {
+  if (moveSet.onBranch) {
+    return;
+  }
+  var options = moveSet.branches().map(function(branch, index) {
+    return ['変化' + index, index];
+  });
+  var branch_select = replaceBranchSelect(options);
+  branch_select.style.display = moveSet.branches().length === 0 ? 'none' : 'inline';
+}
+
+function replaceBranchSelect(options) {
+  var branch_select = document.getElementById("branch_select");
+  removeAllChildren(branch_select);
+  branch_select.appendChild(createOption('本譜', 'trunk'));
+  for (var label_and_value of options) {
+    var label = label_and_value[0];
+    var value = label_and_value[1];
+    branch_select.appendChild(createOption(label, value));
+  }
+  return branch_select;
+}
+
+function createOption(label, value) {
+  var option = document.createElement('option');
+  option.setAttribute('value', value);
+  option.innerText = label;
+  return option;
+}
+
+function removeAllChildren(node) {
+  while (node.firstChild) {
+    node.removeChild(node.firstChild);
+  }
+}
 
 function prepareForPlayMode() {
-  moveSet.setTempMode(false);
-
   clearBoard();
   clearComment();
   putInits();
   setPlayMode();
 
-  indexPlay = 0;
-  if (indexMovesToRestoreFromTempMode !== null) {
-    goToMoveNumberOf(indexMovesToRestoreFromTempMode);
-    indexMovesToRestoreFromTempMode = null;
+  var indexPlayToRestore = moveSet.prepareForPlayMode();
+  if (indexPlayToRestore !== null) {
+    playToNextOf(indexPlayToRestore);
   }
-  var nextTurn;
-  if (moveSet.moves.length === 0) {
-    nextTurn = moveSet.DEFAULT_NEXT_TURN;
-  } else if (indexPlay < moveSet.moves.length) {
-    nextTurn = getColorOfStone(moveSet.moves[indexPlay]);
-  } else {
-    nextTurn = getOpponent(getColorOfStone(moveSet.moves[indexPlay - 1]));
-  }
-  setTurn(nextTurn);
-  updateNumMoves(indexPlay);
+
+  setTurn(moveSet.nextTurn());
+  updateBranchSelectDisplay();
+  updateNumMovesDisplay(moveSet.indexPlay);
 
   hideButtonsToPlay(false);
   hideInfoDisplay(false);
@@ -928,10 +1137,7 @@ function prepareForTurnMode() {
   hideInfoDisplay(false);
 }
 
-var indexMovesToRestoreFromTempMode = null;
-
 function prepareForTempMode() {
-  indexMovesToRestoreFromTempMode = indexPlay;
   moveSet.setTempMode(true);
    
   setTempMode();
@@ -951,38 +1157,33 @@ function hideInfoDisplay(toBeHidden) {
 }
 
 function putMovesToLast() {
-  indexPlay = 0;
+  moveSet.prepareForPlayMode();
   playToLast();
 }
 
 function playNext() {
-  if (indexPlay >= moveSet.moves.length) {
-    indexPlay = moveSet.moves.length;
+  var strMove = moveSet.playNext();
+  if (strMove === null) {
     return false;
   }
-
-  var strMove = moveSet.moves[indexPlay++];
   putMove(strMove);
+  //TODO: Should be moveSet.nextTurn() ?
   setTurn(getOpponent(getColorOfStone(strMove)));
-  updateNumMoves(indexPlay);
-
+  updateBranchSelectDisplay();
+  updateNumMovesDisplay(moveSet.indexPlay);
   return true;
 }
 
 function playPrev() {
-  if (indexPlay <= 0) {
-    indexPlay = 0;
+  var strMove = moveSet.playPrev();
+  if (strMove === null) {
     return false;
   }
-
-  indexPlay--;
-  var strMove = moveSet.moves[indexPlay];
-  var comment = moveSet.getComment(indexPlay - 1);
   removeMove(strMove);
   setTurn(getColorOfStone(strMove));
-  displayComment(comment);
-  updateNumMoves(indexPlay);
-
+  displayComment(moveSet.getCurrentComment());
+  updateBranchSelectDisplay();
+  updateNumMovesDisplay(moveSet.indexPlay);
   return true;
 }
 
@@ -1003,17 +1204,10 @@ function playToPrevOf(step) {
 }
 
 function goToMove() {
-  var num_move_to_go = parseInt(document.getElementById("num_move_to_go").value);
-  goToMoveNumberOf(num_move_to_go);
-}
-
-function goToMoveNumberOf(numMove) {
+  var numMoveToGo = parseInt(document.getElementById("num_move_to_go").value);
   clearBoard();
   putInits();
-
-  indexPlay = 0;
-  for (var i = 0; i < numMove; i++) {
-    playNext();
-  }
+  moveSet.prepareForPlayMode();
+  playToNextOf(numMoveToGo);
 }
 
