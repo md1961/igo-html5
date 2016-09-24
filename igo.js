@@ -217,6 +217,24 @@ function MoveSet() {
     return this.moves.branches(this.indexPlay);
   };
 
+  this.offsetToNextJunction = function() {
+    return this._offsetToAdjacentJunction(+1);
+  };
+
+  this.offsetToPrevJunction = function() {
+    return -this._offsetToAdjacentJunction(-1);
+  };
+
+  this._offsetToAdjacentJunction = function(direction) {
+    direction = direction / Math.abs(direction);
+    for (var i = this.indexPlay + direction; 0 <= i && i < this.moves.length(); i += direction) {
+      if (this.moves.branches(i).length > 0) {
+        return i - this.indexPlay;
+      }
+    }
+    return null;
+  };
+
   this.branchTo = function(numBranch) {
     this._strMovesToRewind = this.moves.branches(this.indexPlay)[numBranch];
     this.moves.branchTo(this.indexPlay, numBranch);
@@ -1061,7 +1079,7 @@ function branchSelectChangeHandler(branch_select) {
   } else {
     var numBranch = parseInt(branch_select.value);
     moveSet.branchTo(numBranch);
-    var branch_select = replaceBranchSelect([['変化' + numBranch, numBranch]]);
+    branch_select = replaceBranchSelect([['変化' + numBranch, numBranch]]);
     branch_select.value = numBranch;
   }
   updateNumMovesDisplay(moveSet.indexPlay);
@@ -1201,6 +1219,14 @@ function playToNextOf(step) {
 
 function playToPrevOf(step) {
   for (var i = 0; i < step && playPrev(); i++) {}
+}
+
+function playToNextJunction() {
+  playToNextOf(moveSet.offsetToNextJunction());
+}
+
+function playToPrevJunction() {
+  playToPrevOf(moveSet.offsetToPrevJunction());
 }
 
 function goToMove() {
