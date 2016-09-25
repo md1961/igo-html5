@@ -56,6 +56,18 @@
     <table id="main_board" class="board"></table>
 
     <div id="panels">
+      <div class="panel" style="height: 30px">
+        <span class="panel">
+          <span id="comment_holder">
+            <span id="comment"></span>
+            <span class="small_button" onclick="showCommentInput();">&lt;=</span>
+          </span>
+          <span id="comment_input_holder" hidden>
+            <input type="text" id="comment_input" size="40">
+            <input type="button" value="コメント記入" onclick="inputComment();">
+          </span>
+        </span>
+      </div>
       <div class="panel">
         <span class="panel">
           <input type="submit" value="<=BS" onclick="removeLastMove();"></input>
@@ -73,8 +85,7 @@
           <input type="button" id="button_to_new_move_set" value="新譜" onclick="newMoveSet();">
         </span>
       </div>
-      <br />
-      <div class="panel">
+      <div class="panel" style="margin-top: 20px">
         <span class="panel bordered">
           <input type="radio" name="mode" id="radio_mode_turn" value="turn" onclick="radioModeHandler(this);" checked>
           <label for="radio_mode_turn">対戦</label>
@@ -110,18 +121,6 @@
           </span>
           &nbsp;&nbsp;
           <span id="numMoves" />
-        </span>
-      </div>
-      <div class="panel">
-        <span class="panel">
-          <span id="comment_holder">
-            <span id="comment"></span>
-            <span class="small_button" onclick="showCommentInput();">&lt;=</span>
-          </span>
-          <span id="comment_input_holder" hidden>
-            <input type="text" id="comment_input" size="40">
-            <input type="button" value="コメント記入" onclick="inputComment();">
-          </span>
         </span>
       </div>
       <div id="buttons_to_play" class="panel">
