@@ -1069,13 +1069,16 @@ function radioModeHandler(radioMode) {
   }
 }
 
+const VALUE_TRUNK_OF_BRANCH_SELECT = 'trunk';
+
 function branchSelectChangeHandler(branch_select) {
-  if (branch_select.value == 'trunk') {
+  if (branch_select.value == VALUE_TRUNK_OF_BRANCH_SELECT) {
     moveSet.backToTrunk();
     for (var strMove of moveSet.strMovesToRewind().reverse()) {
       removeMove(strMove);
     }
     updateBranchSelectDisplay();
+    displayComment(moveSet.getCurrentComment());
   } else {
     var numBranch = parseInt(branch_select.value);
     moveSet.branchTo(numBranch);
@@ -1099,7 +1102,7 @@ function updateBranchSelectDisplay() {
 function replaceBranchSelect(options) {
   var branch_select = document.getElementById("branch_select");
   removeAllChildren(branch_select);
-  branch_select.appendChild(createOption('本譜', 'trunk'));
+  branch_select.appendChild(createOption('本譜', VALUE_TRUNK_OF_BRANCH_SELECT));
   for (var label_and_value of options) {
     var label = label_and_value[0];
     var value = label_and_value[1];
