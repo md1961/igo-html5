@@ -1139,8 +1139,8 @@ function prepareForPlayMode() {
   updateBranchSelectDisplay();
   updateNumMovesDisplay(moveSet.indexPlay);
 
-  hideButtonsToPlay(false);
-  hideInfoDisplay(false);
+  showButtonsToPlay(true);
+  showInfoDisplay(true);
 }
 
 function prepareForTurnMode() {
@@ -1154,8 +1154,8 @@ function prepareForTurnMode() {
   setTurn(moveSet.nextTurn());
 
   displayMoveSet();
-  hideButtonsToPlay(true);
-  hideInfoDisplay(false);
+  showButtonsToPlay(false);
+  showInfoDisplay(true);
 }
 
 function prepareForTempMode() {
@@ -1163,18 +1163,18 @@ function prepareForTempMode() {
    
   setTempMode();
 
-  hideButtonsToPlay(true);
-  hideInfoDisplay(true);
+  showButtonsToPlay(false);
+  showInfoDisplay(false);
 }
 
-function hideButtonsToPlay(toBeHidden) {
+function showButtonsToPlay(toBeShown) {
   var buttons_to_play = document.getElementById("buttons_to_play");
-  buttons_to_play.style.display = toBeHidden ? 'none' : 'inline';
+  buttons_to_play.style.display = toBeShown ? 'inline' : 'none';
 }
 
-function hideInfoDisplay(toBeHidden) {
+function showInfoDisplay(toBeShown) {
   var info = document.getElementById("info");
-  info.style.display = toBeHidden ? 'none' : 'block';
+  info.style.display = toBeShown ? 'block' : 'none';
 }
 
 function putMovesToLast() {
