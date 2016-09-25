@@ -773,7 +773,9 @@ function displayMoveSet() {
 function showTitleInput() {
   document.getElementById("title_holder"      ).style.display = 'none';
   document.getElementById("title_input_holder").style.display = 'inline';
-  document.getElementById("title_input").value = document.getElementById("title").innerText;
+  var title_input = document.getElementById("title_input");
+  title_input.value = document.getElementById("title").innerText;
+  title_input.focus();
 }
 
 function inputTitle() {
@@ -787,7 +789,9 @@ function inputTitle() {
 function showCommentInput() {
   document.getElementById("comment_holder"      ).style.display = 'none';
   document.getElementById("comment_input_holder").style.display = 'inline';
-  document.getElementById("comment_input").value = document.getElementById("comment").innerText;
+  var comment_input = document.getElementById("comment_input");
+  comment_input.value = document.getElementById("comment").innerText;
+  comment_input.focus();
 }
 
 function inputComment() {
