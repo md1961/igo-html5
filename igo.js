@@ -490,6 +490,9 @@ function readDataFromLocalStorage() {
 
     moveDisplay.value = data;
     readDataIntoMoveBook();
+
+    moveSet = moveBook.prev();
+    updateBoardByMoveSet();
   }
 }
 
