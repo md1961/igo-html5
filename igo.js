@@ -469,6 +469,7 @@ function readDataIntoMoveBook() {
 
 function updateBoardByMoveSet() {
   clearBoard();
+  clearComment();
   putInits();
   putMovesToLast();
 
@@ -555,6 +556,7 @@ function clearAll() {
   setTurn(BLACK);
 
   clearBoard();
+  clearComment();
   enableRadioToInitMode(true);
 }
 
