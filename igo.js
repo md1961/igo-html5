@@ -561,7 +561,7 @@ function updateBoardByMoveSet() {
   setTurn(moveSet.nextTurn());
 
   displayMoveSet();
-  disableRadioToInitMode(true);
+  enableRadioToInitMode(false);
 }
 
 function readDataFromLocalStorage() {
@@ -640,7 +640,7 @@ function clearAll() {
   setTurn(BLACK);
 
   clearBoard();
-  disableRadioToInitMode(false);
+  enableRadioToInitMode(true);
 }
 
 function gridClickHandler() {
@@ -676,7 +676,7 @@ function putStone(x, y) {
     toggleTurn();
     clearComment();
 
-    disableRadioToInitMode(true);
+    enableRadioToInitMode(false);
   }
 
   updateCanvasDisplay(x, y);
@@ -684,9 +684,9 @@ function putStone(x, y) {
   displayMoveSet();
 }
 
-function disableRadioToInitMode(toBeDisabled) {
+function enableRadioToInitMode(toBeEnabled) {
   var radioToInit = document.getElementById("radio_mode_init_with_label");
-  radioToInit.style.display = toBeDisabled ? 'none' : 'inline';
+  radioToInit.style.display = toBeEnabled ? 'inline' : 'none';
 }
 
 function removeLastMove() {
