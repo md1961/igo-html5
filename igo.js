@@ -999,7 +999,7 @@ function updateCanvasDisplay(x, y) {
   var end = dim.gridPitch + 0.5;
   var mid = Math.floor(dim.gridPitch / 2) + 0.5;
 
-  var cxt = getCanvasContext(getCanvasId(x, y));
+  var cxt = CanvasUtil.getCanvasContext(getCanvasId(x, y));
 
   cxt.fillStyle = RGB_WHITE;
   cxt.clearRect(start, start, end, end);

@@ -1,14 +1,10 @@
-function getCanvasContext(canvasId) {
+var CanvasUtil = {
 
-  /* canvas要素のノードオブジェクト */
-  var canvas = document.getElementById(canvasId);
-
-  /* canvas要素の存在チェックとCanvas未対応ブラウザの対処 */
-  if ( ! canvas || ! canvas.getContext ) {
-    return false;
+  getCanvasContext: function(canvasId) {
+    var canvas = document.getElementById(canvasId);
+    if (! canvas || ! canvas.getContext) {
+      return false;
+    }
+    return canvas.getContext('2d');
   }
-
-  /* 2Dコンテキスト */
-  return canvas.getContext('2d');
-}
-
+};
