@@ -11,4 +11,18 @@ describe("Moves", function() {
       expect(moves.strMoves()).toEqual(strMoves);
     });
   });
+
+  describe("#_isTrunkMove()", function() {
+    describe("argument is a string", function() {
+      it("should return true", function() {
+        expect(moves._isTrunkMove('a string')).toBeTruthy;
+      });
+    });
+
+    describe("argument is an array", function() {
+      it("should return false", function() {
+        expect(moves._isTrunkMove([])).toBeFalsy;
+      });
+    });
+  });
 });
