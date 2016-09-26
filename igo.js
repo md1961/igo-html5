@@ -16,13 +16,11 @@ function getQueryString() {
 }
 
 
-var boardDimension = {
-  margin:    10,
-  gridPitch: 24,  // recommended to be an even number
-  numGrids:  19,
-  stoneDiameterShrinkage: 1.5,
-  starDiameter:           2.0,
-};
+const NONE  = 'NONE';
+const BLACK = 'BLACK';
+const WHITE = 'WHITE';
+const STONES = [NONE, BLACK, WHITE];
+
 
 const RADIO_MODE_INIT_ID  = "radio_mode_init";
 const RADIO_MODE_TURN_ID  = "radio_mode_turn";
@@ -30,20 +28,12 @@ const RADIO_MODE_PLAY_ID  = "radio_mode_play";
 const RADIO_MODE_TEMP_ID  = "radio_mode_temp";
 const RADIO_TURN_BLACK_ID = "radio_turn_black";
 const RADIO_TURN_WHITE_ID = "radio_turn_white";
-const ATTR_MARKED = 'marked';
-
-const NONE  = 'NONE';
-const BLACK = 'BLACK';
-const WHITE = 'WHITE';
-const STONES = [NONE, BLACK, WHITE];
-const OUT_OF_BOUNDS = 'out_of_bounds';
 
 const DEFAULT_BOARD_COLOR = '#fff';
 const REAL_BOARD_COLOR    = '#fb0';
-const RGB_BLACK = 'rgb(0, 0, 0)';
-const RGB_WHITE = 'rgb(255, 255, 255)';
 
 const KEY_FOR_DATA_IN_LOCAL_STORAGE = 'igoHtml5_keyForData';
+
 
 function getOpponent(stone) {
   switch (stone) {
@@ -262,8 +252,21 @@ function isLocalStorageAvailable() {
 
 function Board() {
 
+  this.boardDimension = {
+    margin:    10,
+    gridPitch: 24,  // recommended to be an even number
+    numGrids:  19,
+    stoneDiameterShrinkage: 1.5,
+    starDiameter:           2.0,
+  };
+
+  this.RGB_BLACK = 'rgb(0, 0, 0)';
+  this.RGB_WHITE = 'rgb(255, 255, 255)';
+  this.OUT_OF_BOUNDS = 'out_of_bounds';
+  this.ATTR_MARKED = 'marked';
+
   this.initialize = function(tableId, boardColor) {
-    var dim = boardDimension;
+    var dim = this.boardDimension;
     var table = document.getElementById(tableId);
     table.style.backgroundColor = boardColor;
     for (var y = 1; y <= dim.numGrids; y++) {
@@ -288,7 +291,7 @@ function Board() {
   };
 
   this.clear = function() {
-    var dim = boardDimension;
+    var dim = this.boardDimension;
     for (var y = 1; y <= dim.numGrids; y++) {
       for (var x = 1; x <= dim.numGrids; x++) {
         this.drawStone(x, y, NONE);
@@ -327,7 +330,7 @@ function Board() {
   };
 
   this.takeStones = function() {
-    var dim = boardDimension;
+    var dim = this.boardDimension;
     var stonesTaken = [];
     for (var y = 1; y <= dim.numGrids; y++) {
       for (var x = 1; x <= dim.numGrids; x++) {
@@ -389,10 +392,10 @@ function Board() {
   };
 
   this.getStone = function(x, y) {
-    var dim = boardDimension;
+    var dim = this.boardDimension;
 
     if (x < 1 || x > dim.numGrids || y < 1 || y > dim.numGrids) {
-      return OUT_OF_BOUNDS;
+      return this.OUT_OF_BOUNDS;
     }
     return this.getCanvas(x, y).class;
   };
@@ -402,7 +405,7 @@ function Board() {
   };
 
   this.isBottom = function(x, y) {
-    return y == boardDimension.numGrids;
+    return y == this.boardDimension.numGrids;
   };
 
   this.isLeftmost = function(x, y) {
@@ -410,13 +413,13 @@ function Board() {
   };
 
   this.isRightmost = function(x, y) {
-    return x == boardDimension.numGrids;
+    return x == this.boardDimension.numGrids;
   };
 
   const STAR_COORDS = [4, 10, 16];
 
   this.isStar = function(x, y) {
-    if (boardDimension.numGrids == 19) {
+    if (this.boardDimension.numGrids == 19) {
       if (STAR_COORDS.indexOf(x) >= 0 && STAR_COORDS.indexOf(y) >= 0) {
         return true;
       }
@@ -460,19 +463,19 @@ function Board() {
   };
 
   this.isMarked = function(x, y) {
-    return this.getCanvas(x, y).hasAttribute(ATTR_MARKED);
+    return this.getCanvas(x, y).hasAttribute(this.ATTR_MARKED);
   };
 
   this.markStone = function(x, y) {
-    this.getCanvas(x, y).setAttribute(ATTR_MARKED, ATTR_MARKED);
+    this.getCanvas(x, y).setAttribute(this.ATTR_MARKED, this.ATTR_MARKED);
   };
 
   this.unmarkStone = function(x, y) {
-    this.getCanvas(x, y).removeAttribute(ATTR_MARKED);
+    this.getCanvas(x, y).removeAttribute(this.ATTR_MARKED);
   };
 
   this.unmarkAllStones = function() {
-    var dim = boardDimension;
+    var dim = this.boardDimension;
 
     for (var y = 1; y <= dim.numGrids; y++) {
       for (var x = 1; x <= dim.numGrids; x++) {
@@ -482,7 +485,7 @@ function Board() {
   };
 
   this.updateCanvasDisplay = function(x, y) {
-    var dim = boardDimension;
+    var dim = this.boardDimension;
 
     var start = 0 + 0.5;
     var end = dim.gridPitch + 0.5;
@@ -490,7 +493,7 @@ function Board() {
 
     var cxt = CanvasUtil.getCanvasContext(this.getCanvasId(x, y));
 
-    cxt.fillStyle = RGB_WHITE;
+    cxt.fillStyle = this.RGB_WHITE;
     cxt.clearRect(start, start, end, end);
     cxt.beginPath();
 
@@ -512,13 +515,13 @@ function Board() {
     if (stone == WHITE || stone == BLACK) {
       cxt.beginPath();
       cxt.arc(mid, mid, mid - dim.stoneDiameterShrinkage, 0, Math.PI * 2);
-      cxt.fillStyle = stone == BLACK ? RGB_BLACK : RGB_WHITE;
+      cxt.fillStyle = stone == BLACK ? this.RGB_BLACK : this.RGB_WHITE;
       cxt.fill();
       cxt.closePath();
     } else if (this.isStar(x, y)) {
       cxt.beginPath();
       cxt.arc(mid, mid, dim.starDiameter, 0, Math.PI * 2);
-      cxt.fillStyle = RGB_BLACK;
+      cxt.fillStyle = this.RGB_BLACK;
       cxt.fill();
       cxt.closePath();
     }
