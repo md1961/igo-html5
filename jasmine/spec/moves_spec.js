@@ -73,4 +73,16 @@ describe("Moves", function() {
       expect(moves.get(25)).toEqual("Wob");
     });
   });
+
+  describe("#branches()", function() {
+    it("should return an array of arrays just before in this._trunkMoves()", function() {
+      expect(moves.branches( 0)).toEqual([]);
+      expect(moves.branches( 4)).toEqual([]);
+      expect(moves.branches( 5)).toEqual([["Wcm","Ben","Wfp","Bdl","Wck"]]);
+      expect(moves.branches(19)).toEqual([]);
+      expect(moves.branches(20)).toEqual([["Bqc","Wkc","Bqp","Wpo","Bop","Wql"]]);
+      expect(moves.branches(21)).toEqual([["Wmd","Blc","Wnd","Bqc"],["Wmd","Blc","Wnb","Bqc"]]);
+      expect(moves.branches(25)).toEqual([]);
+    });
+  });
 });
