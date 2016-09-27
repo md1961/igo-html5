@@ -85,4 +85,14 @@ describe("Moves", function() {
       expect(moves.branches(25)).toEqual([]);
     });
   });
+
+  describe("#set()", function() {
+    it("should change element at index to given value", function() {
+      var new_value = "Bpp[悪手]";
+      moves.set( 0, new_value);
+      expect(moves._moves[ 0]).toEqual(new_value);
+      moves.set(21, new_value);
+      expect(moves._moves[25]).toEqual(new_value);
+    });
+  });
 });
