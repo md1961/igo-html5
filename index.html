@@ -18,6 +18,21 @@
     <script type="text/javascript" src="app/move_book.js"></script>
     <script type="text/javascript" src="igo.js"></script>
 
+
+    <!-- Jasmine files
+
+    <link rel="shortcut icon" type="image/png" href="jasmine/lib/jasmine-2.5.2/jasmine_favicon.png">
+    <link rel="stylesheet" href="jasmine/lib/jasmine-2.5.2/jasmine.css">
+
+    <script src="jasmine/lib/jasmine-2.5.2/jasmine.js"></script>
+    <script src="jasmine/lib/jasmine-2.5.2/jasmine-html.js"></script>
+    <script src="jasmine/lib/jasmine-2.5.2/boot.js"></script>
+
+    <script src="jasmine/spec/moves_spec.js"></script>
+
+    End of Jasmine files -->
+
+
     <style>
       table.board {
         border-spacing: 0px;
@@ -56,124 +71,125 @@
   </head>
 
   <body>
-    <table id="main_board" class="board"></table>
+    <div id="application">
+      <table id="main_board" class="board"></table>
 
-    <div id="panels">
-      <div class="panel" style="height: 30px">
-        <span class="panel">
-          <span id="comment_holder">
-            <span id="comment"></span>
-            <span class="small_button" onclick="showCommentInput();">&lt;=</span>
+      <div id="panels">
+        <div class="panel" style="height: 30px">
+          <span class="panel">
+            <span id="comment_holder">
+              <span id="comment"></span>
+              <span class="small_button" onclick="showCommentInput();">&lt;=</span>
+            </span>
+            <span id="comment_input_holder" hidden>
+              <input type="text" id="comment_input" size="40">
+              <input type="button" value="コメント記入" onclick="inputComment();">
+            </span>
           </span>
-          <span id="comment_input_holder" hidden>
-            <input type="text" id="comment_input" size="40">
-            <input type="button" value="コメント記入" onclick="inputComment();">
+        </div>
+        <div class="panel">
+          <span class="panel">
+            <input type="submit" value="<=BS" onclick="removeLastMove();"></input>
           </span>
-        </span>
-      </div>
-      <div class="panel">
-        <span class="panel">
-          <input type="submit" value="<=BS" onclick="removeLastMove();"></input>
-        </span>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <span class="panel">
-          <input type="submit" value="全消去" onclick="clearAll();" disabled></input>
-        </span>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <span id="buttons_to_browze_move_sets" class="panel">
-          <input type="button" id="button_to_prev_move_set" value="< 前譜" onclick="prevMoveSet();">
-          &nbsp;&nbsp;
-          <input type="button" id="button_to_next_move_set" value="次譜 >" onclick="nextMoveSet();">
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <input type="button" id="button_to_new_move_set" value="新譜" onclick="newMoveSet();">
-        </span>
-      </div>
-      <div class="panel" style="margin-top: 20px">
-        <span class="panel bordered">
-          <input type="radio" name="mode" id="radio_mode_turn" value="turn" onclick="radioModeHandler(this);" checked>
-          <label for="radio_mode_turn">対戦</label>
-          <input type="radio" name="mode" id="radio_mode_play" value="play" onclick="radioModeHandler(this);">
-          <label for="radio_mode_play">再現</label>
-          <input type="radio" name="mode" id="radio_mode_temp" value="temp" onclick="radioModeHandler(this);">
-          <label for="radio_mode_temp">検討</label>
-          <span id="radio_mode_init_with_label">
-            &nbsp;
-            <input type="radio" name="mode" id="radio_mode_init" value="init" onclick="radioModeHandler(this);">
-            <label for="radio_mode_init">置石</label>
+          <span class="panel">
+            <input type="submit" value="全消去" onclick="clearAll();" disabled></input>
           </span>
-        </span>
-      </div>
-      <div class="panel">
-        <span class="panel bordered">
-          <input type="radio" name="turn" id="radio_turn_black" value="black" checked>
-          <label for="radio_turn_black">黒番</label>
-          <input type="radio" name="turn" id="radio_turn_white" value="white">
-          <label for="radio_turn_white">白番</label>
-        </span>
-      </div>
-      <div id="info" class="panel">
-        <span class="panel">
-          <span id="set_num" style="font-size: small">[1/1]</span>
-          <span id="title_holder">
-            <span id="title">(No Title)</span>
-            <span class="small_button" onclick="showTitleInput();">&lt;=</span>
-          </span>
-          <span id="title_input_holder" hidden>
-            <input type="text" id="title_input">
-            <input type="button" value="入力" onclick="inputTitle();">
-          </span>
-          &nbsp;&nbsp;
-          <span id="numMoves" />
-        </span>
-      </div>
-      <div id="buttons_to_play" class="panel">
-        <span class="panel">
-          <input type="button" id="button_prev_move" value="  <  "   onclick="playPrev();">
-          &nbsp;&nbsp;
-          <input type="button" id="button_next_move" value="    >    "   onclick="playNext();"
-                 style="font-size: x-large;">
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <select id="branch_select" onchange="branchSelectChangeHandler(this);" hidden>
-            <option value="trunk">本譜</option>
-          </select>
-        </span>
-        <br />
-        <br />
-        <span class="panel">
-          <input type="button" id="button_to_first"  value="|<"  onclick="playToFirst();">
-          <input type="button" id="button_prev_ten"  value="<10" onclick="playToPrevOf(10);">
-          <input type="button" id="button_prev_five" value="<5"  onclick="playToPrevOf(5);">
-          <input type="button" id="button_prev_junc" value="+<"  onclick="playToPrevJunction();">
-          &nbsp;&nbsp;
-          <input type="button" id="button_next_junc" value=">+"  onclick="playToNextJunction();">
-          <input type="button" id="button_next_five" value="5>"  onclick="playToNextOf(5);">
-          <input type="button" id="button_next_ten"  value="10>" onclick="playToNextOf(10);">
-          <input type="button" id="button_to_last"   value=">|"  onclick="playToLast();">
-          &nbsp;&nbsp;
-        </span>
-        <br />
-        <span class="panel">
-          <input type="text"   id="num_move_to_go"   size="1">
-          手目へ
-          <input type="button" id="button_to_go"     value="GO" onclick="goToMove();">
-        </span>
-      </div>
-      <div class="panel">
-        <span class="panel">
-          <textarea id="moves_display" cols="50" rows="4"></textarea>
-        </span>
-        <br />
-        <span class="panel">
-          <input type="button" value="盤面へ読込" onclick="readDataIntoMoveBook();"></input>
-          &nbsp;&nbsp;
-          <input type="button" value="Localへ書込"   onclick="writeDataToLocalStorage();"></input>
-          <input type="button" value="Localから読込" onclick="readDataFromLocalStorage();"></input>
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          <input type="button" value="SGF式に変換" onclick="convertToSGF();"></input>
-        </span>
+          <span id="buttons_to_browze_move_sets" class="panel">
+            <input type="button" id="button_to_prev_move_set" value="< 前譜" onclick="prevMoveSet();">
+            &nbsp;&nbsp;
+            <input type="button" id="button_to_next_move_set" value="次譜 >" onclick="nextMoveSet();">
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="button" id="button_to_new_move_set" value="新譜" onclick="newMoveSet();">
+          </span>
+        </div>
+        <div class="panel" style="margin-top: 20px">
+          <span class="panel bordered">
+            <input type="radio" name="mode" id="radio_mode_turn" value="turn" onclick="radioModeHandler(this);" checked>
+            <label for="radio_mode_turn">対戦</label>
+            <input type="radio" name="mode" id="radio_mode_play" value="play" onclick="radioModeHandler(this);">
+            <label for="radio_mode_play">再現</label>
+            <input type="radio" name="mode" id="radio_mode_temp" value="temp" onclick="radioModeHandler(this);">
+            <label for="radio_mode_temp">検討</label>
+            <span id="radio_mode_init_with_label">
+              &nbsp;
+              <input type="radio" name="mode" id="radio_mode_init" value="init" onclick="radioModeHandler(this);">
+              <label for="radio_mode_init">置石</label>
+            </span>
+          </span>
+        </div>
+        <div class="panel">
+          <span class="panel bordered">
+            <input type="radio" name="turn" id="radio_turn_black" value="black" checked>
+            <label for="radio_turn_black">黒番</label>
+            <input type="radio" name="turn" id="radio_turn_white" value="white">
+            <label for="radio_turn_white">白番</label>
+          </span>
+        </div>
+        <div id="info" class="panel">
+          <span class="panel">
+            <span id="set_num" style="font-size: small">[1/1]</span>
+            <span id="title_holder">
+              <span id="title">(No Title)</span>
+              <span class="small_button" onclick="showTitleInput();">&lt;=</span>
+            </span>
+            <span id="title_input_holder" hidden>
+              <input type="text" id="title_input">
+              <input type="button" value="入力" onclick="inputTitle();">
+            </span>
+            &nbsp;&nbsp;
+            <span id="numMoves" />
+          </span>
+        </div>
+        <div id="buttons_to_play" class="panel">
+          <span class="panel">
+            <input type="button" id="button_prev_move" value="  <  "   onclick="playPrev();">
+            &nbsp;&nbsp;
+            <input type="button" id="button_next_move" value="    >    "   onclick="playNext();"
+                   style="font-size: x-large;">
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <select id="branch_select" onchange="branchSelectChangeHandler(this);" hidden>
+              <option value="trunk">本譜</option>
+            </select>
+          </span>
+          <br />
+          <br />
+          <span class="panel">
+            <input type="button" id="button_to_first"  value="|<"  onclick="playToFirst();">
+            <input type="button" id="button_prev_ten"  value="<10" onclick="playToPrevOf(10);">
+            <input type="button" id="button_prev_five" value="<5"  onclick="playToPrevOf(5);">
+            <input type="button" id="button_prev_junc" value="+<"  onclick="playToPrevJunction();">
+            &nbsp;&nbsp;
+            <input type="button" id="button_next_junc" value=">+"  onclick="playToNextJunction();">
+            <input type="button" id="button_next_five" value="5>"  onclick="playToNextOf(5);">
+            <input type="button" id="button_next_ten"  value="10>" onclick="playToNextOf(10);">
+            <input type="button" id="button_to_last"   value=">|"  onclick="playToLast();">
+            &nbsp;&nbsp;
+          </span>
+          <br />
+          <span class="panel">
+            <input type="text"   id="num_move_to_go"   size="1">
+            手目へ
+            <input type="button" id="button_to_go"     value="GO" onclick="goToMove();">
+          </span>
+        </div>
+        <div class="panel">
+          <span class="panel">
+            <textarea id="moves_display" cols="50" rows="4"></textarea>
+          </span>
+          <br />
+          <span class="panel">
+            <input type="button" value="盤面へ読込" onclick="readDataIntoMoveBook();"></input>
+            &nbsp;&nbsp;
+            <input type="button" value="Localへ書込"   onclick="writeDataToLocalStorage();"></input>
+            <input type="button" value="Localから読込" onclick="readDataFromLocalStorage();"></input>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="button" value="SGF式に変換" onclick="convertToSGF();"></input>
+          </span>
+        </div>
       </div>
     </div>
-
   </body>
 </html>
 
