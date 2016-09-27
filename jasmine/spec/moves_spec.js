@@ -121,13 +121,16 @@ describe("Moves", function() {
 
     describe("has non-empty moves", function() {
       it("should pop last string element from this._moves", function() {
+        var moves_length_before = moves.length();
         expect(moves.pop()).toEqual("Wob");
+        expect(moves.length()).toEqual(moves_length_before - 1);
         moves.pop();
         moves.pop();
         moves.pop();
         expect(moves.pop()).toEqual("Wmb");
         expect(moves.pop()).toEqual("Bmc");
         expect(moves.pop()).toEqual("Wpb");
+        expect(moves.length()).toEqual(moves_length_before - 7);
       });
     });
   });
