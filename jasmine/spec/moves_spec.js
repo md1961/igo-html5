@@ -43,4 +43,16 @@ describe("Moves", function() {
       );
     });
   });
+
+  describe("#_indexInMoves()", function() {
+    it("should return index in this._moves which corresponds to index in this._trunkMoves()", function() {
+      expect(moves._indexInMoves( 0)).toEqual( 0);
+      expect(moves._indexInMoves( 4)).toEqual( 4);
+      expect(moves._indexInMoves( 5)).toEqual( 6);
+      expect(moves._indexInMoves(19)).toEqual(20);
+      expect(moves._indexInMoves(20)).toEqual(22);
+      expect(moves._indexInMoves(21)).toEqual(25);
+      expect(moves._indexInMoves(25)).toEqual(29);
+    });
+  });
 });
