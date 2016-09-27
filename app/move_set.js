@@ -128,7 +128,7 @@ function MoveSet() {
   };
 
   this.backToTrunk = function() {
-    if (this.indexPlaySaved === null) {
+    if (! this.onBranch || this.indexPlaySaved === null) {
       return;
     }
     this.moves.backToTrunk();
