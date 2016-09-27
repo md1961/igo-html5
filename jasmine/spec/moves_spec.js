@@ -55,4 +55,10 @@ describe("Moves", function() {
       expect(moves._indexInMoves(25)).toEqual(29);
     });
   });
+
+  describe("#length()", function() {
+    it("should return length of this._trunkMoves()", function() {
+      expect(moves.length()).toEqual(26);
+    });
+  });
 });
