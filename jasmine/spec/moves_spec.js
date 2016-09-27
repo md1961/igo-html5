@@ -1,6 +1,11 @@
 describe("Moves", function() {
   var moves;
-  var strMoves = ["Bpd","Wdd","Bpq","Wdq"];
+  var strMoves = [
+    "Bpd","Wdd","Bpq","Wdq","Bdo",["Wcm","Ben","Wfp","Bdl","Wck"],
+    "Wco","Bcn","Wcp","Bdm","Wfq","Bep","Weq","Bfc","Wcf","Bci",
+    "Wqo","Bqj","Wnc","Bpf","Wpb",["Bqc","Wkc","Bqp","Wpo","Bop","Wql"],"Bmc",
+    ["Wmd","Blc","Wnd","Bqc"],["Wmd","Blc","Wnb","Bqc"],"Wmb","Bnb","Wlc","Bmd","Wob"
+  ];
 
   beforeEach(function() {
     moves = new Moves(strMoves);
@@ -23,6 +28,19 @@ describe("Moves", function() {
       it("should return false", function() {
         expect(moves._isTrunkMove([])).toBeFalsy;
       });
+    });
+  });
+
+  describe("#_trunkMoves()", function() {
+    it("should return this._moves with elements of _trunkMoves() is true", function() {
+      expect(moves._trunkMoves()).toEqual(
+        [
+          "Bpd","Wdd","Bpq","Wdq","Bdo",
+          "Wco","Bcn","Wcp","Bdm","Wfq","Bep","Weq","Bfc","Wcf","Bci",
+          "Wqo","Bqj","Wnc","Bpf","Wpb","Bmc",
+          "Wmb","Bnb","Wlc","Bmd","Wob"
+        ]
+      );
     });
   });
 });
