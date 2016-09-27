@@ -1,17 +1,18 @@
 describe("Moves", function() {
   var moves;
-  var strMoves = [
-  //   0     1     2     3     4
-    "Bpd","Wdd","Bpq","Wdq","Bdo",["Wcm","Ben","Wfp","Bdl","Wck"],
-  //   5     6     7     8     9    10    11    12    13    14
-    "Wco","Bcn","Wcp","Bdm","Wfq","Bep","Weq","Bfc","Wcf","Bci",
-  //  15    16    17    18    19                                          20
-    "Wqo","Bqj","Wnc","Bpf","Wpb",["Bqc","Wkc","Bqp","Wpo","Bop","Wql"],"Bmc",
-  //                                                      21    22    23    24    25
-    ["Wmd","Blc","Wnd","Bqc"],["Wmd","Blc","Wnb","Bqc"],"Wmb","Bnb","Wlc","Bmd","Wob"
-  ];
+  var strMoves;
 
   beforeEach(function() {
+    strMoves = [
+    //   0     1     2     3     4
+      "Bpd","Wdd","Bpq","Wdq","Bdo",["Wcm","Ben","Wfp","Bdl","Wck"],
+    //   5     6     7     8     9    10    11    12    13    14
+      "Wco","Bcn","Wcp","Bdm","Wfq","Bep","Weq","Bfc","Wcf","Bci",
+    //  15    16    17    18    19                                          20
+      "Wqo","Bqj","Wnc","Bpf","Wpb",["Bqc","Wkc","Bqp","Wpo","Bop","Wql"],"Bmc",
+    //                                                      21    22    23    24    25
+      ["Wmd","Blc","Wnd","Bqc"],["Wmd","Blc","Wnb","Bqc"],"Wmb","Bnb","Wlc","Bmd","Wob"
+    ];
     moves = new Moves(strMoves);
   });
 
@@ -107,6 +108,27 @@ describe("Moves", function() {
       moves.push(new_value);
       expect(moves._moves.length).toEqual(moves_length_before + 1);
       expect(moves._moves[moves._moves.length - 1]).toEqual(new_value);
+    });
+  });
+
+  describe("#pop()", function() {
+    describe("has empty moves", function() {
+      it("should return null", function() {
+        moves = new Moves([]);
+        expect(moves.pop()).toBeNull();
+      });
+    });
+
+    describe("has non-empty moves", function() {
+      it("should pop last string element from this._moves", function() {
+        expect(moves.pop()).toEqual("Wob");
+        moves.pop();
+        moves.pop();
+        moves.pop();
+        expect(moves.pop()).toEqual("Wmb");
+        expect(moves.pop()).toEqual("Bmc");
+        expect(moves.pop()).toEqual("Wpb");
+      });
     });
   });
 });
