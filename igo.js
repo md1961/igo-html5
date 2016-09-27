@@ -4,7 +4,7 @@ window.onload = function() {
     boardColor = REAL_BOARD_COLOR;
   }
 
-  initializeBoard("main_board", boardColor);
+  board.initialize("main_board", boardColor);
   isBoardInitialized = true;
 };
 
@@ -16,13 +16,11 @@ function getQueryString() {
 }
 
 
-var boardDimension = {
-  margin:    10,
-  gridPitch: 24,  // recommended to be an even number
-  numGrids:  19,
-  stoneDiameterShrinkage: 1.5,
-  starDiameter:           2.0,
-};
+const NONE  = 'NONE';
+const BLACK = 'BLACK';
+const WHITE = 'WHITE';
+const STONES = [NONE, BLACK, WHITE];
+
 
 const RADIO_MODE_INIT_ID  = "radio_mode_init";
 const RADIO_MODE_TURN_ID  = "radio_mode_turn";
@@ -30,382 +28,37 @@ const RADIO_MODE_PLAY_ID  = "radio_mode_play";
 const RADIO_MODE_TEMP_ID  = "radio_mode_temp";
 const RADIO_TURN_BLACK_ID = "radio_turn_black";
 const RADIO_TURN_WHITE_ID = "radio_turn_white";
-const ATTR_MARKED = 'marked';
-
-const NONE  = 'NONE';
-const BLACK = 'BLACK';
-const WHITE = 'WHITE';
-const STONES = [NONE, BLACK, WHITE];
-const OUT_OF_BOUNDS = 'out_of_bounds';
 
 const DEFAULT_BOARD_COLOR = '#fff';
 const REAL_BOARD_COLOR    = '#fb0';
-const RGB_BLACK = 'rgb(0, 0, 0)';
-const RGB_WHITE = 'rgb(255, 255, 255)';
 
 const KEY_FOR_DATA_IN_LOCAL_STORAGE = 'igoHtml5_keyForData';
 
 
-function MoveBook() {
-  this.moveSets = [];
-  this.cursor = null;
-  this.usesSGF = true;
-
-  this.add = function(moveSet) {
-    this.moveSets.push(moveSet);
-    this.cursor = this.moveSets.length - 1;
-    return this.current();
-  };
-
-  this.current = function() {
-    if (this.cursor === null) {
-      return null;
-    }
-    return this.moveSets[this.cursor];
-  };
-
-  this.prev = function() {
-    return this.changeSet(-1);
-  };
-
-  this.next = function() {
-    return this.changeSet(1);
-  };
-
-  this.changeSet = function(step) {
-    if (this.moveSets.length === 0) {
-      return null;
-    } else if (this.cursor === null) {
-      this.cursor = 0;
-    } else {
-      this.cursor += step;
-    }
-    if (this.cursor >= this.moveSets.length) {
-      this.cursor = 0;
-    } else if (this.cursor < 0) {
-      this.cursor = this.moveSets.length - 1;
-    }
-    var nextSet = this.moveSets[this.cursor];
-    return nextSet;
-  };
-
-  this.setNumber = function() {
-    return '[' + (this.cursor + 1) + '/' + this.moveSets.length + ']';
-  };
-
-  this.readDataInJson = function(json) {
-    var arrayOfHash = JSON.parse(json);
-    if (! Array.isArray(arrayOfHash)) {
-      arrayOfHash = [arrayOfHash];
-    }
-    this.moveSets = [];
-    for (var hash of arrayOfHash) {
-      var _moveSet = new MoveSet();
-      _moveSet.readDataInHash(hash);
-      this.add(_moveSet);
-    }
-    this.cursor = 0;
-  };
-
-  this.toJson = function() {
-    var arrayOfHash = this.moveSets.map(function(moveSet) {
-      return moveSet.toHash();
-    });
-    return JSON.stringify(arrayOfHash);
-  };
+function getOpponent(stone) {
+  switch (stone) {
+    case BLACK:
+      return WHITE;
+    case WHITE:
+      return BLACK;
+    default:
+      throw "getOpponent(): Argument stone must be BLACK or WHITE";
+  }
 }
 
-function MoveSet() {
-
-  this.clear = function() {
-    this.title = "";
-    this.inits = [];
-    this.moves = new Moves([]);
-  };
-
-  this.clear();
-  //TODO: Rename to indexNext or indexMoves ?
-  this.indexPlay = 0;
-  this.isPlayMode = false;
-  this.onBranch = false;
-  this.isTempMode = false;
-  this.tempMoves = [];
-  this.indexPlaySaved = null;
-  //TODO: Remove these two
-  this.indexPlayOnTrunk = null;
-  this.indexMovesToRestoreFromTempMode = null;
-
-  this.length = function() {
-    return this.moves.length();
-  };
-
-  this.writeInits = function(stone, x, y) {
-    var init = stringifyMove(stone, x, y);
-    this.inits = this.inits.filter(function(element, i, a) {
-      return element.substr(1, 4) != init.substr(1, 4);
-    });
-    this.inits.push(init);
-  };
-
-  this.writeMoves = function(stone, x, y, stonesTaken) {
-    var move = stringifyMove(stone, x, y);
-    if (stonesTaken.length > 0) {
-      move += '(' + stonesTaken.join(',') + ')';
-    }
-    var moves = this.isTempMode ? this.tempMoves : this.moves;
-    moves.push(move);
-  };
-
-  this.popLastMove = function() {
-    var moves = this.isTempMode ? this.tempMoves : this.moves;
-    if (moves.length === 0) {
-      return null;
-    }
-    return moves.pop();
-  };
-
-  this.prepareForPlayMode = function() {
-    this.isPlayMode = true;
-    this.setTempMode(false);
-    this.indexPlay = 0;
-
-    var indexPlayToRestore = this.indexPlaySaved;
-    this.indexPlaySaved = null;
-    return indexPlayToRestore;
-  };
-
-  this.playNext = function() {
-    if (this.indexPlay >= this.moves.length()) {
-      this.indexPlay = this.moves.length();
-      return null;
-    }
-    return this.moves.get(this.indexPlay++);
-  };
-
-  this.playPrev = function() {
-    if (this.indexPlay <= 0) {
-      this.indexPlay = 0;
-      return null;
-    }
-    this.indexPlay--;
-    return this.moves.get(this.indexPlay);
-  };
-
-  this.DEFAULT_NEXT_TURN = BLACK;
-
-  this.nextTurn = function() {
-    if (this.moves.length() === 0) {
-      return this.DEFAULT_NEXT_TURN;
-    } else if (this.isPlayMode) {
-      if (this.indexPlay < this.moves.length()) {
-        return getColorOfStone(this.moves.get(this.indexPlay));
-      }
-      return getOpponent(getColorOfStone(this.moves.get(this.indexPlay - 1)));
-    } else {
-      var lastStrMove = this.moves.get(this.moves.length() - 1);
-      //TODO: Use getOpponent()?
-      switch (lastStrMove[0].toUpperCase()) {
-        case  NONE[0]: return null;
-        case BLACK[0]: return WHITE;
-        case WHITE[0]: return BLACK;
-        default : throw "Illegal stringified move '" + lastStrMove +"'";
-      }
-    }
-  };
-
-  this.branches = function() {
-    return this.moves.branches(this.indexPlay);
-  };
-
-  this.offsetToNextJunction = function() {
-    return this._offsetToAdjacentJunction(+1);
-  };
-
-  this.offsetToPrevJunction = function() {
-    return -this._offsetToAdjacentJunction(-1);
-  };
-
-  this._offsetToAdjacentJunction = function(direction) {
-    direction = direction / Math.abs(direction);
-    for (var i = this.indexPlay + direction; 0 <= i && i < this.moves.length(); i += direction) {
-      if (this.moves.branches(i).length > 0) {
-        return i - this.indexPlay;
-      }
-    }
-    return null;
-  };
-
-  this.branchTo = function(numBranch) {
-    this._strMovesToRewind = this.moves.branches(this.indexPlay)[numBranch];
-    this.moves.branchTo(this.indexPlay, numBranch);
-    //TODO: Handle branch on branch...
-    this.indexPlaySaved = this.indexPlay;
-    this.indexPlay = 0;
-    this.onBranch = true;
-  };
-
-  this.backToTrunk = function() {
-    if (this.indexPlaySaved === null) {
-      return;
-    }
-    this.moves.backToTrunk();
-    this._strMovesToRewind = this._strMovesToRewind.slice(0, this.indexPlay);
-    this.indexPlay = this.indexPlaySaved;
-    this.indexPlaySaved = null;
-    this.onBranch = false;
-  };
-
-  this.strMovesToRewind = function() {
-    return this._strMovesToRewind;
-  };
-
-  this.setTempMode = function(isTempMode) {
-    this.isTempMode = isTempMode;
-    if (isTempMode) {
-      this.tempMoves = [];
-      this.isPlayMode = false;
-      this.indexPlaySaved = this.indexPlay;
-    } else if (this.tempMoves.length > 0) {
-      if (confirm("Save this branch?")) {
-        this.moves.insert(this.indexPlaySaved, this.tempMoves);
-      }
-      this.tempMoves = [];
-    }
-  };
-
-  this.addComment = function(comment, index) {
-    if (index < 0 || index >= this.moves.length()) {
-      index = this.moves.length() - 1;
-    }
-
-    var move = this.moves.get(index);
-    move = move.replace(/\[[^\]]*\]/, '');
-    move += '[' + comment + ']';
-    this.moves.set(index, move);
-  };
-
-  this.getCurrentComment = function() {
-    if (this.indexPlay <= 0) {
-      return null;
-    } else if (this.indexPlay > this.moves.length()) {
-      this.indexPlay = this.moves.length();
-    }
-    var move = this.moves.get(this.indexPlay - 1);
-    return parseMove(move)[4];
-  };
-
-  this.readDataInHash = function(hash) {
-    this.title = hash.title;
-    this.inits = hash.inits;
-    this.moves = new Moves(hash.moves);
-  };
-
-  this.readDataInJson = function(json) {
-    var hash = JSON.parse(json);
-    this.readDataInHash(hash);
-  };
-
-  this.toHash = function() {
-    return {
-      "title": this.title,
-      "inits": this.inits,
-      "moves": this.moves.strMoves()
-    };
-  };
-
-  this.toJson = function() {
-    return JSON.stringify(this.toHash());
-  };
-}
-
-function Moves(strMoves) {
-  this._moves = strMoves;
-
-  this.strMoves = function() {
-    return this._moves;
-  };
-
-  this._isTrunkMove = function(move) {
-    return typeof move == 'string';
-  };
-
-  this._trunkMoves = function() {
-    var _isTrunkMove = this._isTrunkMove;
-    return this._moves.filter(function(move) {
-      return _isTrunkMove(move);
-    });
-  };
-
-  this._indexInMoves = function(index) {
-    var countTrunkMoves = 0;
-    var countBranches   = 0;
-    for (var move of this._moves) {
-      if (this._isTrunkMove(move)) {
-        countTrunkMoves++;
-        if (countTrunkMoves >= index + 1) {
-          break;
-        }
-      } else {
-        countBranches++;
-      }
-    }
-    return index + countBranches;
-  };
-
-  this.length = function() {
-    return this._trunkMoves().length;
-  };
-
-  this.get = function(index) {
-    return this._trunkMoves()[index];
-  };
-
-  this.branches = function(index) {
-    var branches = [];
-    for (var move of this._moves.slice(0, this._indexInMoves(index)).reverse()) {
-      if (this._isTrunkMove(move)) {
-        break;
-      }
-      branches.unshift(move);
-    }
-    return branches;
-  };
-
-  this.set = function(index, move) {
-    this._moves[this._indexInMoves(index)] = move;
-  };
-
-  this.push = function(move) {
-    this._moves.push(move);
-  };
-
-  this.pop = function() {
-    do {
-      var move = this._moves.pop();
-      if (this._isTrunkMove(move)) {
-        return move;
-      }
-    } while (this._moves.length > 0);
-    return null;
-  };
-
-  this.insert = function(index, move) {
-    this._moves.splice(this._indexInMoves(index), 0, move);
-  };
-
-  this.branchTo = function(index, numBranch) {
-    this._moves_trunk = this._moves;
-    this._moves = this.branches(index)[numBranch];
-  };
-
-  this.backToTrunk = function() {
-    this._moves = this._moves_trunk;
-  };
+function adjacentCoordsInArray(x, y) {
+  return [
+    [x - 1, y    ],
+    [x    , y - 1],
+    [x + 1, y    ],
+    [x    , y + 1]
+  ];
 }
 
 
 var moveBook = new MoveBook();
 var moveSet;
+var board = new Board();
 var isBoardInitialized = false;
 
 
@@ -512,7 +165,7 @@ function putInits() {
   var inits = moveSet.inits;
   for (var i = 0; i < inits.length; i++) {
     var move = parseMove(inits[i]);
-    setStoneByMove(move);
+    board.setStoneByMove(move);
   }
 
   restoreMode();
@@ -553,7 +206,8 @@ function readDataIntoMoveBook() {
 }
 
 function updateBoardByMoveSet() {
-  clearBoard();
+  board.clear();
+  board.clearComment();
   putInits();
   putMovesToLast();
 
@@ -574,6 +228,9 @@ function readDataFromLocalStorage() {
 
     moveDisplay.value = data;
     readDataIntoMoveBook();
+
+    moveSet = moveBook.prev();
+    updateBoardByMoveSet();
   }
 }
 
@@ -592,54 +249,296 @@ function isLocalStorageAvailable() {
   return (typeof localStorage !== 'undefined');
 }
 
-function initializeBoard(tableId, boardColor) {
-  var dim = boardDimension;
 
-  var table = document.getElementById(tableId);
-  table.style.backgroundColor = boardColor;
-  for (var y = 1; y <= dim.numGrids; y++) {
-    var row = document.createElement('tr');
-    table.appendChild(row);
-    for (var x = 1; x <= dim.numGrids; x++) {
-      var cell = document.createElement('td');
-      row.appendChild(cell);
-      var canvas = document.createElement('canvas');
-      cell.appendChild(canvas);
+function Board() {
 
-      canvas.id = getCanvasId(x, y);
-      canvas.setAttribute('x_coord', x);
-      canvas.setAttribute('y_coord', y);
-      canvas.width  = dim.gridPitch;
-      canvas.height = dim.gridPitch;
-      canvas.style.backgroundColor = boardColor;
-      canvas.onclick = gridClickHandler;
+  this.boardDimension = {
+    margin:    10,
+    gridPitch: 24,  // recommended to be an even number
+    numGrids:  19,
+    stoneDiameterShrinkage: 1.5,
+    starDiameter:           2.0,
+  };
+
+  this.RGB_BLACK = 'rgb(0, 0, 0)';
+  this.RGB_WHITE = 'rgb(255, 255, 255)';
+  this.OUT_OF_BOUNDS = 'out_of_bounds';
+  this.ATTR_MARKED = 'marked';
+
+  this.initialize = function(tableId, boardColor) {
+    var dim = this.boardDimension;
+    var table = document.getElementById(tableId);
+    table.style.backgroundColor = boardColor;
+    for (var y = 1; y <= dim.numGrids; y++) {
+      var row = document.createElement('tr');
+      table.appendChild(row);
+      for (var x = 1; x <= dim.numGrids; x++) {
+        var cell = document.createElement('td');
+        row.appendChild(cell);
+        var canvas = document.createElement('canvas');
+        cell.appendChild(canvas);
+
+        canvas.id = this.getCanvasId(x, y);
+        canvas.setAttribute('x_coord', x);
+        canvas.setAttribute('y_coord', y);
+        canvas.width  = dim.gridPitch;
+        canvas.height = dim.gridPitch;
+        canvas.style.backgroundColor = boardColor;
+        canvas.onclick = gridClickHandler;
+      }
     }
-  }
+    this.clear();
+  };
 
-  clearBoard();
+  this.clear = function() {
+    var dim = this.boardDimension;
+    for (var y = 1; y <= dim.numGrids; y++) {
+      for (var x = 1; x <= dim.numGrids; x++) {
+        this.drawStone(x, y, NONE);
+        this.updateCanvasDisplay(x, y);
+      }
+    }
+
+    document.getElementById("title").innerText = null;
+    document.getElementById("moves_display").value = null;
+    updateNumMovesDisplay(0);
+  };
+
+  this.drawStone = function(x, y, stone) {
+    if (STONES.indexOf(stone) < 0) {
+      throw "drawStone(): Argument stone must be NONE, BLACK or WHITE";
+    }
+    var canvas = this.getCanvas(x, y);
+    canvas.class = stone;
+  };
+
+  this.setStoneByMove = function(move) {
+    var stone   = move[0];
+    var x       = move[1];
+    var y       = move[2];
+    var comment = move[4];
+    this.drawStone(x, y, stone);
+    this.displayComment(comment);
+    this.updateCanvasDisplay(x, y);
+  };
+
+  this.removeStoneByMove = function(move) {
+    var x = move[1];
+    var y = move[2];
+    this.drawStone(x, y, NONE);
+    this.updateCanvasDisplay(x, y);
+  };
+
+  this.takeStones = function() {
+    var dim = this.boardDimension;
+    var stonesTaken = [];
+    for (var y = 1; y <= dim.numGrids; y++) {
+      for (var x = 1; x <= dim.numGrids; x++) {
+        if (this.isMarked(x, y)) {
+          var stone = this.getStone(x, y);
+          this.drawStone(x, y, NONE);
+          stonesTaken.push(stringifyMove(stone, x, y));
+          //TODO: Count up taken stones
+
+          this.updateCanvasDisplay(x, y);
+        }
+      }
+    }
+    return stonesTaken;
+  };
+
+  this.removeMove = function(strMove) {
+    var moveWithTakens = parseMove(strMove);
+    var move = moveWithTakens.splice(0, 3);
+    this.removeStoneByMove(move);
+
+    var movesTaken = moveWithTakens[0];
+    for (var i = 0; i < movesTaken.length; i++) {
+      var moveTaken = movesTaken[i];
+      this.setStoneByMove(moveTaken);
+    }
+  };
+
+  this.putMove = function(strMove) {
+    var moveWithTakens = parseMove(strMove);
+    var move = moveWithTakens.splice(0, 3);
+    this.setStoneByMove(move);
+
+    var movesTaken = moveWithTakens[0];
+    for (var i = 0; i < movesTaken.length; i++) {
+      var moveTaken = movesTaken[i];
+      this.removeStoneByMove(moveTaken);
+    }
+
+    var comment = moveWithTakens[1];
+    this.displayComment(comment);
+  };
+
+  this.clearComment = function() {
+    this.displayComment(null);
+  };
+
+  this.displayComment = function(_comment) {
+    var comment = document.getElementById("comment");
+    comment.innerText = _comment === undefined ? null : _comment;
+  };
+
+  this.getCanvasId = function(x, y) {
+    return 'g' + KumaUtil.zeroLeftPad(x, 2) + KumaUtil.zeroLeftPad(y, 2);
+  };
+
+  this.getCanvas = function(x, y) {
+    return document.getElementById(this.getCanvasId(x, y));
+  };
+
+  this.getStone = function(x, y) {
+    var dim = this.boardDimension;
+
+    if (x < 1 || x > dim.numGrids || y < 1 || y > dim.numGrids) {
+      return this.OUT_OF_BOUNDS;
+    }
+    return this.getCanvas(x, y).class;
+  };
+
+  this.isTop = function(x, y) {
+    return y == 1;
+  };
+
+  this.isBottom = function(x, y) {
+    return y == this.boardDimension.numGrids;
+  };
+
+  this.isLeftmost = function(x, y) {
+    return x == 1;
+  };
+
+  this.isRightmost = function(x, y) {
+    return x == this.boardDimension.numGrids;
+  };
+
+  const STAR_COORDS = [4, 10, 16];
+
+  this.isStar = function(x, y) {
+    if (this.boardDimension.numGrids == 19) {
+      if (STAR_COORDS.indexOf(x) >= 0 && STAR_COORDS.indexOf(y) >= 0) {
+        return true;
+      }
+    }
+  };
+
+  this.checkIfStoneTaken = function(x, y, currentTurn) {
+    var stone = this.getStone(x, y);
+    var opponent = getOpponent(currentTurn);
+    if (stone != opponent) {
+      return [];
+    }
+
+    var stonesTaken = [];
+    if (this.isDead(x, y)) {
+      stonesTaken = this.takeStones();
+    }
+    this.unmarkAllStones();
+
+    return stonesTaken;
+  };
+
+  this.isDead = function(x, y) {
+    this.markStone(x, y);
+    var stoneToBeTaken = this.getStone(x, y);
+    var adjs = adjacentCoordsInArray(x, y);
+    for (var i = 0; i < adjs.length; i++) {
+      var xAdj = adjs[i][0];
+      var yAdj = adjs[i][1];
+      var stoneAdj = this.getStone(xAdj, yAdj);
+      if (stoneAdj == NONE) {
+        return false;
+      } else if (stoneAdj == stoneToBeTaken) {
+        if (! this.isMarked(xAdj, yAdj) && ! this.isDead(xAdj, yAdj)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  };
+
+  this.isMarked = function(x, y) {
+    return this.getCanvas(x, y).hasAttribute(this.ATTR_MARKED);
+  };
+
+  this.markStone = function(x, y) {
+    this.getCanvas(x, y).setAttribute(this.ATTR_MARKED, this.ATTR_MARKED);
+  };
+
+  this.unmarkStone = function(x, y) {
+    this.getCanvas(x, y).removeAttribute(this.ATTR_MARKED);
+  };
+
+  this.unmarkAllStones = function() {
+    var dim = this.boardDimension;
+
+    for (var y = 1; y <= dim.numGrids; y++) {
+      for (var x = 1; x <= dim.numGrids; x++) {
+        this.unmarkStone(x, y);
+      }
+    }
+  };
+
+  this.updateCanvasDisplay = function(x, y) {
+    var dim = this.boardDimension;
+
+    var start = 0 + 0.5;
+    var end = dim.gridPitch + 0.5;
+    var mid = Math.floor(dim.gridPitch / 2) + 0.5;
+
+    var cxt = CanvasUtil.getCanvasContext(this.getCanvasId(x, y));
+
+    cxt.fillStyle = this.RGB_WHITE;
+    cxt.clearRect(start, start, end, end);
+    cxt.beginPath();
+
+    // horizontal line
+    var x0 = this.isLeftmost(x, y)  ? mid : start;
+    var x1 = this.isRightmost(x, y) ? mid : end;
+    cxt.moveTo(x0, mid);
+    cxt.lineTo(x1, mid);
+    // vertical line
+    var y0 = this.isTop(x, y)    ? mid : start;
+    var y1 = this.isBottom(x, y) ? mid : end;
+    cxt.moveTo(mid, y0);
+    cxt.lineTo(mid, y1);
+
+    cxt.closePath();
+    cxt.stroke();
+
+    var stone = this.getStone(x, y);
+    if (stone == WHITE || stone == BLACK) {
+      cxt.beginPath();
+      cxt.arc(mid, mid, mid - dim.stoneDiameterShrinkage, 0, Math.PI * 2);
+      cxt.fillStyle = stone == BLACK ? this.RGB_BLACK : this.RGB_WHITE;
+      cxt.fill();
+      cxt.closePath();
+    } else if (this.isStar(x, y)) {
+      cxt.beginPath();
+      cxt.arc(mid, mid, dim.starDiameter, 0, Math.PI * 2);
+      cxt.fillStyle = this.RGB_BLACK;
+      cxt.fill();
+      cxt.closePath();
+    }
+
+    cxt.stroke();
+  };
 }
 
-function clearBoard() {
-  var dim = boardDimension;
 
-  for (var y = 1; y <= dim.numGrids; y++) {
-    for (var x = 1; x <= dim.numGrids; x++) {
-      drawStone(x, y, NONE);
-      updateCanvasDisplay(x, y);
-    }
-  }
-
-  document.getElementById("title").innerText = null;
-  document.getElementById("moves_display").value = null;
-  updateNumMovesDisplay(0);
-}
 
 function clearAll() {
   moveSet.clear();
   setTurnMode();
   setTurn(BLACK);
 
-  clearBoard();
+  board.clear();
+  board.clearComment();
   enableRadioToInitMode(true);
 }
 
@@ -656,30 +555,30 @@ function gridClickHandler() {
 function putStone(x, y) {
   if (isInitMode()) {
     var turnCycle = isBlackTurn() ? [NONE, BLACK, WHITE] : [NONE, WHITE, BLACK];
-    var stone = KumaUtil.nextInArray(getStone(x, y), turnCycle);
-    drawStone(x, y, stone);
+    var stone = KumaUtil.nextInArray(board.getStone(x, y), turnCycle);
+    board.drawStone(x, y, stone);
     moveSet.writeInits(stone, x, y);
-  } else if (getStone(x, y) == NONE) {
+  } else if (board.getStone(x, y) == NONE) {
     var currentTurn = getCurrentTurn();
-    drawStone(x, y, currentTurn);
+    board.drawStone(x, y, currentTurn);
 
     var stonesTaken = [];
     var adjs = adjacentCoordsInArray(x, y);
     for (var i = 0; i < adjs.length; i++) {
       var xAdj = adjs[i][0];
       var yAdj = adjs[i][1];
-      var stonesTakenHere = checkIfStoneTaken(xAdj, yAdj, currentTurn);
+      var stonesTakenHere = board.checkIfStoneTaken(xAdj, yAdj, currentTurn);
       stonesTaken = stonesTaken.concat(stonesTakenHere);
     }
 
     moveSet.writeMoves(currentTurn, x, y, stonesTaken);
     toggleTurn();
-    clearComment();
+    board.clearComment();
 
     enableRadioToInitMode(false);
   }
 
-  updateCanvasDisplay(x, y);
+  board.updateCanvasDisplay(x, y);
   updateNumMovesDisplay(moveSet.length());
   displayMoveSet();
 }
@@ -695,56 +594,12 @@ function removeLastMove() {
     return;
   }
 
-  removeMove(moveToRemove);
+  board.removeMove(moveToRemove);
 
   toggleTurn();
 
   updateNumMovesDisplay(moveSet.length());
   displayMoveSet();
-}
-
-function removeMove(strMove) {
-  var moveWithTakens = parseMove(strMove);
-  var move = moveWithTakens.splice(0, 3);
-  removeStoneByMove(move);
-
-  var movesTaken = moveWithTakens[0];
-  for (var i = 0; i < movesTaken.length; i++) {
-    var moveTaken = movesTaken[i];
-    setStoneByMove(moveTaken);
-  }
-}
-
-function putMove(strMove) {
-  var moveWithTakens = parseMove(strMove);
-  var move = moveWithTakens.splice(0, 3);
-  setStoneByMove(move);
-
-  var movesTaken = moveWithTakens[0];
-  for (var i = 0; i < movesTaken.length; i++) {
-    var moveTaken = movesTaken[i];
-    removeStoneByMove(moveTaken);
-  }
-
-  var comment = moveWithTakens[1];
-  displayComment(comment);
-}
-
-function setStoneByMove(move) {
-  var stone   = move[0];
-  var x       = move[1];
-  var y       = move[2];
-  var comment = move[4];
-  drawStone(x, y, stone);
-  displayComment(comment);
-  updateCanvasDisplay(x, y);
-}
-
-function removeStoneByMove(move) {
-  var x = move[1];
-  var y = move[2];
-  drawStone(x, y, NONE);
-  updateCanvasDisplay(x, y);
 }
 
 function updateNumMovesDisplay(numMoves) {
@@ -806,119 +661,6 @@ function inputComment() {
   displayMoveSet();
 }
 
-function clearComment() {
-  displayComment(null);
-}
-
-function displayComment(_comment) {
-  var comment = document.getElementById("comment");
-  comment.innerText = _comment === undefined ? null : _comment;
-}
-
-function adjacentCoordsInArray(x, y) {
-  return [
-    [x - 1, y    ],
-    [x    , y - 1],
-    [x + 1, y    ],
-    [x    , y + 1]
-  ];
-}
-
-function isBlackTurn() {
-  return document.getElementById(RADIO_TURN_BLACK_ID).checked;
-}
-
-function toggleTurn() {
-  setTurn(isBlackTurn() ? WHITE : BLACK);
-}
-
-function setTurn(stone) {
-  if (stone != BLACK && stone != WHITE) {
-    throw "setTurn(): Argument stone must be BLACK or WHITE";
-  }
-
-  var radioId = stone == BLACK ? RADIO_TURN_BLACK_ID : RADIO_TURN_WHITE_ID;
-  document.getElementById(radioId).checked = true;
-}
-
-function checkIfStoneTaken(x, y, currentTurn) {
-  var stone = getStone(x, y);
-  var opponent = getOpponent(currentTurn);
-  if (stone != opponent) {
-    return [];
-  }
-
-  var stonesTaken = [];
-  if (isDead(x, y)) {
-    stonesTaken = takeStones();
-  }
-  unmarkAllStones();
-
-  return stonesTaken;
-}
-
-function takeStones() {
-  var dim = boardDimension;
-
-  var stonesTaken = [];
-  for (var y = 1; y <= dim.numGrids; y++) {
-    for (var x = 1; x <= dim.numGrids; x++) {
-      if (isMarked(x, y)) {
-        var stone = getStone(x, y);
-        drawStone(x, y, NONE);
-        stonesTaken.push(stringifyMove(stone, x, y));
-        //TODO: Count up taken stones
-
-        updateCanvasDisplay(x, y);
-      }
-    }
-  }
-
-  return stonesTaken;
-}
-
-function isDead(x, y) {
-  markStone(x, y);
-  var stoneToBeTaken = getStone(x, y);
-  var adjs = adjacentCoordsInArray(x, y);
-  for (var i = 0; i < adjs.length; i++) {
-    var xAdj = adjs[i][0];
-    var yAdj = adjs[i][1];
-    var stoneAdj = getStone(xAdj, yAdj);
-    if (stoneAdj == NONE) {
-      return false;
-    } else if (stoneAdj == stoneToBeTaken) {
-      if (! isMarked(xAdj, yAdj) && ! isDead(xAdj, yAdj)) {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-
-function isMarked(x, y) {
-  return getCanvas(x, y).hasAttribute(ATTR_MARKED);
-}
-
-function markStone(x, y) {
-  getCanvas(x, y).setAttribute(ATTR_MARKED, ATTR_MARKED);
-}
-
-function unmarkStone(x, y) {
-  getCanvas(x, y).removeAttribute(ATTR_MARKED);
-}
-
-function unmarkAllStones() {
-  var dim = boardDimension;
-
-  for (var y = 1; y <= dim.numGrids; y++) {
-    for (var x = 1; x <= dim.numGrids; x++) {
-      unmarkStone(x, y);
-    }
-  }
-}
-
 function isInitMode() {
   return document.getElementById(RADIO_MODE_INIT_ID).checked;
 }
@@ -955,112 +697,21 @@ function getCurrentTurn() {
   return isBlackTurn() ? BLACK : WHITE;
 }
 
-function getOpponent(stone) {
-  switch (stone) {
-    case BLACK:
-      return WHITE;
-    case WHITE:
-      return BLACK;
-    default:
-      throw "getOpponent(): Argument stone must be BLACK or WHITE";
-  }
+function isBlackTurn() {
+  return document.getElementById(RADIO_TURN_BLACK_ID).checked;
 }
 
-function getCanvasId(x, y) {
-  return 'g' + KumaUtil.zeroLeftPad(x, 2) + KumaUtil.zeroLeftPad(y, 2);
+function toggleTurn() {
+  setTurn(isBlackTurn() ? WHITE : BLACK);
 }
 
-function getCanvas(x, y) {
-  return document.getElementById(getCanvasId(x, y));
-}
-
-function getStone(x, y) {
-  var dim = boardDimension;
-
-  if (x < 1 || x > dim.numGrids || y < 1 || y > dim.numGrids) {
-    return OUT_OF_BOUNDS;
-  }
-  return getCanvas(x, y).class;
-}
-
-function drawStone(x, y, stone) {
-  if (STONES.indexOf(stone) < 0) {
-    throw "drawStone(): Argument stone must be NONE, BLACK or WHITE";
+function setTurn(stone) {
+  if (stone != BLACK && stone != WHITE) {
+    throw "setTurn(): Argument stone must be BLACK or WHITE";
   }
 
-  var canvas = getCanvas(x, y);
-  canvas.class = stone;
-}
-
-function updateCanvasDisplay(x, y) {
-  var dim = boardDimension;
-
-  var start = 0 + 0.5;
-  var end = dim.gridPitch + 0.5;
-  var mid = Math.floor(dim.gridPitch / 2) + 0.5;
-
-  var cxt = CanvasUtil.getCanvasContext(getCanvasId(x, y));
-
-  cxt.fillStyle = RGB_WHITE;
-  cxt.clearRect(start, start, end, end);
-  cxt.beginPath();
-
-  // horizontal line
-  var x0 = isLeftmost(x, y)  ? mid : start;
-  var x1 = isRightmost(x, y) ? mid : end;
-  cxt.moveTo(x0, mid);
-  cxt.lineTo(x1, mid);
-  // vertical line
-  var y0 = isTop(x, y)    ? mid : start;
-  var y1 = isBottom(x, y) ? mid : end;
-  cxt.moveTo(mid, y0);
-  cxt.lineTo(mid, y1);
-
-  cxt.closePath();
-  cxt.stroke();
-
-  var stone = getStone(x, y);
-  if (stone == WHITE || stone == BLACK) {
-    cxt.beginPath();
-    cxt.arc(mid, mid, mid - dim.stoneDiameterShrinkage, 0, Math.PI * 2);
-    cxt.fillStyle = stone == BLACK ? RGB_BLACK : RGB_WHITE;
-    cxt.fill();
-    cxt.closePath();
-  } else if (isStar(x, y)) {
-    cxt.beginPath();
-    cxt.arc(mid, mid, dim.starDiameter, 0, Math.PI * 2);
-    cxt.fillStyle = RGB_BLACK;
-    cxt.fill();
-    cxt.closePath();
-  }
-
-  cxt.stroke();
-}
-
-function isTop(x, y) {
-  return y == 1;
-}
-
-function isBottom(x, y) {
-  return y == boardDimension.numGrids;
-}
-
-function isLeftmost(x, y) {
-  return x == 1;
-}
-
-function isRightmost(x, y) {
-  return x == boardDimension.numGrids;
-}
-
-const STAR_COORDS = [4, 10, 16];
-
-function isStar(x, y) {
-  if (boardDimension.numGrids == 19) {
-    if (STAR_COORDS.indexOf(x) >= 0 && STAR_COORDS.indexOf(y) >= 0) {
-      return true;
-    }
-  }
+  var radioId = stone == BLACK ? RADIO_TURN_BLACK_ID : RADIO_TURN_WHITE_ID;
+  document.getElementById(radioId).checked = true;
 }
 
 function radioModeHandler(radioMode) {
@@ -1079,10 +730,10 @@ function branchSelectChangeHandler(branch_select) {
   if (branch_select.value == VALUE_TRUNK_OF_BRANCH_SELECT) {
     moveSet.backToTrunk();
     for (var strMove of moveSet.strMovesToRewind().reverse()) {
-      removeMove(strMove);
+      board.removeMove(strMove);
     }
     updateBranchSelectDisplay();
-    displayComment(moveSet.getCurrentComment());
+    board.displayComment(moveSet.getCurrentComment());
   } else {
     var numBranch = parseInt(branch_select.value);
     moveSet.branchTo(numBranch);
@@ -1129,8 +780,8 @@ function removeAllChildren(node) {
 }
 
 function prepareForPlayMode() {
-  clearBoard();
-  clearComment();
+  board.clear();
+  board.clearComment();
   putInits();
   setPlayMode();
 
@@ -1150,7 +801,7 @@ function prepareForPlayMode() {
 function prepareForTurnMode() {
   moveSet.setTempMode(false);
 
-  clearBoard();
+  board.clear();
   putInits();
   putMovesToLast();
 
@@ -1191,7 +842,7 @@ function playNext() {
   if (strMove === null) {
     return false;
   }
-  putMove(strMove);
+  board.putMove(strMove);
   //TODO: Should be moveSet.nextTurn() ?
   setTurn(getOpponent(getColorOfStone(strMove)));
   updateBranchSelectDisplay();
@@ -1204,9 +855,9 @@ function playPrev() {
   if (strMove === null) {
     return false;
   }
-  removeMove(strMove);
+  board.removeMove(strMove);
   setTurn(getColorOfStone(strMove));
-  displayComment(moveSet.getCurrentComment());
+  board.displayComment(moveSet.getCurrentComment());
   updateBranchSelectDisplay();
   updateNumMovesDisplay(moveSet.indexPlay);
   return true;
@@ -1238,7 +889,7 @@ function playToPrevJunction() {
 
 function goToMove() {
   var numMoveToGo = parseInt(document.getElementById("num_move_to_go").value);
-  clearBoard();
+  board.clear();
   putInits();
   moveSet.prepareForPlayMode();
   playToNextOf(numMoveToGo);
