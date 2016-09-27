@@ -1,9 +1,13 @@
 describe("Moves", function() {
   var moves;
   var strMoves = [
+  //   0     1     2     3     4
     "Bpd","Wdd","Bpq","Wdq","Bdo",["Wcm","Ben","Wfp","Bdl","Wck"],
+  //   5     6     7     8     9    10    11    12    13    14
     "Wco","Bcn","Wcp","Bdm","Wfq","Bep","Weq","Bfc","Wcf","Bci",
+  //  15    16    17    18    19                                          20
     "Wqo","Bqj","Wnc","Bpf","Wpb",["Bqc","Wkc","Bqp","Wpo","Bop","Wql"],"Bmc",
+  //                                                      21    22    23    24    25
     ["Wmd","Blc","Wnd","Bqc"],["Wmd","Blc","Wnb","Bqc"],"Wmb","Bnb","Wlc","Bmd","Wob"
   ];
 
@@ -93,6 +97,16 @@ describe("Moves", function() {
       expect(moves._moves[ 0]).toEqual(new_value);
       moves.set(21, new_value);
       expect(moves._moves[25]).toEqual(new_value);
+    });
+  });
+
+  describe("#push()", function() {
+    it("should add given value at end of this._moves", function() {
+      var moves_length_before = moves._moves.length;
+      var new_value = "Bpp[悪手]";
+      moves.push(new_value);
+      expect(moves._moves.length).toEqual(moves_length_before + 1);
+      expect(moves._moves[moves._moves.length - 1]).toEqual(new_value);
     });
   });
 });
