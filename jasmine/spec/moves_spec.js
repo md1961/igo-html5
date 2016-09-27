@@ -61,4 +61,16 @@ describe("Moves", function() {
       expect(moves.length()).toEqual(26);
     });
   });
+
+  describe("#get()", function() {
+    it("should return corresponding element of this._trunkMoves()", function() {
+      expect(moves.get( 0)).toEqual("Bpd");
+      expect(moves.get( 4)).toEqual("Bdo");
+      expect(moves.get( 5)).toEqual("Wco");
+      expect(moves.get(19)).toEqual("Wpb");
+      expect(moves.get(20)).toEqual("Bmc");
+      expect(moves.get(21)).toEqual("Wmb");
+      expect(moves.get(25)).toEqual("Wob");
+    });
+  });
 });
