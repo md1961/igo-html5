@@ -1,5 +1,7 @@
 #! /bin/env ruby
 
+require 'kuma/color'
+
 BEGIN_JASMINE_FILES_WHEN_DISABLED = "<!-- Jasmine files"           .freeze
   END_JASMINE_FILES_WHEN_DISABLED = "End of Jasmine files -->"     .freeze
 BEGIN_JASMINE_FILES_WHEN_ENABLED  = "<!-- Jasmine files -->"       .freeze
@@ -9,9 +11,9 @@ RE_DIV_APPLICATION = /<div id="application"( hidden)?>[ \t]*$/.freeze
 DIV_APPLICATION_DISABLED = '<div id="application">'       .freeze
 DIV_APPLICATION_ENABLED  = '<div id="application" hidden>'.freeze
 
-COLOR_RED   = "\e[31m"
-COLOR_BLUE  = "\e[36m"
-COLOR_RESET = "\e[0m"
+COLOR_RED   = Kuma::Color::RED
+COLOR_BLUE  = Kuma::Color::CYAN
+COLOR_RESET = Kuma::Color::RESET
 
 
 TARGET_FILE = 'index.html'.freeze
