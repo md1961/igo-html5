@@ -134,4 +134,16 @@ describe("Moves", function() {
       });
     });
   });
+
+  describe("#insert()", function() {
+    it("should insert given value before given index", function() {
+      var moves_length_before = moves.length();
+      var new_value = "Bpp[悪手]";
+      var index = 23;
+      expect(moves.get(index)).toEqual("Wlc");
+      moves.insert(index, new_value);
+      expect(moves.get(index)).toEqual(new_value);
+      expect(moves.length()).toEqual(moves_length_before + 1);
+    });
+  });
 });
