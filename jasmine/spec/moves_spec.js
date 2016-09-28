@@ -140,9 +140,10 @@ describe("Moves", function() {
       var moves_length_before = moves.length();
       var new_value = "Bpp[悪手]";
       var index = 23;
-      expect(moves.get(index)).toEqual("Wlc");
+      var former_value = moves.get(index);
       moves.insert(index, new_value);
       expect(moves.get(index)).toEqual(new_value);
+      expect(moves.get(index + 1)).toEqual(former_value);
       expect(moves.length()).toEqual(moves_length_before + 1);
     });
   });
