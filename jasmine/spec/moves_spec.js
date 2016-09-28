@@ -1,13 +1,18 @@
 describe("Moves", function() {
   var moves;
-  var strMoves = [
-    "Bpd","Wdd","Bpq","Wdq","Bdo",["Wcm","Ben","Wfp","Bdl","Wck"],
-    "Wco","Bcn","Wcp","Bdm","Wfq","Bep","Weq","Bfc","Wcf","Bci",
-    "Wqo","Bqj","Wnc","Bpf","Wpb",["Bqc","Wkc","Bqp","Wpo","Bop","Wql"],"Bmc",
-    ["Wmd","Blc","Wnd","Bqc"],["Wmd","Blc","Wnb","Bqc"],"Wmb","Bnb","Wlc","Bmd","Wob"
-  ];
+  var strMoves;
 
   beforeEach(function() {
+    strMoves = [
+    //   0     1     2     3     4
+      "Bpd","Wdd","Bpq","Wdq","Bdo",["Wcm","Ben","Wfp","Bdl","Wck"],
+    //   5     6     7     8     9    10    11    12    13    14
+      "Wco","Bcn","Wcp","Bdm","Wfq","Bep","Weq","Bfc","Wcf","Bci",
+    //  15    16    17    18    19                                          20
+      "Wqo","Bqj","Wnc","Bpf","Wpb",["Bqc","Wkc","Bqp","Wpo","Bop","Wql"],"Bmc",
+    //                                                      21    22    23    24    25
+      ["Wmd","Blc","Wnd","Bqc"],["Wmd","Blc","Wnb","Bqc"],"Wmb","Bnb","Wlc","Bmd","Wob"
+    ];
     moves = new Moves(strMoves);
   });
 
@@ -83,6 +88,72 @@ describe("Moves", function() {
       expect(moves.branches(20)).toEqual([["Bqc","Wkc","Bqp","Wpo","Bop","Wql"]]);
       expect(moves.branches(21)).toEqual([["Wmd","Blc","Wnd","Bqc"],["Wmd","Blc","Wnb","Bqc"]]);
       expect(moves.branches(25)).toEqual([]);
+    });
+  });
+
+  describe("#set()", function() {
+    it("should change element at index to given value", function() {
+      var new_value = "Bpp[悪手]";
+      moves.set( 0, new_value);
+      expect(moves._moves[ 0]).toEqual(new_value);
+      moves.set(21, new_value);
+      expect(moves._moves[25]).toEqual(new_value);
+    });
+  });
+
+  describe("#push()", function() {
+    it("should add given value at end of this._moves", function() {
+      var moves_length_before = moves._moves.length;
+      var new_value = "Bpp[悪手]";
+      moves.push(new_value);
+      expect(moves._moves.length).toEqual(moves_length_before + 1);
+      expect(moves._moves[moves._moves.length - 1]).toEqual(new_value);
+    });
+  });
+
+  describe("#pop()", function() {
+    describe("has empty moves", function() {
+      it("should return null", function() {
+        moves = new Moves([]);
+        expect(moves.pop()).toBeNull();
+      });
+    });
+
+    describe("has non-empty moves", function() {
+      it("should pop last string element from this._moves", function() {
+        var moves_length_before = moves.length();
+        expect(moves.pop()).toEqual("Wob");
+        expect(moves.length()).toEqual(moves_length_before - 1);
+        moves.pop();
+        moves.pop();
+        moves.pop();
+        expect(moves.pop()).toEqual("Wmb");
+        expect(moves.pop()).toEqual("Bmc");
+        expect(moves.pop()).toEqual("Wpb");
+        expect(moves.length()).toEqual(moves_length_before - 7);
+      });
+    });
+  });
+
+  describe("#insert()", function() {
+    it("should insert given value before given index", function() {
+      var moves_length_before = moves.length();
+      var new_value = "Bpp[悪手]";
+      var index = 23;
+      var former_value = moves.get(index);
+      moves.insert(index, new_value);
+      expect(moves.get(index)).toEqual(new_value);
+      expect(moves.get(index + 1)).toEqual(former_value);
+      expect(moves.length()).toEqual(moves_length_before + 1);
+    });
+  });
+
+  describe("#branchTo()", function() {
+    it("should save this._moves and assign branch to it", function() {
+      var _moves_copied = moves._moves.concat();
+      moves.branchTo(21, 1);
+      expect(moves._moves_trunk).toEqual(_moves_copied);
+      expect(moves._moves).toEqual(["Wmd","Blc","Wnb","Bqc"]);
     });
   });
 });
