@@ -147,4 +147,13 @@ describe("Moves", function() {
       expect(moves.length()).toEqual(moves_length_before + 1);
     });
   });
+
+  describe("#branchTo()", function() {
+    it("should save this._moves and assign branch to it", function() {
+      var _moves_copied = moves._moves.concat();
+      moves.branchTo(21, 1);
+      expect(moves._moves_trunk).toEqual(_moves_copied);
+      expect(moves._moves).toEqual(["Wmd","Blc","Wnb","Bqc"]);
+    });
+  });
 });
