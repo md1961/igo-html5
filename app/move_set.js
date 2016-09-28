@@ -108,6 +108,7 @@ function MoveSet() {
     return -this._offsetToAdjacentJunction(-1);
   };
 
+  //FIXME: Junction at very end
   this._offsetToAdjacentJunction = function(direction) {
     direction = direction / Math.abs(direction);
     for (var i = this.indexPlay + direction; 0 <= i && i < this.moves.length(); i += direction) {
