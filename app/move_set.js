@@ -1,22 +1,40 @@
 function MoveSet() {
 
+  this.MODE_TURN = "turn";
+  this.MODE_PLAY = "play";
+  this.MODE_TEMP = "temp";
+  this.VALID_MODES = [this.MODE_TURN, this.MODE_PLAY, this.MODE_TEMP];
+
   this.clear = function() {
     this.title = "";
     this.inits = [];
     this.moves = new Moves([]);
   };
 
+  this._mode = this.MODE_TURN;
   this.clear();
   //TODO: Rename to indexNext or indexMoves ?
   this.indexPlay = 0;
-  this.isPlayMode = false;
   this.onBranch = false;
+  //TODO: Remove these two
+  this.isPlayMode = false;
   this.isTempMode = false;
   this.tempMoves = [];
   this.indexPlaySaved = null;
   //TODO: Remove these two
   this.indexPlayOnTrunk = null;
   this.indexMovesToRestoreFromTempMode = null;
+
+  this.setMode = function(mode) {
+    if (this.VALID_MODES.indexOf(mode) < 0) {
+      throw "Illegal mode specified: " + mode;
+    } else if (this._mode == mode) {
+      return;
+    }
+    this._finishMode(this._mode);
+    this._startMode(mode);
+    this._mode = mode;
+  };
 
   this.length = function() {
     return this.moves.length();
@@ -47,14 +65,52 @@ function MoveSet() {
     return moves.pop();
   };
 
+  this._startMode = function(mode) {
+    switch (mode) {
+      case this.MODE_PLAY:
+        this.prepareForPlayMode();
+        break;
+      case this.MODE_TEMP:
+        this.setTempMode(true);
+        break;
+    }
+  };
+  this._finishMode = function(mode) {
+    switch (mode) {
+      case this.MODE_TEMP:
+        this.setTempMode(false);
+        break;
+      case this.MODE_PLAY:
+        this.backToTrunk();
+        break;
+    }
+  };
+  //TODO: Remove these function.
   this.prepareForPlayMode = function() {
     this.isPlayMode = true;
     this.setTempMode(false);
     this.indexPlay = 0;
 
-    var indexPlayToRestore = this.indexPlaySaved;
+    this._numMovesToPlay = this.indexPlaySaved;
     this.indexPlaySaved = null;
-    return indexPlayToRestore;
+  };
+  this.setTempMode = function(isTempMode) {
+    this.isTempMode = isTempMode;
+    if (isTempMode) {
+      this.tempMoves = [];
+      this.isPlayMode = false;
+      //TODO: indexPlaySaved is unused while isTempMode is true
+      this.indexPlaySaved = this.indexPlay;
+    } else if (this.tempMoves.length > 0) {
+      if (confirm("Save this branch?")) {
+        this.moves.insert(this.indexPlaySaved, this.tempMoves);
+      }
+      this.tempMoves = [];
+    }
+  };
+
+  this.numMovesToPlay = function() {
+    return this._numMovesToPlay || 0;
   };
 
   this.playNext = function() {
@@ -141,20 +197,6 @@ function MoveSet() {
 
   this.strMovesToRewind = function() {
     return this._strMovesToRewind;
-  };
-
-  this.setTempMode = function(isTempMode) {
-    this.isTempMode = isTempMode;
-    if (isTempMode) {
-      this.tempMoves = [];
-      this.isPlayMode = false;
-      this.indexPlaySaved = this.indexPlay;
-    } else if (this.tempMoves.length > 0) {
-      if (confirm("Save this branch?")) {
-        this.moves.insert(this.indexPlaySaved, this.tempMoves);
-      }
-      this.tempMoves = [];
-    }
   };
 
   this.addComment = function(comment, index) {

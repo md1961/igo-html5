@@ -81,4 +81,7 @@ function Moves(strMoves) {
   this.backToTrunk = function() {
     this._moves = this._moves_trunk;
   };
+
+  this.addComment = function(comment, index) {
+  };
 }

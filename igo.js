@@ -201,7 +201,7 @@ function readDataIntoMoveBook() {
   moveBook = new MoveBook();
   moveBook.readDataInJson(moveDisplay.value);
 
-  moveSet = moveBook.current();
+  moveSet = moveBook.prev();
   updateBoardByMoveSet();
 }
 
@@ -229,7 +229,6 @@ function readDataFromLocalStorage() {
     moveDisplay.value = data;
     readDataIntoMoveBook();
 
-    moveSet = moveBook.prev();
     updateBoardByMoveSet();
   }
 }
@@ -583,11 +582,6 @@ function putStone(x, y) {
   displayMoveSet();
 }
 
-function enableRadioToInitMode(toBeEnabled) {
-  var radioToInit = document.getElementById("radio_mode_init_with_label");
-  radioToInit.style.display = toBeEnabled ? 'inline' : 'none';
-}
-
 function removeLastMove() {
   var moveToRemove = moveSet.popLastMove();
   if (moveToRemove === null) {
@@ -694,6 +688,11 @@ function setTempMode() {
   document.getElementById(RADIO_MODE_TEMP_ID).checked = true;
 }
 
+function enableRadioToInitMode(toBeEnabled) {
+  var radioToInit = document.getElementById("radio_mode_init_with_label");
+  radioToInit.style.display = toBeEnabled ? 'inline' : 'none';
+}
+
 function getCurrentTurn() {
   return isBlackTurn() ? BLACK : WHITE;
 }
@@ -732,6 +731,7 @@ function branchSelectChangeHandler(branch_select) {
     moveSet.backToTrunk();
     for (var strMove of moveSet.strMovesToRewind().reverse()) {
       board.removeMove(strMove);
+      setTurn(getColorOfStone(strMove));
     }
     updateBranchSelectDisplay();
     board.displayComment(moveSet.getCurrentComment());
@@ -781,15 +781,14 @@ function removeAllChildren(node) {
 }
 
 function prepareForPlayMode() {
+  moveSet.setMode(moveSet.MODE_PLAY);
+
   board.clear();
   board.clearComment();
   putInits();
   setPlayMode();
 
-  var indexPlayToRestore = moveSet.prepareForPlayMode();
-  if (indexPlayToRestore !== null) {
-    playToNextOf(indexPlayToRestore);
-  }
+  playToNextOf(moveSet.numMovesToPlay());
 
   setTurn(moveSet.nextTurn());
   updateBranchSelectDisplay();
@@ -800,7 +799,7 @@ function prepareForPlayMode() {
 }
 
 function prepareForTurnMode() {
-  moveSet.setTempMode(false);
+  moveSet.setMode(moveSet.MODE_TURN);
 
   board.clear();
   putInits();
@@ -815,7 +814,7 @@ function prepareForTurnMode() {
 }
 
 function prepareForTempMode() {
-  moveSet.setTempMode(true);
+  moveSet.setMode(moveSet.MODE_TEMP);
    
   setTempMode();
 
