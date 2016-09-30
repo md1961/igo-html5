@@ -579,7 +579,9 @@ function putStone(x, y) {
 
   board.updateCanvasDisplay(x, y);
   updateNumMovesDisplay(moveSet.length());
-  displayMoveSet();
+  if (! isTempMode()) {
+    displayMoveSet();
+  }
 }
 
 function removeLastMove() {
@@ -587,9 +589,7 @@ function removeLastMove() {
   if (moveToRemove === null) {
     return;
   }
-
   board.removeMove(moveToRemove);
-
   toggleTurn();
 
   updateNumMovesDisplay(moveSet.length());
@@ -833,7 +833,7 @@ function showInfoDisplay(toBeShown) {
 }
 
 function putMovesToLast() {
-  moveSet.prepareForPlayMode();
+  moveSet.resetIndex();
   playToLast();
 }
 
@@ -891,7 +891,7 @@ function goToMove() {
   var numMoveToGo = parseInt(document.getElementById("num_move_to_go").value);
   board.clear();
   putInits();
-  moveSet.prepareForPlayMode();
+  moveSet.resetIndex();
   playToNextOf(numMoveToGo);
 }
 

@@ -16,14 +16,7 @@ function MoveSet() {
   //TODO: Rename to indexNext or indexMoves ?
   this.indexPlay = 0;
   this.onBranch = false;
-  //TODO: Remove these two
-  this.isPlayMode = false;
-  this.isTempMode = false;
-  this.tempMoves = [];
   this.indexPlaySaved = null;
-  //TODO: Remove these two
-  this.indexPlayOnTrunk = null;
-  this.indexMovesToRestoreFromTempMode = null;
 
   this.setMode = function(mode) {
     if (this.VALID_MODES.indexOf(mode) < 0) {
@@ -40,6 +33,10 @@ function MoveSet() {
     return this.moves.length();
   };
 
+  this.resetIndex = function() {
+    this.indexPlay = 0;
+  };
+
   this.writeInits = function(stone, x, y) {
     var init = stringifyMove(stone, x, y);
     this.inits = this.inits.filter(function(element, i, a) {
@@ -53,60 +50,56 @@ function MoveSet() {
     if (stonesTaken.length > 0) {
       move += '(' + stonesTaken.join(',') + ')';
     }
-    var moves = this.isTempMode ? this.tempMoves : this.moves;
-    moves.push(move);
+    this.moves.push(move);
   };
 
   this.popLastMove = function() {
-    var moves = this.isTempMode ? this.tempMoves : this.moves;
-    if (moves.length === 0) {
+    if (this.moves.length() === 0) {
       return null;
     }
-    return moves.pop();
+    return this.moves.pop();
   };
 
   this._startMode = function(mode) {
     switch (mode) {
       case this.MODE_PLAY:
-        this.prepareForPlayMode();
+        this._startPlayMode();
         break;
       case this.MODE_TEMP:
-        this.setTempMode(true);
+        this._startTempMode();
         break;
     }
   };
+
   this._finishMode = function(mode) {
     switch (mode) {
       case this.MODE_TEMP:
-        this.setTempMode(false);
+        this._finishTempMode();
         break;
       case this.MODE_PLAY:
         this.backToTrunk();
         break;
     }
   };
-  //TODO: Remove these function.
-  this.prepareForPlayMode = function() {
-    this.isPlayMode = true;
-    this.setTempMode(false);
-    this.indexPlay = 0;
 
+  this._startPlayMode = function() {
+    this.indexPlay = 0;
     this._numMovesToPlay = this.indexPlaySaved;
     this.indexPlaySaved = null;
   };
-  this.setTempMode = function(isTempMode) {
-    this.isTempMode = isTempMode;
-    if (isTempMode) {
-      this.tempMoves = [];
-      this.isPlayMode = false;
-      //TODO: indexPlaySaved is unused while isTempMode is true
-      this.indexPlaySaved = this.indexPlay;
-    } else if (this.tempMoves.length > 0) {
-      if (confirm("Save this branch?")) {
-        this.moves.insert(this.indexPlaySaved, this.tempMoves);
-      }
-      this.tempMoves = [];
+
+  this._startTempMode = function() {
+    this._moves_saved = this.moves;
+    this.moves = new Moves([]);
+    //TODO: indexPlaySaved is unused while isTempMode is true ????
+    this.indexPlaySaved = this.indexPlay;
+  };
+
+  this._finishTempMode = function() {
+    if (this.moves.length() > 0 && confirm("Save this branch?")) {
+      this._moves_saved.insert(this.indexPlaySaved, this.moves.strMoves());
     }
+    this.moves = this._moves_saved;
   };
 
   this.numMovesToPlay = function() {
@@ -135,7 +128,7 @@ function MoveSet() {
   this.nextTurn = function() {
     if (this.moves.length() === 0) {
       return this.DEFAULT_NEXT_TURN;
-    } else if (this.isPlayMode) {
+    } else if (this._mode == this.MODE_PLAY) {
       if (this.indexPlay < this.moves.length()) {
         return getColorOfStone(this.moves.get(this.indexPlay));
       }
