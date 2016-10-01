@@ -57,7 +57,7 @@ function Moves(strMoves) {
       throw "No branches at index " + index;
     }
     var indexInMoves = this._indexInMoves(index) - lenBranches + numBranch;
-    this._moves.splice(indexInMoves, 1)
+    this._moves.splice(indexInMoves, 1);
   };
 
   this.set = function(index, move) {
@@ -92,5 +92,9 @@ function Moves(strMoves) {
   };
 
   this.addComment = function(comment, index) {
+    var move = this.get(index);
+    move = move.replace(/\[[^\]]*\]/, '');
+    move += '[' + comment + ']';
+    this.set(index, move);
   };
 }

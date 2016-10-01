@@ -649,9 +649,7 @@ function inputComment() {
   document.getElementById("comment").innerText = document.getElementById("comment_input").value;
 
   var comment = document.getElementById("comment_input");
-  //FIXME: Comment on branch
-  var index = isTurnMode() ? -1 : moveSet.indexPlay - 1;
-  moveSet.addComment(comment.value, index);
+  moveSet.addComment(comment.value);
 
   displayMoveSet();
 }

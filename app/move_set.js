@@ -201,15 +201,9 @@ function MoveSet() {
     return this._strMovesToRewind;
   };
 
-  this.addComment = function(comment, index) {
-    if (index < 0 || index >= this.moves.length()) {
-      index = this.moves.length() - 1;
-    }
-
-    var move = this.moves.get(index);
-    move = move.replace(/\[[^\]]*\]/, '');
-    move += '[' + comment + ']';
-    this.moves.set(index, move);
+  this.addComment = function(comment) {
+    var _index = (this._mode == this.MODE_TURN) ? this.moves.length() - 1 : this.indexPlay - 1;
+    this.moves.addComment(comment, _index);
   };
 
   this.getCurrentComment = function() {
