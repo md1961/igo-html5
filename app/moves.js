@@ -51,6 +51,15 @@ function Moves(strMoves) {
     return branches;
   };
 
+  this.removeBranch = function(index, numBranch) {
+    var lenBranches = this.branches(index).length;
+    if (lenBranches === 0) {
+      throw "No branches at index " + index;
+    }
+    var indexInMoves = this._indexInMoves(index) - lenBranches + numBranch;
+    this._moves.splice(indexInMoves, 1)
+  };
+
   this.set = function(index, move) {
     this._moves[this._indexInMoves(index)] = move;
   };

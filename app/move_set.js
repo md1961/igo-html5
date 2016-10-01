@@ -96,7 +96,7 @@ function MoveSet() {
   };
 
   this._finishTempMode = function() {
-    if (this.moves.length() > 0 && confirm("Save this branch?")) {
+    if (this.moves.length() > 0 && confirm("この検討手順を分岐として保存しますか?")) {
       this._moves_saved.insert(this.indexPlaySaved, this.moves.strMoves());
     }
     this.moves = this._moves_saved;
@@ -175,6 +175,7 @@ function MoveSet() {
     this.indexPlaySaved = this.indexPlay;
     this.indexPlay = 0;
     this.onBranch = true;
+    this._numBranch = numBranch;
   };
 
   this.backToTrunk = function() {
@@ -186,6 +187,14 @@ function MoveSet() {
     this.indexPlay = this.indexPlaySaved;
     this.indexPlaySaved = null;
     this.onBranch = false;
+  };
+
+  this.removeBranch = function() {
+    if (! this.onBranch) {
+      return;
+    }
+    this.backToTrunk();
+    this.moves.removeBranch(this.indexPlay, this._numBranch);
   };
 
   this.strMovesToRewind = function() {

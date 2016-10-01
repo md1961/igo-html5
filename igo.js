@@ -729,19 +729,24 @@ const VALUE_TRUNK_OF_BRANCH_SELECT = 'trunk';
 function branchSelectChangeHandler(branch_select) {
   if (branch_select.value == VALUE_TRUNK_OF_BRANCH_SELECT) {
     moveSet.backToTrunk();
-    for (var strMove of moveSet.strMovesToRewind().reverse()) {
-      board.removeMove(strMove);
-      setTurn(getColorOfStone(strMove));
-    }
-    updateBranchSelectDisplay();
-    board.displayComment(moveSet.getCurrentComment());
+    backBoardToTrunk();
   } else {
     var numBranch = parseInt(branch_select.value);
     moveSet.branchTo(numBranch);
     branch_select = replaceBranchSelect([['変化' + numBranch, numBranch]]);
     branch_select.value = numBranch;
+    document.getElementById("button_to_remove_branch").style.display = 'inline';
   }
   updateNumMovesDisplay(moveSet.indexPlay);
+}
+
+function backBoardToTrunk() {
+  for (var strMove of moveSet.strMovesToRewind().reverse()) {
+    board.removeMove(strMove);
+    setTurn(getColorOfStone(strMove));
+  }
+  updateBranchSelectDisplay();
+  board.displayComment(moveSet.getCurrentComment());
 }
 
 function updateBranchSelectDisplay() {
@@ -753,6 +758,7 @@ function updateBranchSelectDisplay() {
   });
   var branch_select = replaceBranchSelect(options);
   branch_select.style.display = moveSet.branches().length === 0 ? 'none' : 'inline';
+  document.getElementById("button_to_remove_branch").style.display = 'none';
 }
 
 function replaceBranchSelect(options) {
@@ -778,6 +784,12 @@ function removeAllChildren(node) {
   while (node.firstChild) {
     node.removeChild(node.firstChild);
   }
+}
+
+function removeBranch() {
+  moveSet.removeBranch();
+  backBoardToTrunk();
+  updateNumMovesDisplay(moveSet.indexPlay);
 }
 
 function prepareForPlayMode() {
