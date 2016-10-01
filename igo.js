@@ -363,11 +363,9 @@ function showCommentInput() {
 function inputComment() {
   document.getElementById("comment_input_holder").style.display = 'none';
   document.getElementById("comment_holder"      ).style.display = 'inline';
-  document.getElementById("comment").innerText = document.getElementById("comment_input").value;
-
-  var comment = document.getElementById("comment_input");
-  moveSet.addComment(comment.value);
-
+  var comment = document.getElementById("comment_input").value;
+  moveSet.addComment(comment);
+  board.displayComment(comment);
   displayMoveSet();
 }
 
