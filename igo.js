@@ -66,6 +66,7 @@ function newMoveSet() {
   moveSet = moveBook.add(new MoveSet());
   if (isBoardInitialized) {
     clearAll();
+    displayTitle();
   }
 }
 
