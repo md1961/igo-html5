@@ -1,25 +1,40 @@
 function MoveSet() {
 
+  this.MODE_TURN = "turn";
+  this.MODE_PLAY = "play";
+  this.MODE_TEMP = "temp";
+  this.VALID_MODES = [this.MODE_TURN, this.MODE_PLAY, this.MODE_TEMP];
+
   this.clear = function() {
     this.title = "";
     this.inits = [];
     this.moves = new Moves([]);
   };
 
+  this._mode = this.MODE_TURN;
   this.clear();
   //TODO: Rename to indexNext or indexMoves ?
   this.indexPlay = 0;
-  this.isPlayMode = false;
   this.onBranch = false;
-  this.isTempMode = false;
-  this.tempMoves = [];
   this.indexPlaySaved = null;
-  //TODO: Remove these two
-  this.indexPlayOnTrunk = null;
-  this.indexMovesToRestoreFromTempMode = null;
+
+  this.setMode = function(mode) {
+    if (this.VALID_MODES.indexOf(mode) < 0) {
+      throw "Illegal mode specified: " + mode;
+    } else if (this._mode == mode) {
+      return;
+    }
+    this._finishMode(this._mode);
+    this._startMode(mode);
+    this._mode = mode;
+  };
 
   this.length = function() {
     return this.moves.length();
+  };
+
+  this.resetIndex = function() {
+    this.indexPlay = 0;
   };
 
   this.writeInits = function(stone, x, y) {
@@ -35,26 +50,60 @@ function MoveSet() {
     if (stonesTaken.length > 0) {
       move += '(' + stonesTaken.join(',') + ')';
     }
-    var moves = this.isTempMode ? this.tempMoves : this.moves;
-    moves.push(move);
+    this.moves.push(move);
   };
 
   this.popLastMove = function() {
-    var moves = this.isTempMode ? this.tempMoves : this.moves;
-    if (moves.length === 0) {
+    if (this.moves.length() === 0) {
       return null;
     }
-    return moves.pop();
+    return this.moves.pop();
   };
 
-  this.prepareForPlayMode = function() {
-    this.isPlayMode = true;
-    this.setTempMode(false);
-    this.indexPlay = 0;
+  this._startMode = function(mode) {
+    switch (mode) {
+      case this.MODE_PLAY:
+        this._startPlayMode();
+        break;
+      case this.MODE_TEMP:
+        this._startTempMode();
+        break;
+    }
+  };
 
-    var indexPlayToRestore = this.indexPlaySaved;
+  this._finishMode = function(mode) {
+    switch (mode) {
+      case this.MODE_TEMP:
+        this._finishTempMode();
+        break;
+      case this.MODE_PLAY:
+        this.backToTrunk();
+        break;
+    }
+  };
+
+  this._startPlayMode = function() {
+    this.indexPlay = 0;
+    this._numMovesToPlay = this.indexPlaySaved;
     this.indexPlaySaved = null;
-    return indexPlayToRestore;
+  };
+
+  this._startTempMode = function() {
+    this._moves_saved = this.moves;
+    this.moves = new Moves([]);
+    //TODO: indexPlaySaved is unused while isTempMode is true ????
+    this.indexPlaySaved = this.indexPlay;
+  };
+
+  this._finishTempMode = function() {
+    if (this.moves.length() > 0 && confirm("この検討手順を分岐として保存しますか?")) {
+      this._moves_saved.insert(this.indexPlaySaved, this.moves.strMoves());
+    }
+    this.moves = this._moves_saved;
+  };
+
+  this.numMovesToPlay = function() {
+    return this._numMovesToPlay || 0;
   };
 
   this.playNext = function() {
@@ -79,7 +128,7 @@ function MoveSet() {
   this.nextTurn = function() {
     if (this.moves.length() === 0) {
       return this.DEFAULT_NEXT_TURN;
-    } else if (this.isPlayMode) {
+    } else if (this._mode == this.MODE_PLAY) {
       if (this.indexPlay < this.moves.length()) {
         return getColorOfStone(this.moves.get(this.indexPlay));
       }
@@ -110,7 +159,7 @@ function MoveSet() {
 
   this._offsetToAdjacentJunction = function(direction) {
     direction = direction / Math.abs(direction);
-    for (var i = this.indexPlay + direction; 0 <= i && i < this.moves.length(); i += direction) {
+    for (var i = this.indexPlay + direction; 0 <= i && i <= this.moves.length(); i += direction) {
       if (this.moves.branches(i).length > 0) {
         return i - this.indexPlay;
       }
@@ -125,6 +174,7 @@ function MoveSet() {
     this.indexPlaySaved = this.indexPlay;
     this.indexPlay = 0;
     this.onBranch = true;
+    this._numBranch = numBranch;
   };
 
   this.backToTrunk = function() {
@@ -138,33 +188,21 @@ function MoveSet() {
     this.onBranch = false;
   };
 
+  this.removeBranch = function() {
+    if (! this.onBranch) {
+      return;
+    }
+    this.backToTrunk();
+    this.moves.removeBranch(this.indexPlay, this._numBranch);
+  };
+
   this.strMovesToRewind = function() {
     return this._strMovesToRewind;
   };
 
-  this.setTempMode = function(isTempMode) {
-    this.isTempMode = isTempMode;
-    if (isTempMode) {
-      this.tempMoves = [];
-      this.isPlayMode = false;
-      this.indexPlaySaved = this.indexPlay;
-    } else if (this.tempMoves.length > 0) {
-      if (confirm("Save this branch?")) {
-        this.moves.insert(this.indexPlaySaved, this.tempMoves);
-      }
-      this.tempMoves = [];
-    }
-  };
-
-  this.addComment = function(comment, index) {
-    if (index < 0 || index >= this.moves.length()) {
-      index = this.moves.length() - 1;
-    }
-
-    var move = this.moves.get(index);
-    move = move.replace(/\[[^\]]*\]/, '');
-    move += '[' + comment + ']';
-    this.moves.set(index, move);
+  this.addComment = function(comment) {
+    var _index = (this._mode == this.MODE_TURN) ? this.moves.length() - 1 : this.indexPlay - 1;
+    this.moves.addComment(comment, _index);
   };
 
   this.getCurrentComment = function() {

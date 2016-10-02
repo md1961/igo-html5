@@ -1,5 +1,7 @@
 #! /bin/env ruby
 
+require 'kuma/color'
+
 BEGIN_JASMINE_FILES_WHEN_DISABLED = "<!-- Jasmine files"           .freeze
   END_JASMINE_FILES_WHEN_DISABLED = "End of Jasmine files -->"     .freeze
 BEGIN_JASMINE_FILES_WHEN_ENABLED  = "<!-- Jasmine files -->"       .freeze
@@ -8,6 +10,10 @@ BEGIN_JASMINE_FILES_WHEN_ENABLED  = "<!-- Jasmine files -->"       .freeze
 RE_DIV_APPLICATION = /<div id="application"( hidden)?>[ \t]*$/.freeze
 DIV_APPLICATION_DISABLED = '<div id="application">'       .freeze
 DIV_APPLICATION_ENABLED  = '<div id="application" hidden>'.freeze
+
+COLOR_RED   = Kuma::Color::RED
+COLOR_BLUE  = Kuma::Color::CYAN
+COLOR_RESET = Kuma::Color::RESET
 
 
 TARGET_FILE = 'index.html'.freeze
@@ -35,7 +41,8 @@ end
 
 
 if ARGV.length >= 1
-  puts "Jasmine is #{will_enable ? 'disabled' : 'enabled'}"
+  status, color = will_enable ? ['disabled', COLOR_RED] : ['enabled', COLOR_BLUE]
+  puts "#{color}Jasmine is #{status}#{COLOR_RESET}"
   exit
 end
 
@@ -59,5 +66,6 @@ end
 
 File.write(TARGET_FILE, contents)
 
-puts "Jasmine has been #{will_enable ? 'enabled' : 'disabled'}"
+status, color = will_enable ? ['enabled', COLOR_BLUE] : ['disabled', COLOR_RED]
+puts "#{color}Jasmine has been #{status}#{COLOR_RESET}"
 

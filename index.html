@@ -16,6 +16,7 @@
     <script type="text/javascript" src="app/moves.js">    </script>
     <script type="text/javascript" src="app/move_set.js"> </script>
     <script type="text/javascript" src="app/move_book.js"></script>
+    <script type="text/javascript" src="app/board.js"></script>
     <script type="text/javascript" src="igo.js"></script>
 
 
@@ -66,6 +67,10 @@
         border-bottom: solid 1px black;
         padding: 0px 2px;
         cursor: pointer;
+      }
+
+      #comment {
+        padding: 2px 10px;
       }
     </style>
   </head>
@@ -152,6 +157,8 @@
             <select id="branch_select" onchange="branchSelectChangeHandler(this);" hidden>
               <option value="trunk">本譜</option>
             </select>
+            &nbsp;&nbsp;
+            <input type="button" id="button_to_remove_branch" value="分岐を削除" onclick="removeBranch();" hidden>
           </span>
           <br />
           <br />
