@@ -25,6 +25,10 @@ function MoveBook() {
   };
 
   this.changeSet = function(step) {
+    if (this.current() !== null) {
+      this.current().backToTrunk();
+    }
+
     if (this.moveSets.length === 0) {
       return null;
     } else if (this.cursor === null) {
