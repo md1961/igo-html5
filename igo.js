@@ -350,6 +350,7 @@ function inputTitle() {
   var title = document.getElementById("title_input").value;
   document.getElementById("title").innerText = title;
   moveSet.title = title;
+  displayMoveSet();
 }
 
 function showCommentInput() {
