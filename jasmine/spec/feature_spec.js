@@ -12,6 +12,12 @@ describe("Feature of igo-html5", function() {
       it("display title of last MoveSet", function() {
         expect(document.getElementById("title").innerText).toEqual("高尾紳路 x 清成哲也");
       });
+      it("display MoveSet number with total MoveSet's", function() {
+        expect(document.getElementById("set_num").innerText).toEqual("[2/2]");
+      });
+      it("display number of moves", function() {
+        expect(document.getElementById("numMoves").innerText).toEqual("135手目 / 全135手");
+      });
     });
   });
 });
