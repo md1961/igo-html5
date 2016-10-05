@@ -16,7 +16,7 @@ describe("Feature of igo-html5", function() {
         expect(document.getElementById("set_num").innerText).toEqual("[2/2]");
       });
       it("display total number of moves", function() {
-        expect(document.getElementById("numMoves").innerText).toEqual("135手目 / 全135手");
+        expect(document.getElementById("num_moves").innerText).toEqual("135手目 / 全135手");
       });
 
       it("display comment of last move", function() {
@@ -30,17 +30,43 @@ describe("Feature of igo-html5", function() {
       });
 
       it("display number of moves of 0", function() {
-        expect(document.getElementById("numMoves").innerText).toEqual("0手目 / 全135手");
+        expect(document.getElementById("num_moves").innerText).toEqual("0手目 / 全135手");
+      });
+
+      it("keep drop-down list for branch hidden", function() {
+        expect(document.getElementById("branch_select").style.display).toEqual('none');
       });
 
       it("display last number of moves after play to last", function() {
         document.getElementById("button_to_last").click();
-        expect(document.getElementById("numMoves").innerText).toEqual("135手目 / 全135手");
+        expect(document.getElementById("num_moves").innerText).toEqual("135手目 / 全135手");
       });
 
       it("display comment of last move after play to last", function() {
         document.getElementById("button_to_last").click();
         expect(document.getElementById("comment").innerText).toEqual("入力はここまで");
+      });
+    });
+
+    describe("go to first junction in Play mode", function() {
+      beforeEach(function() {
+        document.getElementById("radio_mode_play" ).click();
+        document.getElementById("button_next_junc").click();
+      });
+
+      it("display number of moves of 19", function() {
+        expect(document.getElementById("num_moves").innerText).toEqual("19手目 / 全135手");
+      });
+
+      it("show drop-down list for branch", function() {
+        expect(document.getElementById("branch_select").style.display).toEqual("inline");
+      });
+
+      it("show drop-down list for branch with three options", function() {
+        var branch_select = document.getElementById("branch_select");
+        expect(branch_select.options[0].innerText).toEqual("本譜");
+        expect(branch_select.options[1].innerText).toEqual("変化0");
+        expect(branch_select.options[2].innerText).toEqual("変化1");
       });
     });
   });
