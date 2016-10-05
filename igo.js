@@ -325,7 +325,7 @@ function updateNumMovesDisplay(numMoves) {
     totalMoves = moveSet.length();
   }
 
-  document.getElementById("numMoves").innerText = numMoves + "手目 / 全" + totalMoves + "手";
+  document.getElementById("num_moves").innerText = numMoves + "手目 / 全" + totalMoves + "手";
 }
 
 function displayTitle() {
