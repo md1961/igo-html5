@@ -6,7 +6,7 @@ function Moves(strMoves) {
   };
 
   this._isTrunkMove = function(move) {
-    return typeof move == 'string';
+    return typeof move == 'string' && move.match(/^[NBWnbw][a-s]{2}/);
   };
 
   this._trunkMoves = function() {
