@@ -51,6 +51,14 @@ function Moves(strMoves) {
     return branches;
   };
 
+  this.branchNames = function(index) {
+    var _getBranchName = this._getBranchName;
+    var _isTrunkMove   = this._isTrunkMove;
+    return this.branches(index).map(function(branch) {
+      return _getBranchName(branch, _isTrunkMove);
+    });
+  };
+
   this.removeBranch = function(index, numBranch) {
     var lenBranches = this.branches(index).length;
     if (lenBranches === 0) {
@@ -85,6 +93,21 @@ function Moves(strMoves) {
   this.branchTo = function(index, numBranch) {
     this._moves_trunk = this._moves;
     this._moves = this.branches(index)[numBranch];
+  };
+
+  this.branchName = function() {
+    return this._getBranchName(this._moves);
+  };
+
+  this._getBranchName = function(moves, _isTrunkMove) {
+    if (_isTrunkMove === undefined) {
+      _isTrunkMove = this._isTrunkMove;
+    }
+    var name = moves[moves.length - 1];
+    if (_isTrunkMove(name)) {
+      name = "";
+    }
+    return name;
   };
 
   this.backToTrunk = function() {

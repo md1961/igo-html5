@@ -106,6 +106,8 @@ function MoveSet() {
 
   this._finishTempMode = function() {
     if (this._moves.length() > 0 && confirm("この検討手順を分岐として保存しますか?")) {
+      var branchName = "";
+      this._moves.push(branchName);
       this._moves_saved.insert(this._indexPlaySaved, this._moves.strMoves());
     }
     this._moves = this._moves_saved;
@@ -156,6 +158,10 @@ function MoveSet() {
 
   this.branches = function() {
     return this._moves.branches(this._indexPlay);
+  };
+
+  this.branchNames = function() {
+    return this._moves.branchNames(this._indexPlay);
   };
 
   this.offsetToNextJunction = function() {

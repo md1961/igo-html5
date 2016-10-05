@@ -469,8 +469,10 @@ function updateBranchSelectDisplay() {
   if (moveSet.onBranch()) {
     return;
   }
+  var branchNames = moveSet.branchNames();
   var options = moveSet.branches().map(function(branch, index) {
-    return ['変化' + index, index];
+    var label = '変化' + index + ': ' + branchNames[index];
+    return [label, index];
   });
   var branch_select = replaceBranchSelect(options);
   branch_select.style.display = moveSet.branches().length === 0 ? 'none' : 'inline';

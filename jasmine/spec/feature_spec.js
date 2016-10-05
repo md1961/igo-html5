@@ -60,8 +60,8 @@ describe("Feature of igo-html5", function() {
       it("show drop-down list for branch with three options", function() {
         var branch_select = document.getElementById("branch_select");
         expect(branch_select.options[0].innerText).toEqual("本譜");
-        expect(branch_select.options[1].innerText).toEqual("変化0");
-        expect(branch_select.options[2].innerText).toEqual("変化1");
+        expect(branch_select.options[1].innerText).toEqual("変化0: 不要な変化");
+        expect(branch_select.options[2].innerText).toEqual("変化1: ");
       });
     });
 
