@@ -113,6 +113,7 @@ function stringifyMove(stone, x, y) {
 const RE_MOVE_FORMAT_ORIGINAL =   /^([NBWnbw]\d{2,})(?:\(([\w,]+)\))?(?:\[([^\]]*)\])?$/;
 const RE_MOVE_FORMAT_SGF      = /^([NBWnbw][a-s]{2})(?:\(([\w,]+)\))?(?:\[([^\]]*)\])?$/;
 
+//TODO: Use SGF-like format as default
 // (BLACK, 16, 4 [, ((WHITE, 17, 4), ...)]) などの配列に変換
 // 第四要素は取られた石の配列
 function parseMove(stringifiedMove) {
@@ -452,7 +453,7 @@ function branchSelectChangeHandler(branch_select) {
     branch_select.value = numBranch;
     document.getElementById("button_to_remove_branch").style.display = 'inline';
   }
-  updateNumMovesDisplay(moveSet.indexPlay);
+  updateNumMovesDisplay(moveSet.numCurrentMove());
 }
 
 function backBoardToTrunk() {
@@ -465,7 +466,7 @@ function backBoardToTrunk() {
 }
 
 function updateBranchSelectDisplay() {
-  if (moveSet.onBranch) {
+  if (moveSet.onBranch()) {
     return;
   }
   var options = moveSet.branches().map(function(branch, index) {
@@ -504,7 +505,7 @@ function removeAllChildren(node) {
 function removeBranch() {
   moveSet.removeBranch();
   backBoardToTrunk();
-  updateNumMovesDisplay(moveSet.indexPlay);
+  updateNumMovesDisplay(moveSet.numCurrentMove());
 }
 
 function prepareForPlayMode() {
@@ -519,7 +520,7 @@ function prepareForPlayMode() {
 
   setTurn(moveSet.nextTurn());
   updateBranchSelectDisplay();
-  updateNumMovesDisplay(moveSet.indexPlay);
+  updateNumMovesDisplay(moveSet.numCurrentMove());
 
   showButtonsToPlay(true);
   showInfoDisplay(true);
@@ -573,7 +574,7 @@ function playNext() {
   //TODO: Should be moveSet.nextTurn() ?
   setTurn(getOpponent(getColorOfStone(strMove)));
   updateBranchSelectDisplay();
-  updateNumMovesDisplay(moveSet.indexPlay);
+  updateNumMovesDisplay(moveSet.numCurrentMove());
   return true;
 }
 
@@ -586,7 +587,7 @@ function playPrev() {
   setTurn(getColorOfStone(strMove));
   board.displayComment(moveSet.getCurrentComment());
   updateBranchSelectDisplay();
-  updateNumMovesDisplay(moveSet.indexPlay);
+  updateNumMovesDisplay(moveSet.numCurrentMove());
   return true;
 }
 

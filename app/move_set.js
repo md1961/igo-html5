@@ -11,12 +11,13 @@ function MoveSet() {
     this.moves = new Moves([]);
   };
 
-  this._mode = this.MODE_TURN;
   this.clear();
+
+  this._mode = this.MODE_TURN;
   //TODO: Rename to indexNext or indexMoves ?
-  this.indexPlay = 0;
-  this.onBranch = false;
-  this.indexPlaySaved = null;
+  this._indexPlay = 0;  // This points to index of next move.
+  this._onBranch = false;
+  this._indexPlaySaved = null;
 
   this.setMode = function(mode) {
     if (this.VALID_MODES.indexOf(mode) < 0) {
@@ -33,8 +34,16 @@ function MoveSet() {
     return this.moves.length();
   };
 
+  this.numCurrentMove = function() {
+    return this._indexPlay;
+  }
+
+  this.onBranch = function() {
+    return this._onBranch;
+  }
+
   this.resetIndex = function() {
-    this.indexPlay = 0;
+    this._indexPlay = 0;
   };
 
   this.writeInits = function(stone, x, y) {
@@ -83,21 +92,21 @@ function MoveSet() {
   };
 
   this._startPlayMode = function() {
-    this.indexPlay = 0;
-    this._numMovesToPlay = this.indexPlaySaved;
-    this.indexPlaySaved = null;
+    this._indexPlay = 0;
+    this._numMovesToPlay = this._indexPlaySaved;
+    this._indexPlaySaved = null;
   };
 
   this._startTempMode = function() {
     this._moves_saved = this.moves;
     this.moves = new Moves([]);
-    //TODO: indexPlaySaved is unused while isTempMode is true ????
-    this.indexPlaySaved = this.indexPlay;
+    //TODO: _indexPlaySaved is unused while isTempMode is true ????
+    this._indexPlaySaved = this._indexPlay;
   };
 
   this._finishTempMode = function() {
     if (this.moves.length() > 0 && confirm("この検討手順を分岐として保存しますか?")) {
-      this._moves_saved.insert(this.indexPlaySaved, this.moves.strMoves());
+      this._moves_saved.insert(this._indexPlaySaved, this.moves.strMoves());
     }
     this.moves = this._moves_saved;
   };
@@ -107,20 +116,20 @@ function MoveSet() {
   };
 
   this.playNext = function() {
-    if (this.indexPlay >= this.moves.length()) {
-      this.indexPlay = this.moves.length();
+    if (this._indexPlay >= this.moves.length()) {
+      this._indexPlay = this.moves.length();
       return null;
     }
-    return this.moves.get(this.indexPlay++);
+    return this.moves.get(this._indexPlay++);
   };
 
   this.playPrev = function() {
-    if (this.indexPlay <= 0) {
-      this.indexPlay = 0;
+    if (this._indexPlay <= 0) {
+      this._indexPlay = 0;
       return null;
     }
-    this.indexPlay--;
-    return this.moves.get(this.indexPlay);
+    this._indexPlay--;
+    return this.moves.get(this._indexPlay);
   };
 
   this.DEFAULT_NEXT_TURN = BLACK;
@@ -129,10 +138,10 @@ function MoveSet() {
     if (this.moves.length() === 0) {
       return this.DEFAULT_NEXT_TURN;
     } else if (this._mode == this.MODE_PLAY) {
-      if (this.indexPlay < this.moves.length()) {
-        return getColorOfStone(this.moves.get(this.indexPlay));
+      if (this._indexPlay < this.moves.length()) {
+        return getColorOfStone(this.moves.get(this._indexPlay));
       }
-      return getOpponent(getColorOfStone(this.moves.get(this.indexPlay - 1)));
+      return getOpponent(getColorOfStone(this.moves.get(this._indexPlay - 1)));
     } else {
       var lastStrMove = this.moves.get(this.moves.length() - 1);
       //TODO: Use getOpponent()?
@@ -146,7 +155,7 @@ function MoveSet() {
   };
 
   this.branches = function() {
-    return this.moves.branches(this.indexPlay);
+    return this.moves.branches(this._indexPlay);
   };
 
   this.offsetToNextJunction = function() {
@@ -159,41 +168,41 @@ function MoveSet() {
 
   this._offsetToAdjacentJunction = function(direction) {
     direction = direction / Math.abs(direction);
-    for (var i = this.indexPlay + direction; 0 <= i && i <= this.moves.length(); i += direction) {
+    for (var i = this._indexPlay + direction; 0 <= i && i <= this.moves.length(); i += direction) {
       if (this.moves.branches(i).length > 0) {
-        return i - this.indexPlay;
+        return i - this._indexPlay;
       }
     }
     return null;
   };
 
   this.branchTo = function(numBranch) {
-    this._strMovesToRewind = this.moves.branches(this.indexPlay)[numBranch];
-    this.moves.branchTo(this.indexPlay, numBranch);
+    this._strMovesToRewind = this.moves.branches(this._indexPlay)[numBranch];
+    this.moves.branchTo(this._indexPlay, numBranch);
     //TODO: Handle branch on branch...
-    this.indexPlaySaved = this.indexPlay;
-    this.indexPlay = 0;
-    this.onBranch = true;
+    this._indexPlaySaved = this._indexPlay;
+    this._indexPlay = 0;
+    this._onBranch = true;
     this._numBranch = numBranch;
   };
 
   this.backToTrunk = function() {
-    if (! this.onBranch || this.indexPlaySaved === null) {
+    if (! this.onBranch() || this._indexPlaySaved === null) {
       return;
     }
     this.moves.backToTrunk();
-    this._strMovesToRewind = this._strMovesToRewind.slice(0, this.indexPlay);
-    this.indexPlay = this.indexPlaySaved;
-    this.indexPlaySaved = null;
-    this.onBranch = false;
+    this._strMovesToRewind = this._strMovesToRewind.slice(0, this._indexPlay);
+    this._indexPlay = this._indexPlaySaved;
+    this._indexPlaySaved = null;
+    this._onBranch = false;
   };
 
   this.removeBranch = function() {
-    if (! this.onBranch) {
+    if (! this.onBranch()) {
       return;
     }
     this.backToTrunk();
-    this.moves.removeBranch(this.indexPlay, this._numBranch);
+    this.moves.removeBranch(this._indexPlay, this._numBranch);
   };
 
   this.strMovesToRewind = function() {
@@ -201,17 +210,17 @@ function MoveSet() {
   };
 
   this.addComment = function(comment) {
-    var _index = (this._mode == this.MODE_TURN) ? this.moves.length() - 1 : this.indexPlay - 1;
+    var _index = (this._mode == this.MODE_TURN) ? this.moves.length() - 1 : this._indexPlay - 1;
     this.moves.addComment(comment, _index);
   };
 
   this.getCurrentComment = function() {
-    if (this.indexPlay <= 0) {
+    if (this._indexPlay <= 0) {
       return null;
-    } else if (this.indexPlay > this.moves.length()) {
-      this.indexPlay = this.moves.length();
+    } else if (this._indexPlay > this.moves.length()) {
+      this._indexPlay = this.moves.length();
     }
-    var move = this.moves.get(this.indexPlay - 1);
+    var move = this.moves.get(this._indexPlay - 1);
     return parseMove(move)[4];
   };
 
