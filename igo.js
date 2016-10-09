@@ -449,7 +449,8 @@ function branchSelectChangeHandler(branch_select) {
   } else {
     var numBranch = parseInt(branch_select.value);
     moveSet.branchTo(numBranch);
-    branch_select = replaceBranchSelect([['変化' + numBranch, numBranch]]);
+    var label = makeBranchLabel(numBranch, moveSet.branchName());
+    branch_select = replaceBranchSelect([[label, numBranch]]);
     branch_select.value = numBranch;
     document.getElementById("button_to_remove_branch").style.display = 'inline';
   }
@@ -471,7 +472,7 @@ function updateBranchSelectDisplay() {
   }
   var branchNames = moveSet.branchNames();
   var options = moveSet.branches().map(function(branch, index) {
-    var label = '変化' + index + ': ' + branchNames[index];
+    var label = makeBranchLabel(index, branchNames[index]);
     return [label, index];
   });
   var branch_select = replaceBranchSelect(options);
@@ -489,6 +490,10 @@ function replaceBranchSelect(options) {
     branch_select.appendChild(createOption(label, value));
   }
   return branch_select;
+}
+
+function makeBranchLabel(index, name) {
+  return '変化' + index + ': ' + name;
 }
 
 function createOption(label, value) {
