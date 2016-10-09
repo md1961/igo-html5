@@ -159,7 +159,15 @@
               <option value="trunk">本譜</option>
             </select>
             &nbsp;&nbsp;
-            <input type="button" id="button_to_remove_branch" value="分岐を削除" onclick="removeBranch();" hidden>
+            <span id="branch_edit_holder" hidden>
+              <span class="small_button" onclick="showBranchNameInput();">&lt;=</span>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <input type="button" id="button_to_remove_branch" value="分岐を削除" onclick="removeBranch();">
+            </span>
+            <span id="branch_input_holder" hidden>
+              <input type="text" id="branch_name_input">
+              <input type="button" id="button_to_input_branch_name" value="入力" onclick="inputBranchName();">
+            </span>
           </span>
           <br>
           <br>

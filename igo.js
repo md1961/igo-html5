@@ -452,7 +452,7 @@ function branchSelectChangeHandler(branch_select) {
     var label = makeBranchLabel(numBranch, moveSet.branchName());
     branch_select = replaceBranchSelect([[label, numBranch]]);
     branch_select.value = numBranch;
-    document.getElementById("button_to_remove_branch").style.display = 'inline';
+    document.getElementById("branch_edit_holder").style.display = 'inline';
   }
   updateNumMovesDisplay(moveSet.numCurrentMove());
 }
@@ -477,7 +477,7 @@ function updateBranchSelectDisplay() {
   });
   var branch_select = replaceBranchSelect(options);
   branch_select.style.display = moveSet.branches().length === 0 ? 'none' : 'inline';
-  document.getElementById("button_to_remove_branch").style.display = 'none';
+  document.getElementById("branch_edit_holder").style.display = 'none';
 }
 
 function replaceBranchSelect(options) {
@@ -510,9 +510,29 @@ function removeAllChildren(node) {
 }
 
 function removeBranch() {
-  moveSet.removeBranch();
-  backBoardToTrunk();
-  updateNumMovesDisplay(moveSet.numCurrentMove());
+  if (confirm("この分岐を削除していいですか？")) {
+    moveSet.removeBranch();
+    backBoardToTrunk();
+    updateNumMovesDisplay(moveSet.numCurrentMove());
+  }
+}
+
+function showBranchNameInput() {
+  document.getElementById("branch_edit_holder" ).style.display = 'none';
+  document.getElementById("branch_input_holder").style.display = 'inline';
+  var branch_name_input = document.getElementById("branch_name_input");
+  branch_name_input.value = moveSet.branchName();
+  branch_name_input.focus();
+}
+
+function inputBranchName() {
+  document.getElementById("branch_edit_holder" ).style.display = 'inline';
+  document.getElementById("branch_input_holder").style.display = 'none';
+  var branchName = document.getElementById("branch_name_input").value;
+  moveSet.inputBranchName(branchName);
+  var optionBranch = document.getElementById("branch_select").lastChild;
+  var currentLabel = optionBranch.innerText;
+  optionBranch.innerText = currentLabel.replace(/\S*$/, branchName);
 }
 
 function prepareForPlayMode() {

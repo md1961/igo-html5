@@ -95,8 +95,21 @@ function Moves(strMoves) {
     this._moves = this.branches(index)[numBranch];
   };
 
+  this.backToTrunk = function() {
+    this._moves = this._moves_trunk;
+  };
+
   this.branchName = function() {
     return this._getBranchName(this._moves);
+  };
+
+  this.inputBranchName = function(name) {
+    var lastMove = this._moves[this._moves.length - 1];
+    if (this._isTrunkMove(lastMove) || typeof lastMove != 'string') {
+      this._moves.push(name);
+    } else {
+      this._moves[this._moves.length - 1] = name;
+    }
   };
 
   this._getBranchName = function(moves, _isTrunkMove) {
@@ -108,10 +121,6 @@ function Moves(strMoves) {
       name = "";
     }
     return name;
-  };
-
-  this.backToTrunk = function() {
-    this._moves = this._moves_trunk;
   };
 
   this.addComment = function(comment, index) {

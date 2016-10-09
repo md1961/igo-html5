@@ -194,7 +194,11 @@ function MoveSet() {
 
   this.branchName = function() {
     return this._moves.branchName();
-  }
+  };
+
+  this.inputBranchName = function(name) {
+    this._moves.inputBranchName(name);
+  };
 
   this.backToTrunk = function() {
     if (! this.onBranch() || this._indexPlaySaved === null) {
