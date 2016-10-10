@@ -213,11 +213,20 @@ function updateBoardByMoveSet() {
   putInits();
   putMovesToLast();
 
-  setTurnMode();
-  setTurn(moveSet.nextTurn());
+  setInitialMode();
 
   displayMoveSet();
   enableRadioToInitMode(false);
+}
+
+function setInitialMode() {
+  if (moveSet.isReadOnly) {
+    setPlayMode();
+    prepareForPlayMode();
+  } else {
+    setTurnMode();
+    setTurn(moveSet.nextTurn());
+  }
 }
 
 function readDataFromLocalStorage() {

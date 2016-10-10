@@ -6,9 +6,10 @@ function MoveSet() {
   this.VALID_MODES = [this.MODE_TURN, this.MODE_PLAY, this.MODE_TEMP];
 
   this.clear = function() {
-    this.title  = "";
-    this.inits  = [];
-    this._moves = new Moves([]);
+    this.title      = "";
+    this.isReadOnly = false;
+    this.inits      = [];
+    this._moves     = new Moves([]);
   };
 
   this.clear();
@@ -105,7 +106,7 @@ function MoveSet() {
   };
 
   this._finishTempMode = function() {
-    if (this._moves.length() > 0 && confirm("この検討手順を分岐として保存しますか?")) {
+    if (this._moves.length() > 0 && ! this.isReadOnly && confirm("この検討手順を分岐として保存しますか?")) {
       var branchName = "";
       this._moves.push(branchName);
       this._moves_saved.insert(this._indexPlaySaved, this._moves.strMoves());
@@ -239,9 +240,10 @@ function MoveSet() {
   };
 
   this.readDataInHash = function(hash) {
-    this.title = hash.title;
-    this.inits = hash.inits;
-    this._moves = new Moves(hash.moves);
+    this.title      = hash.title;
+    this.isReadOnly = hash.isReadOnly;
+    this.inits      = hash.inits;
+    this._moves     = new Moves(hash.moves);
   };
 
   this.readDataInJson = function(json) {
@@ -251,9 +253,10 @@ function MoveSet() {
 
   this.toHash = function() {
     return {
-      "title": this.title,
-      "inits": this.inits,
-      "moves": this._moves.strMoves()
+      "title"     : this.title,
+      "isReadOnly": this.isReadOnly,
+      "inits"     : this.inits,
+      "moves"     : this._moves.strMoves()
     };
   };
 
