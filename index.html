@@ -112,8 +112,10 @@
         </div>
         <div class="panel" style="margin-top: 20px">
           <span class="panel bordered">
-            <input type="radio" name="mode" id="radio_mode_turn" value="turn" onclick="radioModeHandler(this);" checked>
-            <label for="radio_mode_turn">対戦</label>
+            <span id="radio_mode_turn_with_label">
+              <input type="radio" name="mode" id="radio_mode_turn" value="turn" onclick="radioModeHandler(this);" checked>
+              <label for="radio_mode_turn">対戦</label>
+            </span>
             <input type="radio" name="mode" id="radio_mode_play" value="play" onclick="radioModeHandler(this);">
             <label for="radio_mode_play">再現</label>
             <input type="radio" name="mode" id="radio_mode_temp" value="temp" onclick="radioModeHandler(this);">
@@ -123,6 +125,11 @@
               <input type="radio" name="mode" id="radio_mode_init" value="init" onclick="radioModeHandler(this);">
               <label for="radio_mode_init">置石</label>
             </span>
+          </span>
+          &nbsp;&nbsp;
+          <span class="panel">
+            <input type="checkbox" id="is_read_only" onchange="isReadOnlyHandler(this);" />
+            <label for="is_read_only">読取専用</label>
           </span>
         </div>
         <div class="panel">

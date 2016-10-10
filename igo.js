@@ -211,18 +211,23 @@ function updateBoardByMoveSet() {
   board.clear();
   board.clearComment();
   putInits();
-  putMovesToLast();
 
   setInitialMode();
+  if (isTurnMode()) {
+    putMovesToLast();
+  }
 
   displayMoveSet();
   enableRadioToInitMode(false);
 }
 
 function setInitialMode() {
-  if (moveSet.isReadOnly) {
+  var isReadOnly = moveSet.isReadOnly;
+  checkIsReadOnly(isReadOnly);
+  if (isReadOnly) {
     setPlayMode();
     prepareForPlayMode();
+    moveSet.resetIndex();
   } else {
     setTurnMode();
     setTurn(moveSet.nextTurn());
@@ -267,6 +272,17 @@ function clearAll() {
   board.clear();
   board.clearComment();
   enableRadioToInitMode(true);
+  checkIsReadOnly(moveSet.isReadOnly);
+}
+
+function checkIsReadOnly(is_checked) {
+  document.getElementById("is_read_only").checked = is_checked;
+  document.getElementById("radio_mode_turn_with_label").style.display = is_checked ? 'none' : 'inline';
+}
+
+function isReadOnlyHandler(checkbox) {
+  moveSet.isReadOnly = checkbox.checked;
+  document.getElementById("radio_mode_turn_with_label").style.display = checkbox.checked ? 'none' : 'inline';
 }
 
 function gridClickHandler() {
