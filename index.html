@@ -16,6 +16,7 @@
     <script type="text/javascript" src="app/moves.js">    </script>
     <script type="text/javascript" src="app/move_set.js"> </script>
     <script type="text/javascript" src="app/move_book.js"></script>
+    <script type="text/javascript" src="app/board.js"></script>
     <script type="text/javascript" src="igo.js"></script>
 
 
@@ -28,6 +29,7 @@
     <script src="jasmine/lib/jasmine-2.5.2/jasmine-html.js"></script>
     <script src="jasmine/lib/jasmine-2.5.2/boot.js"></script>
 
+    <script src="jasmine/spec/feature_spec.js"></script>
     <script src="jasmine/spec/moves_spec.js"></script>
 
     End of Jasmine files -->
@@ -67,6 +69,10 @@
         padding: 0px 2px;
         cursor: pointer;
       }
+
+      #comment {
+        padding: 2px 10px;
+      }
     </style>
   </head>
 
@@ -83,7 +89,7 @@
             </span>
             <span id="comment_input_holder" hidden>
               <input type="text" id="comment_input" size="40">
-              <input type="button" value="コメント記入" onclick="inputComment();">
+              <input type="button" id="button_to_input_comment" value="コメント記入" onclick="inputComment();">
             </span>
           </span>
         </div>
@@ -136,10 +142,10 @@
             </span>
             <span id="title_input_holder" hidden>
               <input type="text" id="title_input">
-              <input type="button" value="入力" onclick="inputTitle();">
+              <input type="button" id="button_to_input_title" value="入力" onclick="inputTitle();">
             </span>
             &nbsp;&nbsp;
-            <span id="numMoves" />
+            <span id="num_moves" />
           </span>
         </div>
         <div id="buttons_to_play" class="panel">
@@ -152,9 +158,11 @@
             <select id="branch_select" onchange="branchSelectChangeHandler(this);" hidden>
               <option value="trunk">本譜</option>
             </select>
+            &nbsp;&nbsp;
+            <input type="button" id="button_to_remove_branch" value="分岐を削除" onclick="removeBranch();" hidden>
           </span>
-          <br />
-          <br />
+          <br>
+          <br>
           <span class="panel">
             <input type="button" id="button_to_first"  value="|<"  onclick="playToFirst();">
             <input type="button" id="button_prev_ten"  value="<10" onclick="playToPrevOf(10);">
@@ -167,7 +175,7 @@
             <input type="button" id="button_to_last"   value=">|"  onclick="playToLast();">
             &nbsp;&nbsp;
           </span>
-          <br />
+          <br>
           <span class="panel">
             <input type="text"   id="num_move_to_go"   size="1">
             手目へ
@@ -178,14 +186,18 @@
           <span class="panel">
             <textarea id="moves_display" cols="50" rows="4"></textarea>
           </span>
-          <br />
+          <br>
           <span class="panel">
-            <input type="button" value="盤面へ読込" onclick="readDataIntoMoveBook();"></input>
+            <input type="button" id="button_to_read_data_into_move_book" value="盤面へ読込"
+                   onclick="readDataIntoMoveBook();">
             &nbsp;&nbsp;
-            <input type="button" value="Localへ書込"   onclick="writeDataToLocalStorage();"></input>
-            <input type="button" value="Localから読込" onclick="readDataFromLocalStorage();"></input>
+            <input type="button" id="button_to_write_data_to_local_storage" value="Localへ書込"
+                   onclick="writeDataToLocalStorage();">
+            <input type="button" id="button_to_read_data_from_local_storage" value="Localから読込"
+                   onclick="readDataFromLocalStorage();">
             &nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="button" value="SGF式に変換" onclick="convertToSGF();"></input>
+            <input type="button" id="button_to_read_data_into_move_book" value="SGF式に変換"
+                   onclick="convertToSGF();">
           </span>
         </div>
       </div>
