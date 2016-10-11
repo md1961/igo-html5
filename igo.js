@@ -113,6 +113,7 @@ function stringifyMove(stone, x, y) {
 const RE_MOVE_FORMAT_ORIGINAL =   /^([NBWnbw]\d{2,})(?:\(([\w,]+)\))?(?:\[([^\]]*)\])?$/;
 const RE_MOVE_FORMAT_SGF      = /^([NBWnbw][a-s]{2})(?:\(([\w,]+)\))?(?:\[([^\]]*)\])?$/;
 
+//TODO: Use SGF-like format as default
 // (BLACK, 16, 4 [, ((WHITE, 17, 4), ...)]) などの配列に変換
 // 第四要素は取られた石の配列
 function parseMove(stringifiedMove) {
@@ -210,13 +211,27 @@ function updateBoardByMoveSet() {
   board.clear();
   board.clearComment();
   putInits();
-  putMovesToLast();
 
-  setTurnMode();
-  setTurn(moveSet.nextTurn());
+  setInitialMode();
+  if (isTurnMode()) {
+    putMovesToLast();
+  }
 
   displayMoveSet();
   enableRadioToInitMode(false);
+}
+
+function setInitialMode() {
+  var isReadOnly = moveSet.isReadOnly;
+  checkIsReadOnly(isReadOnly);
+  if (isReadOnly) {
+    setPlayMode();
+    prepareForPlayMode();
+    moveSet.resetIndex();
+  } else {
+    setTurnMode();
+    setTurn(moveSet.nextTurn());
+  }
 }
 
 function readDataFromLocalStorage() {
@@ -257,6 +272,17 @@ function clearAll() {
   board.clear();
   board.clearComment();
   enableRadioToInitMode(true);
+  checkIsReadOnly(moveSet.isReadOnly);
+}
+
+function checkIsReadOnly(is_checked) {
+  document.getElementById("is_read_only").checked = is_checked;
+  document.getElementById("radio_mode_turn_with_label").style.display = is_checked ? 'none' : 'inline';
+}
+
+function isReadOnlyHandler(checkbox) {
+  moveSet.isReadOnly = checkbox.checked;
+  document.getElementById("radio_mode_turn_with_label").style.display = checkbox.checked ? 'none' : 'inline';
 }
 
 function gridClickHandler() {
@@ -324,7 +350,7 @@ function updateNumMovesDisplay(numMoves) {
     totalMoves = moveSet.length();
   }
 
-  document.getElementById("numMoves").innerText = numMoves + "手目 / 全" + totalMoves + "手";
+  document.getElementById("num_moves").innerText = numMoves + "手目 / 全" + totalMoves + "手";
 }
 
 function displayTitle() {
@@ -448,11 +474,12 @@ function branchSelectChangeHandler(branch_select) {
   } else {
     var numBranch = parseInt(branch_select.value);
     moveSet.branchTo(numBranch);
-    branch_select = replaceBranchSelect([['変化' + numBranch, numBranch]]);
+    var label = makeBranchLabel(numBranch, moveSet.branchName());
+    branch_select = replaceBranchSelect([[label, numBranch]]);
     branch_select.value = numBranch;
-    document.getElementById("button_to_remove_branch").style.display = 'inline';
+    document.getElementById("branch_edit_holder").style.display = 'inline';
   }
-  updateNumMovesDisplay(moveSet.indexPlay);
+  updateNumMovesDisplay(moveSet.numCurrentMove());
 }
 
 function backBoardToTrunk() {
@@ -465,15 +492,17 @@ function backBoardToTrunk() {
 }
 
 function updateBranchSelectDisplay() {
-  if (moveSet.onBranch) {
+  if (moveSet.onBranch()) {
     return;
   }
+  var branchNames = moveSet.branchNames();
   var options = moveSet.branches().map(function(branch, index) {
-    return ['変化' + index, index];
+    var label = makeBranchLabel(index, branchNames[index]);
+    return [label, index];
   });
   var branch_select = replaceBranchSelect(options);
   branch_select.style.display = moveSet.branches().length === 0 ? 'none' : 'inline';
-  document.getElementById("button_to_remove_branch").style.display = 'none';
+  document.getElementById("branch_edit_holder").style.display = 'none';
 }
 
 function replaceBranchSelect(options) {
@@ -486,6 +515,10 @@ function replaceBranchSelect(options) {
     branch_select.appendChild(createOption(label, value));
   }
   return branch_select;
+}
+
+function makeBranchLabel(index, name) {
+  return '変化' + index + ': ' + name;
 }
 
 function createOption(label, value) {
@@ -502,9 +535,29 @@ function removeAllChildren(node) {
 }
 
 function removeBranch() {
-  moveSet.removeBranch();
-  backBoardToTrunk();
-  updateNumMovesDisplay(moveSet.indexPlay);
+  if (confirm("この分岐を削除していいですか？")) {
+    moveSet.removeBranch();
+    backBoardToTrunk();
+    updateNumMovesDisplay(moveSet.numCurrentMove());
+  }
+}
+
+function showBranchNameInput() {
+  document.getElementById("branch_edit_holder" ).style.display = 'none';
+  document.getElementById("branch_input_holder").style.display = 'inline';
+  var branch_name_input = document.getElementById("branch_name_input");
+  branch_name_input.value = moveSet.branchName();
+  branch_name_input.focus();
+}
+
+function inputBranchName() {
+  document.getElementById("branch_edit_holder" ).style.display = 'inline';
+  document.getElementById("branch_input_holder").style.display = 'none';
+  var branchName = document.getElementById("branch_name_input").value;
+  moveSet.inputBranchName(branchName);
+  var optionBranch = document.getElementById("branch_select").lastChild;
+  var currentLabel = optionBranch.innerText;
+  optionBranch.innerText = currentLabel.replace(/\S*$/, branchName);
 }
 
 function prepareForPlayMode() {
@@ -519,7 +572,7 @@ function prepareForPlayMode() {
 
   setTurn(moveSet.nextTurn());
   updateBranchSelectDisplay();
-  updateNumMovesDisplay(moveSet.indexPlay);
+  updateNumMovesDisplay(moveSet.numCurrentMove());
 
   showButtonsToPlay(true);
   showInfoDisplay(true);
@@ -573,7 +626,7 @@ function playNext() {
   //TODO: Should be moveSet.nextTurn() ?
   setTurn(getOpponent(getColorOfStone(strMove)));
   updateBranchSelectDisplay();
-  updateNumMovesDisplay(moveSet.indexPlay);
+  updateNumMovesDisplay(moveSet.numCurrentMove());
   return true;
 }
 
@@ -586,7 +639,7 @@ function playPrev() {
   setTurn(getColorOfStone(strMove));
   board.displayComment(moveSet.getCurrentComment());
   updateBranchSelectDisplay();
-  updateNumMovesDisplay(moveSet.indexPlay);
+  updateNumMovesDisplay(moveSet.numCurrentMove());
   return true;
 }
 

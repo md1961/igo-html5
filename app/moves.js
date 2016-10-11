@@ -6,7 +6,7 @@ function Moves(strMoves) {
   };
 
   this._isTrunkMove = function(move) {
-    return typeof move == 'string';
+    return typeof move == 'string' && move.match(/^[NBWnbw][a-s]{2}/);
   };
 
   this._trunkMoves = function() {
@@ -51,6 +51,14 @@ function Moves(strMoves) {
     return branches;
   };
 
+  this.branchNames = function(index) {
+    var _getBranchName = this._getBranchName;
+    var _isTrunkMove   = this._isTrunkMove;
+    return this.branches(index).map(function(branch) {
+      return _getBranchName(branch, _isTrunkMove);
+    });
+  };
+
   this.removeBranch = function(index, numBranch) {
     var lenBranches = this.branches(index).length;
     if (lenBranches === 0) {
@@ -89,6 +97,30 @@ function Moves(strMoves) {
 
   this.backToTrunk = function() {
     this._moves = this._moves_trunk;
+  };
+
+  this.branchName = function() {
+    return this._getBranchName(this._moves);
+  };
+
+  this.inputBranchName = function(name) {
+    var lastMove = this._moves[this._moves.length - 1];
+    if (this._isTrunkMove(lastMove) || typeof lastMove != 'string') {
+      this._moves.push(name);
+    } else {
+      this._moves[this._moves.length - 1] = name;
+    }
+  };
+
+  this._getBranchName = function(moves, _isTrunkMove) {
+    if (_isTrunkMove === undefined) {
+      _isTrunkMove = this._isTrunkMove;
+    }
+    var name = moves[moves.length - 1];
+    if (_isTrunkMove(name)) {
+      name = "";
+    }
+    return name;
   };
 
   this.addComment = function(comment, index) {

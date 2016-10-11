@@ -1,19 +1,20 @@
 function MoveBook() {
-  this.moveSets = [];
-  this.cursor = null;
+  this._moveSets = [];
+  this._cursor = null;
+
   this.usesSGF = true;
 
   this.add = function(moveSet) {
-    this.moveSets.push(moveSet);
-    this.cursor = this.moveSets.length - 1;
+    this._moveSets.push(moveSet);
+    this._cursor = this._moveSets.length - 1;
     return this.current();
   };
 
   this.current = function() {
-    if (this.cursor === null) {
+    if (this._cursor === null) {
       return null;
     }
-    return this.moveSets[this.cursor];
+    return this._moveSets[this._cursor];
   };
 
   this.prev = function() {
@@ -29,24 +30,24 @@ function MoveBook() {
       this.current().backToTrunk();
     }
 
-    if (this.moveSets.length === 0) {
+    if (this._moveSets.length === 0) {
       return null;
-    } else if (this.cursor === null) {
-      this.cursor = 0;
+    } else if (this._cursor === null) {
+      this._cursor = 0;
     } else {
-      this.cursor += step;
+      this._cursor += step;
     }
-    if (this.cursor >= this.moveSets.length) {
-      this.cursor = 0;
-    } else if (this.cursor < 0) {
-      this.cursor = this.moveSets.length - 1;
+    if (this._cursor >= this._moveSets.length) {
+      this._cursor = 0;
+    } else if (this._cursor < 0) {
+      this._cursor = this._moveSets.length - 1;
     }
-    var nextSet = this.moveSets[this.cursor];
+    var nextSet = this._moveSets[this._cursor];
     return nextSet;
   };
 
   this.setNumber = function() {
-    return '[' + (this.cursor + 1) + '/' + this.moveSets.length + ']';
+    return '[' + (this._cursor + 1) + '/' + this._moveSets.length + ']';
   };
 
   this.readDataInJson = function(json) {
@@ -54,17 +55,17 @@ function MoveBook() {
     if (! Array.isArray(arrayOfHash)) {
       arrayOfHash = [arrayOfHash];
     }
-    this.moveSets = [];
+    this._moveSets = [];
     for (var hash of arrayOfHash) {
       var _moveSet = new MoveSet();
       _moveSet.readDataInHash(hash);
       this.add(_moveSet);
     }
-    this.cursor = 0;
+    this._cursor = 0;
   };
 
   this.toJson = function() {
-    var arrayOfHash = this.moveSets.map(function(moveSet) {
+    var arrayOfHash = this._moveSets.map(function(moveSet) {
       return moveSet.toHash();
     });
     return JSON.stringify(arrayOfHash);
