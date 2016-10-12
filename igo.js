@@ -287,7 +287,12 @@ function isReadOnlyHandler(checkbox) {
 
 function gridClickHandler() {
   if (isPlayMode()) {
-    return;
+    if (! moveSet.isReadOnly) {
+      return;
+    } else {
+      setTempMode();
+      prepareForTempMode();
+    }
   }
 
   var x = parseInt(this.getAttribute('x_coord'));
