@@ -1,20 +1,26 @@
 function Board() {
 
-  this.boardDimension = {
-    margin:    10,
-    gridPitch: 24,  // recommended to be an even number
-    numGrids:  19,
+  this.dimension = {
+    margin:     10,
+    gridPitch:  24,  // recommended to be an even number
+    numGrids:   19,
+    starCoords: [4, 10, 16],
     stoneDiameterShrinkage: 1.5,
     starDiameter:           2.0,
   };
+
+  this.STAR_COORDS = [4, 10, 16];
 
   this.RGB_BLACK = 'rgb(0, 0, 0)';
   this.RGB_WHITE = 'rgb(255, 255, 255)';
   this.OUT_OF_BOUNDS = 'out_of_bounds';
   this.ATTR_MARKED = 'marked';
+}
 
-  this.initialize = function(tableId, boardColor) {
-    var dim = this.boardDimension;
+Board.prototype = {
+
+  initialize : function(tableId, boardColor) {
+    var dim = this.dimension;
     var table = document.getElementById(tableId);
     table.style.backgroundColor = boardColor;
     for (var y = 1; y <= dim.numGrids; y++) {
@@ -36,10 +42,10 @@ function Board() {
       }
     }
     this.clear();
-  };
+  },
 
-  this.clear = function() {
-    var dim = this.boardDimension;
+  clear : function() {
+    var dim = this.dimension;
     for (var y = 1; y <= dim.numGrids; y++) {
       for (var x = 1; x <= dim.numGrids; x++) {
         this.drawStone(x, y, NONE);
@@ -50,17 +56,17 @@ function Board() {
     document.getElementById("title").innerText = null;
     document.getElementById("moves_display").value = null;
     updateNumMovesDisplay(0);
-  };
+  },
 
-  this.drawStone = function(x, y, stone) {
+  drawStone : function(x, y, stone) {
     if (STONES.indexOf(stone) < 0) {
       throw "drawStone(): Argument stone must be NONE, BLACK or WHITE";
     }
     var canvas = this.getCanvas(x, y);
     canvas.class = stone;
-  };
+  },
 
-  this.setStoneByMove = function(move) {
+  setStoneByMove : function(move) {
     var stone   = move[0];
     var x       = move[1];
     var y       = move[2];
@@ -68,17 +74,17 @@ function Board() {
     this.drawStone(x, y, stone);
     this.displayComment(comment);
     this.updateCanvasDisplay(x, y);
-  };
+  },
 
-  this.removeStoneByMove = function(move) {
+  removeStoneByMove : function(move) {
     var x = move[1];
     var y = move[2];
     this.drawStone(x, y, NONE);
     this.updateCanvasDisplay(x, y);
-  };
+  },
 
-  this.takeStones = function() {
-    var dim = this.boardDimension;
+  takeStones : function() {
+    var dim = this.dimension;
     var stonesTaken = [];
     for (var y = 1; y <= dim.numGrids; y++) {
       for (var x = 1; x <= dim.numGrids; x++) {
@@ -93,9 +99,9 @@ function Board() {
       }
     }
     return stonesTaken;
-  };
+  },
 
-  this.removeMove = function(strMove) {
+  removeMove : function(strMove) {
     var moveWithTakens = parseMove(strMove);
     var move = moveWithTakens.splice(0, 3);
     this.removeStoneByMove(move);
@@ -105,9 +111,9 @@ function Board() {
       var moveTaken = movesTaken[i];
       this.setStoneByMove(moveTaken);
     }
-  };
+  },
 
-  this.putMove = function(strMove) {
+  putMove : function(strMove) {
     var moveWithTakens = parseMove(strMove);
     var move = moveWithTakens.splice(0, 3);
     this.setStoneByMove(move);
@@ -120,13 +126,13 @@ function Board() {
 
     var comment = moveWithTakens[1];
     this.displayComment(comment);
-  };
+  },
 
-  this.clearComment = function() {
+  clearComment : function() {
     this.displayComment(null);
-  };
+  },
 
-  this.displayComment = function(_comment) {
+  displayComment : function(_comment) {
     var comment = document.getElementById("comment");
     if (_comment === undefined || _comment === null || _comment === "") {
       comment.innerText = null;
@@ -135,52 +141,52 @@ function Board() {
       comment.innerText = _comment;
       comment.style.border = "solid 1px black";
     }
-  };
+  },
 
-  this.getCanvasId = function(x, y) {
+  getCanvasId : function(x, y) {
     return 'g' + KumaUtil.zeroLeftPad(x, 2) + KumaUtil.zeroLeftPad(y, 2);
-  };
+  },
 
-  this.getCanvas = function(x, y) {
+  getCanvas : function(x, y) {
     return document.getElementById(this.getCanvasId(x, y));
-  };
+  },
 
-  this.getStone = function(x, y) {
-    var dim = this.boardDimension;
+  getStone : function(x, y) {
+    var dim = this.dimension;
 
     if (x < 1 || x > dim.numGrids || y < 1 || y > dim.numGrids) {
       return this.OUT_OF_BOUNDS;
     }
     return this.getCanvas(x, y).class;
-  };
+  },
 
-  this.isTop = function(x, y) {
+  isTop : function(x, y) {
     return y == 1;
-  };
+  },
 
-  this.isBottom = function(x, y) {
-    return y == this.boardDimension.numGrids;
-  };
+  isBottom : function(x, y) {
+    return y == this.dimension.numGrids;
+  },
 
-  this.isLeftmost = function(x, y) {
+  isLeftmost : function(x, y) {
     return x == 1;
-  };
+  },
 
-  this.isRightmost = function(x, y) {
-    return x == this.boardDimension.numGrids;
-  };
+  isRightmost : function(x, y) {
+    return x == this.dimension.numGrids;
+  },
 
-  const STAR_COORDS = [4, 10, 16];
-
-  this.isStar = function(x, y) {
-    if (this.boardDimension.numGrids == 19) {
-      if (STAR_COORDS.indexOf(x) >= 0 && STAR_COORDS.indexOf(y) >= 0) {
+  isStar : function(x, y) {
+    var dim = this.dimension;
+    var starCoords = dim.starCoords;
+    if (dim.numGrids == 19) {
+      if (starCoords.indexOf(x) >= 0 && starCoords.indexOf(y) >= 0) {
         return true;
       }
     }
-  };
+  },
 
-  this.checkIfStoneTaken = function(x, y, currentTurn) {
+  checkIfStoneTaken : function(x, y, currentTurn) {
     var stone = this.getStone(x, y);
     var opponent = getOpponent(currentTurn);
     if (stone != opponent) {
@@ -194,9 +200,9 @@ function Board() {
     this.unmarkAllStones();
 
     return stonesTaken;
-  };
+  },
 
-  this.isDead = function(x, y) {
+  isDead : function(x, y) {
     this.markStone(x, y);
     var stoneToBeTaken = this.getStone(x, y);
     var adjs = adjacentCoordsInArray(x, y);
@@ -214,32 +220,32 @@ function Board() {
     }
 
     return true;
-  };
+  },
 
-  this.isMarked = function(x, y) {
+  isMarked : function(x, y) {
     return this.getCanvas(x, y).hasAttribute(this.ATTR_MARKED);
-  };
+  },
 
-  this.markStone = function(x, y) {
+  markStone : function(x, y) {
     this.getCanvas(x, y).setAttribute(this.ATTR_MARKED, this.ATTR_MARKED);
-  };
+  },
 
-  this.unmarkStone = function(x, y) {
+  unmarkStone : function(x, y) {
     this.getCanvas(x, y).removeAttribute(this.ATTR_MARKED);
-  };
+  },
 
-  this.unmarkAllStones = function() {
-    var dim = this.boardDimension;
+  unmarkAllStones : function() {
+    var dim = this.dimension;
 
     for (var y = 1; y <= dim.numGrids; y++) {
       for (var x = 1; x <= dim.numGrids; x++) {
         this.unmarkStone(x, y);
       }
     }
-  };
+  },
 
-  this.updateCanvasDisplay = function(x, y) {
-    var dim = this.boardDimension;
+  updateCanvasDisplay : function(x, y) {
+    var dim = this.dimension;
 
     var start = 0 + 0.5;
     var end = dim.gridPitch + 0.5;
@@ -281,5 +287,5 @@ function Board() {
     }
 
     cxt.stroke();
-  };
-}
+  },
+};
