@@ -132,4 +132,4 @@ Moves.prototype = {
     move += '[' + comment + ']';
     this.set(index, move);
   },
-}
+};

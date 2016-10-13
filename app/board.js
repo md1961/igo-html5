@@ -128,7 +128,7 @@ function Board() {
 
   this.displayComment = function(_comment) {
     var comment = document.getElementById("comment");
-    if (_comment === undefined || _comment === null || _comment == "") {
+    if (_comment === undefined || _comment === null || _comment === "") {
       comment.innerText = null;
       comment.style.border = "none 0px black";
     } else {
