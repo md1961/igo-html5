@@ -6,6 +6,15 @@ window.onload = function() {
 
   board.initialize("main_board", boardColor);
   isBoardInitialized = true;
+
+  var configFirebase = configApplication.firebase;
+  FirebaseUtil.initialize(configFirebase.initializingParameters);
+
+  var da = configFirebase.databaseAccount;
+  authenticateForFirebase(da.email, da.password);
+
+  var strJson = '[{"title":"2016-09 懸賞問題１","isReadOnly":true,"inits":["Bcs","Bcr","Bdr","Bbq","Bbp","Bdq","Bdp","Beo","Bfo","Bgp","Bgr","Bhq","Wap","Wao","Wbo","Wcp","Wdo","Wcn","Wdm","Wep","Weq","Wer","Wes","Wds"],"moves":[]},{"title":"2016-09 懸賞問題２","isReadOnly":true,"inits":["Baq","Bbp","Bco","Bbn","Beo","Bfp","Bgp","Bgq","Bgr","Bgs","Wbr","Wbq","Wcq","Wdq","Weq","Wfq","Wfr"],"moves":[]},{"title":"2016-10 懸賞問題１","isReadOnly":true,"inits":["Bcq","Bdq","Beq","Bdp","Bdo","Bhq","Biq","Bjq","Bhp","Bgo","Bgn","Wbq","Wbr","Wco","Wcp","Wdn","Wcm","Wem","Weo","Wfo","Wfq","Wgq"],"moves":[]},{"title":"2016-10 懸賞問題２","isReadOnly":true,"inits":["Bbr","Bbo","Bcp","Bcn","Bdp","Bep","Bfq","Ber","Bgr","Bhr","Bgp","Wbp","Wbq","Wcq","Wdq","Weq","Wfr","Wds"],"moves":[]}]';
+  storeIntoFirebase('data/moveBooks', JSON.parse(strJson));
 };
 
 function getQueryString() {
@@ -13,6 +22,19 @@ function getQueryString() {
     return null;
   }
   return document.location.search.substring(1);
+}
+
+
+function authenticateForFirebase(email, password) {
+  FirebaseUtil.authenticate(email, password, function(error) {
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    alert('Login to Firebase failed by "' + errorCode + '"\n' + errorMessage);
+  });
+}
+
+function storeIntoFirebase(name, value) {
+  firebase.database().ref(name).set(value);
 }
 
 
