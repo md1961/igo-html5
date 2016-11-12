@@ -23,13 +23,21 @@ function writeDataToFirebase() {
   storeIntoFirebase(FIREBASE_KEY_MOVEBOOKS, moveBook.toHash());
 }
 
+function storeIntoFirebase(name, value) {
+  firebase.database().ref(name).push().set(value);
+}
+
 function readDataFromFirebase() {
   if (! confirm("いま表示されているデータを上書きしていいですか？")) {
     return;
   }
   var moveDisplay = document.getElementById("moves_display");
-  moveDisplay.value = data;
-  readDataIntoMoveBook();
+  var refLastMoveBook = firebase.database().ref(FIREBASE_KEY_MOVEBOOKS).orderByKey().limitToLast(1);
+  refLastMoveBook.once('value').then(function(snapshot) {
+    var objMoveBook = snapshot.val();
+    moveDisplay.value = JSON.stringify(Object.values(objMoveBook)[0]);
+    readDataIntoMoveBook();
+  });
 }
 
 function tmp() {
@@ -62,10 +70,6 @@ function authenticateForFirebase(email, password) {
     var errorMessage = error.message;
     alert('Login to Firebase failed by "' + errorCode + '"\n' + errorMessage);
   });
-}
-
-function storeIntoFirebase(name, value) {
-  firebase.database().ref(name).push().set(value);
 }
 
 const FIREBASE_KEY_MOVEBOOKS = 'data/moveBooks';
