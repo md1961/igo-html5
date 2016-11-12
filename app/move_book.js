@@ -77,9 +77,12 @@ MoveBook.prototype = {
     var moveSets = this._moveSets.map(function(moveSet) {
       return moveSet.toHash();
     });
+    var now = new Date();
+    var timestamp = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
     return {
-      "name"    : this._name,
-      "moveSets": moveSets,
+      "name"     : this._name,
+      "moveSets" : moveSets,
+      "timestamp": timestamp,
     };
   },
 
