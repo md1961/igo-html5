@@ -58,7 +58,7 @@ MoveBook.prototype = {
     var _object = JSON.parse(json);
     var arrayOfHash;
     if (_object.hasOwnProperty('moveSets')) {
-      arrayOfHash = _object['moveSets'];
+      arrayOfHash = _object.moveSets;
     } else if (Array.isArray(_object)) {
       arrayOfHash = _object;
     } else {

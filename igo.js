@@ -17,7 +17,7 @@ window.onload = function() {
     document.getElementById('button_to_read_data_from_firebase').style.display = 'none';
     document.getElementById('button_to_write_data_to_firebase' ).style.display = 'none';
   }
-}
+};
 
 function writeDataToFirebase() {
   storeIntoFirebase(FIREBASE_KEY_MOVEBOOKS, moveBook.toHash());
@@ -39,22 +39,6 @@ function readDataFromFirebase() {
     readDataIntoMoveBook();
   });
 }
-
-function tmp() {
-  var refMoveBooks = firebase.database().ref(FIREBASE_KEY_MOVEBOOKS);
-  var moveBookNames;
-  refMoveBooks.once('value').then(function(snapshot) {
-    objMoveBooks = snapshot.val();
-    moveBookNames = Object.values(objMoveBooks).map(function(moveBook) { return moveBook.name; });
-  });
-
-  for (var strJson of arrayOfStrJson) {
-    var obj = JSON.parse(strJson);
-    var now = new Date();
-    obj.timestamp = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
-    storeIntoFirebase(FIREBASE_KEY_MOVEBOOKS, obj);
-  }
-};
 
 function getQueryString() {
   if (document.location.search.length <= 1) {
