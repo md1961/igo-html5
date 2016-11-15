@@ -53,7 +53,7 @@ Board.prototype = {
       }
     }
 
-    document.getElementById("title").innerText = null;
+    document.getElementById("title").textContent = null;
     document.getElementById("moves_display").value = null;
     updateNumMovesDisplay(0);
   },
@@ -135,10 +135,10 @@ Board.prototype = {
   displayComment : function(_comment) {
     var comment = document.getElementById("comment");
     if (_comment === undefined || _comment === null || _comment === "") {
-      comment.innerText = null;
+      comment.textContent = null;
       comment.style.border = "none 0px black";
     } else {
-      comment.innerText = _comment;
+      comment.textContent = _comment;
       comment.style.border = "solid 1px black";
     }
   },

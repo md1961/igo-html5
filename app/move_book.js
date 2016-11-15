@@ -64,6 +64,7 @@ MoveBook.prototype = {
     } else {
       arrayOfHash = [_object];
     }
+    this._name = _object.name;
     this._moveSets = [];
     for (var hash of arrayOfHash) {
       var _moveSet = new MoveSet();
@@ -88,5 +89,13 @@ MoveBook.prototype = {
 
   toJson : function() {
     return JSON.stringify(this.toHash());
+  },
+
+  get name () {
+    return this._name;
+  },
+
+  set name (value) {
+    this._name = value;
   },
 };
