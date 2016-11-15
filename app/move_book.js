@@ -1,4 +1,5 @@
 function MoveBook() {
+  this._name     = 'MoveBook1';
   this._moveSets = [];
   this._cursor = null;
 
@@ -54,9 +55,14 @@ MoveBook.prototype = {
   },
 
   readDataInJson : function(json) {
-    var arrayOfHash = JSON.parse(json);
-    if (! Array.isArray(arrayOfHash)) {
-      arrayOfHash = [arrayOfHash];
+    var _object = JSON.parse(json);
+    var arrayOfHash;
+    if (_object.hasOwnProperty('moveSets')) {
+      arrayOfHash = _object.moveSets;
+    } else if (Array.isArray(_object)) {
+      arrayOfHash = _object;
+    } else {
+      arrayOfHash = [_object];
     }
     this._moveSets = [];
     for (var hash of arrayOfHash) {
@@ -67,10 +73,20 @@ MoveBook.prototype = {
     this._cursor = 0;
   },
 
-  toJson : function() {
-    var arrayOfHash = this._moveSets.map(function(moveSet) {
+  toHash : function() {
+    var moveSets = this._moveSets.map(function(moveSet) {
       return moveSet.toHash();
     });
-    return JSON.stringify(arrayOfHash);
+    var now = new Date();
+    var timestamp = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+    return {
+      "name"     : this._name,
+      "moveSets" : moveSets,
+      "timestamp": timestamp,
+    };
+  },
+
+  toJson : function() {
+    return JSON.stringify(this.toHash());
   },
 };
