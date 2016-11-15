@@ -11,8 +11,12 @@
     <title>Igo HTML5</title>
 
     <!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
+    <script src="https://www.gstatic.com/firebasejs/3.4.1/firebase.js"></script>
+
     <script type="text/javascript" src="lib/canvas_util.js"></script>
     <script type="text/javascript" src="lib/kuma_util.js">  </script>
+    <script type="text/javascript" src="lib/firebase_util.js"></script>
+    <script type="text/javascript" src="app/config_application.js"></script>
     <script type="text/javascript" src="app/moves.js">    </script>
     <script type="text/javascript" src="app/move_set.js"> </script>
     <script type="text/javascript" src="app/move_book.js"></script>
@@ -112,8 +116,10 @@
         </div>
         <div class="panel" style="margin-top: 20px">
           <span class="panel bordered">
-            <input type="radio" name="mode" id="radio_mode_turn" value="turn" onclick="radioModeHandler(this);" checked>
-            <label for="radio_mode_turn">対戦</label>
+            <span id="radio_mode_turn_with_label">
+              <input type="radio" name="mode" id="radio_mode_turn" value="turn" onclick="radioModeHandler(this);" checked>
+              <label for="radio_mode_turn">対戦</label>
+            </span>
             <input type="radio" name="mode" id="radio_mode_play" value="play" onclick="radioModeHandler(this);">
             <label for="radio_mode_play">再現</label>
             <input type="radio" name="mode" id="radio_mode_temp" value="temp" onclick="radioModeHandler(this);">
@@ -123,6 +129,11 @@
               <input type="radio" name="mode" id="radio_mode_init" value="init" onclick="radioModeHandler(this);">
               <label for="radio_mode_init">置石</label>
             </span>
+          </span>
+          &nbsp;&nbsp;
+          <span class="panel">
+            <input type="checkbox" id="is_read_only" onchange="isReadOnlyHandler(this);" />
+            <label for="is_read_only">読取専用</label>
           </span>
         </div>
         <div class="panel">
@@ -159,7 +170,15 @@
               <option value="trunk">本譜</option>
             </select>
             &nbsp;&nbsp;
-            <input type="button" id="button_to_remove_branch" value="分岐を削除" onclick="removeBranch();" hidden>
+            <span id="branch_edit_holder" hidden>
+              <span class="small_button" onclick="showBranchNameInput();">&lt;=</span>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <input type="button" id="button_to_remove_branch" value="分岐を削除" onclick="removeBranch();">
+            </span>
+            <span id="branch_input_holder" hidden>
+              <input type="text" id="branch_name_input">
+              <input type="button" id="button_to_input_branch_name" value="入力" onclick="inputBranchName();">
+            </span>
           </span>
           <br>
           <br>
@@ -195,9 +214,11 @@
                    onclick="writeDataToLocalStorage();">
             <input type="button" id="button_to_read_data_from_local_storage" value="Localから読込"
                    onclick="readDataFromLocalStorage();">
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="button" id="button_to_read_data_into_move_book" value="SGF式に変換"
-                   onclick="convertToSGF();">
+            &nbsp;&nbsp;
+            <input type="button" id="button_to_write_data_to_firebase" value="Firebaseへ書込"
+                   onclick="writeDataToFirebase();">
+            <input type="button" id="button_to_read_data_from_firebase" value="Firebaseから読込"
+                   onclick="readDataFromFirebase();">
           </span>
         </div>
       </div>

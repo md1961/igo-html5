@@ -6,7 +6,39 @@ window.onload = function() {
 
   board.initialize("main_board", boardColor);
   isBoardInitialized = true;
+
+  if (FirebaseUtil.isFirebaseEnabled()) {
+    var configFirebase = configApplication.firebase;
+    FirebaseUtil.initialize(configFirebase.initializingParameters);
+
+    var da = configFirebase.databaseAccount;
+    authenticateForFirebase(da.email, da.password);
+  } else {
+    document.getElementById('button_to_read_data_from_firebase').style.display = 'none';
+    document.getElementById('button_to_write_data_to_firebase' ).style.display = 'none';
+  }
 };
+
+function writeDataToFirebase() {
+  storeIntoFirebase(FIREBASE_KEY_MOVEBOOKS, moveBook.toHash());
+}
+
+function storeIntoFirebase(name, value) {
+  firebase.database().ref(name).push().set(value);
+}
+
+function readDataFromFirebase() {
+  if (! confirm("いま表示されているデータを上書きしていいですか？")) {
+    return;
+  }
+  var moveDisplay = document.getElementById("moves_display");
+  var refLastMoveBook = firebase.database().ref(FIREBASE_KEY_MOVEBOOKS).orderByKey().limitToLast(1);
+  refLastMoveBook.once('value').then(function(snapshot) {
+    var objMoveBook = snapshot.val();
+    moveDisplay.value = JSON.stringify(Object.values(objMoveBook)[0]);
+    readDataIntoMoveBook();
+  });
+}
 
 function getQueryString() {
   if (document.location.search.length <= 1) {
@@ -14,6 +46,22 @@ function getQueryString() {
   }
   return document.location.search.substring(1);
 }
+
+
+function authenticateForFirebase(email, password) {
+  FirebaseUtil.authenticate(email, password, function(error) {
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    alert('Login to Firebase failed by "' + errorCode + '"\n' + errorMessage);
+  });
+}
+
+const FIREBASE_KEY_MOVEBOOKS = 'data/moveBooks';
+
+var arrayOfStrJson = [
+  '{"name":"囲碁研究 懸賞問題","moveSets":[{"title":"2016-09 懸賞問題１","isReadOnly":true,"inits":["Bcs","Bcr","Bdr","Bbq","Bbp","Bdq","Bdp","Beo","Bfo","Bgp","Bgr","Bhq","Wap","Wao","Wbo","Wcp","Wdo","Wcn","Wdm","Wep","Weq","Wer","Wes","Wds"],"moves":[]},{"title":"2016-09 懸賞問題２","isReadOnly":true,"inits":["Baq","Bbp","Bco","Bbn","Beo","Bfp","Bgp","Bgq","Bgr","Bgs","Wbr","Wbq","Wcq","Wdq","Weq","Wfq","Wfr"],"moves":[]},{"title":"2016-10 懸賞問題１","isReadOnly":true,"inits":["Bcq","Bdq","Beq","Bdp","Bdo","Bhq","Biq","Bjq","Bhp","Bgo","Bgn","Wbq","Wbr","Wco","Wcp","Wdn","Wcm","Wem","Weo","Wfo","Wfq","Wgq"],"moves":[]},{"title":"2016-10 懸賞問題２","isReadOnly":true,"inits":["Bbr","Bbo","Bcp","Bcn","Bdp","Bep","Bfq","Ber","Bgr","Bhr","Bgp","Wbp","Wbq","Wcq","Wdq","Weq","Wfr","Wds"],"moves":[]},{"title":"2016-11 懸賞問題１","isReadOnly":true,"inits":["Bcs","Bbs","Bbr","Bbq","Baq","Bbp","Bcp","Bdo","Beo","Bfo","Bgo","Bhp","Bgq","Wcq","Wcr","Wdr","Weq","Wep","Wdp","Wco","Wbo","Wap","Wan","Wbm","Wcm","Wdn"],"moves":["Ber","Wes","Bfr","War","Bfs"]},{"title":"2016-11 懸賞問題２","isReadOnly":true,"inits":["Bbs","Bcr","Bes","Bfs","Bfr","Bfq","Bfp","Bep","Bdp","Bco","Bbo","Bbn","Bdn","Wds","Wbr","Wbp","Wcp","Wcq","Wdq","Weq","Wer"],"moves":["Bcs","Wdr","Bap","Was(Bcr,Bbs,Bcs)","Baq"]}]}',
+  '{"name":"2016十段戦予選 依田、高尾の二局","moveSets":[{"title":"沼舘沙輝哉 x 依田紀基","inits":[],"moves":["Bpd","Wdd","Bpq","Wdq","Bdo",["Wcm","Ben","Wfp","Bdl","Wck"],"Wco","Bcn","Wcp","Bdm","Wfq","Bep","Weq","Bfc","Wcf","Bci","Wqo","Bqj","Wnc","Bpf","Wpb",["Bqc","Wkc","Bqp","Wpo","Bop","Wql"],"Bmc",["Wmd","Blc","Wnd","Bqc"],["Wmd","Blc","Wnb","Bqc"],"Wmb","Bnb","Wlc","Bmd","Wob",["Blb","Wna(Bnb)","Bkc","Wdj","Bld(Wlc)","Wcj","Bgn","Wdi"],"Bde","Wce","Bdc","Wed","Bcc","Wec","Beb","Wfb","Bgb","Wdb","Bfa(Wfb)","Wcb","Bfd","Wcd","Blb","Wna(Bnb)","Bkb","Woe",["Bme","Wpe","Bqe","Wof","Bog","Wnf","Bpg","Wqd","Brd","Wqc","Bqm"],["Bpe","Wqc"],"Bmf","Wpe","Bqe","Wne","Bme","Wqf","Bqg","Wrf","Bre","Wrg[]",["Bpg","Wrh","Bqc","Wqb","Brb","Wra","Brd","Wpi","Bqi","Wqh","Bph","Woh","Boi","Wpj","Bog","Wqk[黒敗勢]"],"Bqh","Wpg","Bof","Wnf","Bog","Wng","Boh","Wqd","Brd","Wqc","Brc","Wnh","Boi","Wrq","Bpo","Wpp","Bqp","Wop","Bqq","Wrp","Boq","Wpn","Bro","Wqn","Bnp","Woo(Bpo)","Brr","Wrn","Bqb","Wpc","Bsq","Wso(Bro)","Bkq","Wjc","Bkc","Wje","Bic","Wcl","Bbm","Wcj","Bdj","Wdk","Bbj","Wbk","Bck(Wcj)","Wnq","Bnr","Wcj(Bck)","Bek","Wej","Bck(Wcj)","Wmq","Bdl(Wdk)","Wmr","Bns","Wrs","Bqr","Wmo","Bor","Wid","Bib","Wrb","Bsb","Wqa(Bqb)","Brh",["Wkf","Blg","Wjh"],"Whq[依田唯一の失着]","Bjg","Wlg","Bkf","Whg","Bgf","Whf","Bhe","Wge","Bfe","Wgg","Bff","Wih[黒敗勢に近い]"]},{"title":"高尾紳路 x 清成哲也","inits":[],"moves":["Bqd","Wdc","Bdp","Wqp","Boq","Wlp","Bon","Wop","Bnp","Wpq","Boo","Wpp","Bmp","Wlq","Bmq","Wqm","Blo","Wko","Bln",["Wjp","Bgq","Wjm[うそ]","不要な変化"],["Wjp","Bgq","Wkn","Blm","Wjl[白ゆっくりしていて打てる]"],"Wfq[焦りすぎ]","Bjq","Wdn","Ben","Wlr","Bjp","Wkp","Bdo","Wkn","Blm","Wfo","Bin","Weo","Bfn","Wgo","Bgn[]",["Who","Bhn","Wio","Bjo","Wjn","Bhq","Wir","Bgq","Wiq","Bip","Wjr","Bfp","Whp","Bep","Wkq(Bjo,Bip,Bjp,Bjq)","Bdm","Wcf"],"Wdq","Bcq","Wdr","Bcn","Wdm","Bho","Wcm","Bbn","Wcr","Bbm[]",["Wck","Bbq","Whq","Bjl","Wir","Bjr","Wor","Bnr","Wls","Bci"],"Whp","Bhq","Wbq","Bgp","Wep",["Wco","Bel"],"Bcl","Wdl","Bdk","Wck","Bbl",["Wco","Bel"],"Wel","Bek","Wfl","Bbp","Wcp(Bcq)","Bco","Whm","Bhn","Wfk","Bcj","Wkm","Bkl","Wjm","Bim","Wjl",["Bil","Wll","Bkk","Wjk","Bml","Whj"],"Bhk[正しい]","Wll","Bml","Wkk(Bkl)","Bmk","Wil","Bhl","Wgm","Bgq","Wfr","Bjj","Wlj","Bir","Whj","Bgj","Wik","Bhi","Wij","Bgk","Wdj","Bbk(Wck)","Wej","Bgh","Wci","Bbi","Wck(Bdk,Bek)","Bdk(Wck)","Wdf","Bjh","Wor","Bfe","Weg","Bch","Wfi","Bgi","Wgf","Bff","Wfg","Bgg","Whf","Bfc","Wgd","Bfd","Wcd","Bic","Wjd","Bjc","Wkd","Blh","Wmj","Bcf","Wde","Beb","Wdb","Blb","Wjf","Bmg","Wmc","Blc","Wld","Bne","Wme","Bnd","Wmd","Bnf[入力はここまで]",["Wob","Bnc","Wmb","Bnb","Wna"]]}]}',
+];
 
 
 const NONE  = 'NONE';
@@ -211,27 +259,39 @@ function updateBoardByMoveSet() {
   board.clear();
   board.clearComment();
   putInits();
-  putMovesToLast();
 
-  setTurnMode();
-  setTurn(moveSet.nextTurn());
+  setInitialMode();
+  if (isTurnMode()) {
+    putMovesToLast();
+  }
 
   displayMoveSet();
   enableRadioToInitMode(false);
 }
 
+function setInitialMode() {
+  var isReadOnly = moveSet.isReadOnly;
+  checkIsReadOnly(isReadOnly);
+  if (isReadOnly) {
+    setPlayMode();
+    prepareForPlayMode();
+    moveSet.resetIndex();
+  } else {
+    setTurnMode();
+    setTurn(moveSet.nextTurn());
+  }
+}
+
 function readDataFromLocalStorage() {
   if (isLocalStorageAvailable()) {
-    var moveDisplay = document.getElementById("moves_display");
     var data = localStorage.getItem(KEY_FOR_DATA_IN_LOCAL_STORAGE);
     if (data === null || ! confirm("いま表示されているデータを上書きしていいですか？")) {
       return;
     }
 
+    var moveDisplay = document.getElementById("moves_display");
     moveDisplay.value = data;
     readDataIntoMoveBook();
-
-    updateBoardByMoveSet();
   }
 }
 
@@ -258,11 +318,27 @@ function clearAll() {
   board.clear();
   board.clearComment();
   enableRadioToInitMode(true);
+  checkIsReadOnly(moveSet.isReadOnly);
+}
+
+function checkIsReadOnly(is_checked) {
+  document.getElementById("is_read_only").checked = is_checked;
+  document.getElementById("radio_mode_turn_with_label").style.display = is_checked ? 'none' : 'inline';
+}
+
+function isReadOnlyHandler(checkbox) {
+  moveSet.isReadOnly = checkbox.checked;
+  document.getElementById("radio_mode_turn_with_label").style.display = checkbox.checked ? 'none' : 'inline';
 }
 
 function gridClickHandler() {
   if (isPlayMode()) {
-    return;
+    if (! moveSet.isReadOnly) {
+      return;
+    } else {
+      setTempMode();
+      prepareForTempMode();
+    }
   }
 
   var x = parseInt(this.getAttribute('x_coord'));
@@ -449,9 +525,10 @@ function branchSelectChangeHandler(branch_select) {
   } else {
     var numBranch = parseInt(branch_select.value);
     moveSet.branchTo(numBranch);
-    branch_select = replaceBranchSelect([['変化' + numBranch, numBranch]]);
+    var label = makeBranchLabel(numBranch, moveSet.branchName());
+    branch_select = replaceBranchSelect([[label, numBranch]]);
     branch_select.value = numBranch;
-    document.getElementById("button_to_remove_branch").style.display = 'inline';
+    document.getElementById("branch_edit_holder").style.display = 'inline';
   }
   updateNumMovesDisplay(moveSet.numCurrentMove());
 }
@@ -469,12 +546,14 @@ function updateBranchSelectDisplay() {
   if (moveSet.onBranch()) {
     return;
   }
+  var branchNames = moveSet.branchNames();
   var options = moveSet.branches().map(function(branch, index) {
-    return ['変化' + index, index];
+    var label = makeBranchLabel(index, branchNames[index]);
+    return [label, index];
   });
   var branch_select = replaceBranchSelect(options);
   branch_select.style.display = moveSet.branches().length === 0 ? 'none' : 'inline';
-  document.getElementById("button_to_remove_branch").style.display = 'none';
+  document.getElementById("branch_edit_holder").style.display = 'none';
 }
 
 function replaceBranchSelect(options) {
@@ -487,6 +566,10 @@ function replaceBranchSelect(options) {
     branch_select.appendChild(createOption(label, value));
   }
   return branch_select;
+}
+
+function makeBranchLabel(index, name) {
+  return '変化' + index + ': ' + name;
 }
 
 function createOption(label, value) {
@@ -503,9 +586,29 @@ function removeAllChildren(node) {
 }
 
 function removeBranch() {
-  moveSet.removeBranch();
-  backBoardToTrunk();
-  updateNumMovesDisplay(moveSet.numCurrentMove());
+  if (confirm("この分岐を削除していいですか？")) {
+    moveSet.removeBranch();
+    backBoardToTrunk();
+    updateNumMovesDisplay(moveSet.numCurrentMove());
+  }
+}
+
+function showBranchNameInput() {
+  document.getElementById("branch_edit_holder" ).style.display = 'none';
+  document.getElementById("branch_input_holder").style.display = 'inline';
+  var branch_name_input = document.getElementById("branch_name_input");
+  branch_name_input.value = moveSet.branchName();
+  branch_name_input.focus();
+}
+
+function inputBranchName() {
+  document.getElementById("branch_edit_holder" ).style.display = 'inline';
+  document.getElementById("branch_input_holder").style.display = 'none';
+  var branchName = document.getElementById("branch_name_input").value;
+  moveSet.inputBranchName(branchName);
+  var optionBranch = document.getElementById("branch_select").lastChild;
+  var currentLabel = optionBranch.innerText;
+  optionBranch.innerText = currentLabel.replace(/\S*$/, branchName);
 }
 
 function prepareForPlayMode() {

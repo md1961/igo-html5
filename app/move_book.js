@@ -1,31 +1,35 @@
 function MoveBook() {
+  this._name     = 'MoveBook1';
   this._moveSets = [];
   this._cursor = null;
 
   this.usesSGF = true;
+}
 
-  this.add = function(moveSet) {
+MoveBook.prototype = {
+
+  add : function(moveSet) {
     this._moveSets.push(moveSet);
     this._cursor = this._moveSets.length - 1;
     return this.current();
-  };
+  },
 
-  this.current = function() {
+  current : function() {
     if (this._cursor === null) {
       return null;
     }
     return this._moveSets[this._cursor];
-  };
+  },
 
-  this.prev = function() {
+  prev : function() {
     return this.changeSet(-1);
-  };
+  },
 
-  this.next = function() {
+  next : function() {
     return this.changeSet(1);
-  };
+  },
 
-  this.changeSet = function(step) {
+  changeSet : function(step) {
     if (this.current() !== null) {
       this.current().backToTrunk();
     }
@@ -44,16 +48,21 @@ function MoveBook() {
     }
     var nextSet = this._moveSets[this._cursor];
     return nextSet;
-  };
+  },
 
-  this.setNumber = function() {
+  setNumber : function() {
     return '[' + (this._cursor + 1) + '/' + this._moveSets.length + ']';
-  };
+  },
 
-  this.readDataInJson = function(json) {
-    var arrayOfHash = JSON.parse(json);
-    if (! Array.isArray(arrayOfHash)) {
-      arrayOfHash = [arrayOfHash];
+  readDataInJson : function(json) {
+    var _object = JSON.parse(json);
+    var arrayOfHash;
+    if (_object.hasOwnProperty('moveSets')) {
+      arrayOfHash = _object.moveSets;
+    } else if (Array.isArray(_object)) {
+      arrayOfHash = _object;
+    } else {
+      arrayOfHash = [_object];
     }
     this._moveSets = [];
     for (var hash of arrayOfHash) {
@@ -62,12 +71,22 @@ function MoveBook() {
       this.add(_moveSet);
     }
     this._cursor = 0;
-  };
+  },
 
-  this.toJson = function() {
-    var arrayOfHash = this._moveSets.map(function(moveSet) {
+  toHash : function() {
+    var moveSets = this._moveSets.map(function(moveSet) {
       return moveSet.toHash();
     });
-    return JSON.stringify(arrayOfHash);
-  };
-}
+    var now = new Date();
+    var timestamp = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+    return {
+      "name"     : this._name,
+      "moveSets" : moveSets,
+      "timestamp": timestamp,
+    };
+  },
+
+  toJson : function() {
+    return JSON.stringify(this.toHash());
+  },
+};
