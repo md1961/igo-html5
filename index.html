@@ -64,7 +64,14 @@
           </span>
           &nbsp;&nbsp;&nbsp;&nbsp;
           <span class="panel">
-            <input type="submit" value="全消去" onclick="clearAll();" disabled></input>
+            <span id="book_name_holder">
+              <span id="book_name">(No Book)</span>
+              <span class="small_button" onclick="showBookNameInput();">&lt;=</span>
+            </span>
+            <span id="book_name_input_holder" hidden>
+              <input type="text" id="book_name_input">
+              <input type="button" id="button_to_input_book_name" value="入力" onclick="inputBookName();">
+            </span>
           </span>
           &nbsp;&nbsp;&nbsp;&nbsp;
           <span id="buttons_to_browze_move_sets" class="panel">

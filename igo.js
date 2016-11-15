@@ -252,6 +252,7 @@ function readDataIntoMoveBook() {
   var moveDisplay = document.getElementById("moves_display");
   moveBook = new MoveBook();
   moveBook.readDataInJson(moveDisplay.value);
+  document.getElementById("book_name").textContent = moveBook.name;
 
   moveSet = moveBook.prev();
   updateBoardByMoveSet();
@@ -414,6 +415,22 @@ function displayTitle() {
 function displayMoveSet() {
   var moveDisplay = document.getElementById("moves_display");
   moveDisplay.value = moveBook.toJson();
+}
+
+function showBookNameInput() {
+  document.getElementById("book_name_holder"      ).style.display = 'none';
+  document.getElementById("book_name_input_holder").style.display = 'inline';
+  var book_name_input = document.getElementById("book_name_input");
+  book_name_input.value = document.getElementById("book_name").innerText;
+  book_name_input.focus();
+}
+
+function inputBookName() {
+  document.getElementById("book_name_input_holder").style.display = 'none';
+  document.getElementById("book_name_holder"      ).style.display = 'inline';
+  var book_name = document.getElementById("book_name_input").value;
+  document.getElementById("book_name").innerText = book_name;
+  moveBook.name = book_name;
 }
 
 function showTitleInput() {
