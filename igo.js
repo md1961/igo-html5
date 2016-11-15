@@ -20,21 +20,23 @@ window.onload = function() {
 };
 
 function writeDataToFirebase() {
-  storeIntoFirebase(FIREBASE_KEY_MOVEBOOKS, moveBook.toHash());
+  firebase.database().ref(FIREBASE_KEY_MOVEBOOKS).push().set(moveBook.toHash());
 }
 
-function storeIntoFirebase(name, value) {
-  firebase.database().ref(name).push().set(value);
-}
+var cursorForFirebase = 1;
 
 function readDataFromFirebase() {
   if (! confirm("いま表示されているデータを上書きしていいですか？")) {
     return;
   }
   var moveDisplay = document.getElementById("moves_display");
-  var refLastMoveBook = firebase.database().ref(FIREBASE_KEY_MOVEBOOKS).orderByKey().limitToLast(1);
+  var refLastMoveBook = firebase.database().ref(FIREBASE_KEY_MOVEBOOKS).orderByKey().limitToLast(cursorForFirebase);
   refLastMoveBook.once('value').then(function(snapshot) {
     var objMoveBook = snapshot.val();
+    if (Array.isArray(objMoveBook)) {
+      objMoveBook = objMoveBook[0];
+    }
+    cursorForFirebase++;
     moveDisplay.value = JSON.stringify(Object.values(objMoveBook)[0]);
     readDataIntoMoveBook();
   });
