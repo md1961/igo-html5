@@ -64,6 +64,7 @@ MoveBook.prototype = {
     } else {
       arrayOfHash = [_object];
     }
+    this._name = _object.name;
     this._moveSets = [];
     for (var hash of arrayOfHash) {
       var _moveSet = new MoveSet();
