@@ -404,12 +404,12 @@ function updateNumMovesDisplay(numMoves) {
     totalMoves = moveSet.length();
   }
 
-  document.getElementById("num_moves").innerText = numMoves + "手目 / 全" + totalMoves + "手";
+  document.getElementById("num_moves").textContent = numMoves + "手目 / 全" + totalMoves + "手";
 }
 
 function displayTitle() {
-  document.getElementById("set_num").innerText = moveBook.setNumber();
-  document.getElementById("title"  ).innerText = moveSet.title;
+  document.getElementById("set_num").textContent = moveBook.setNumber();
+  document.getElementById("title"  ).textContent = moveSet.title;
 }
 
 function displayMoveSet() {
@@ -421,7 +421,7 @@ function showBookNameInput() {
   document.getElementById("book_name_holder"      ).style.display = 'none';
   document.getElementById("book_name_input_holder").style.display = 'inline';
   var book_name_input = document.getElementById("book_name_input");
-  book_name_input.value = document.getElementById("book_name").innerText;
+  book_name_input.value = document.getElementById("book_name").textContent;
   book_name_input.focus();
 }
 
@@ -429,7 +429,7 @@ function inputBookName() {
   document.getElementById("book_name_input_holder").style.display = 'none';
   document.getElementById("book_name_holder"      ).style.display = 'inline';
   var book_name = document.getElementById("book_name_input").value;
-  document.getElementById("book_name").innerText = book_name;
+  document.getElementById("book_name").textContent = book_name;
   moveBook.name = book_name;
 }
 
@@ -437,7 +437,7 @@ function showTitleInput() {
   document.getElementById("title_holder"      ).style.display = 'none';
   document.getElementById("title_input_holder").style.display = 'inline';
   var title_input = document.getElementById("title_input");
-  title_input.value = document.getElementById("title").innerText;
+  title_input.value = document.getElementById("title").textContent;
   title_input.focus();
 }
 
@@ -445,7 +445,7 @@ function inputTitle() {
   document.getElementById("title_input_holder").style.display = 'none';
   document.getElementById("title_holder"      ).style.display = 'inline';
   var title = document.getElementById("title_input").value;
-  document.getElementById("title").innerText = title;
+  document.getElementById("title").textContent = title;
   moveSet.title = title;
   displayMoveSet();
 }
@@ -454,7 +454,7 @@ function showCommentInput() {
   document.getElementById("comment_holder"      ).style.display = 'none';
   document.getElementById("comment_input_holder").style.display = 'inline';
   var comment_input = document.getElementById("comment_input");
-  comment_input.value = document.getElementById("comment").innerText;
+  comment_input.value = document.getElementById("comment").textContent;
   comment_input.focus();
 }
 
@@ -594,7 +594,7 @@ function makeBranchLabel(index, name) {
 function createOption(label, value) {
   var option = document.createElement('option');
   option.setAttribute('value', value);
-  option.innerText = label;
+  option.textContent = label;
   return option;
 }
 
@@ -626,8 +626,8 @@ function inputBranchName() {
   var branchName = document.getElementById("branch_name_input").value;
   moveSet.inputBranchName(branchName);
   var optionBranch = document.getElementById("branch_select").lastChild;
-  var currentLabel = optionBranch.innerText;
-  optionBranch.innerText = currentLabel.replace(/\S*$/, branchName);
+  var currentLabel = optionBranch.textContent;
+  optionBranch.textContent = currentLabel.replace(/\S*$/, branchName);
 }
 
 function prepareForPlayMode() {
