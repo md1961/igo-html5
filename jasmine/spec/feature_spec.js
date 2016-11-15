@@ -10,16 +10,16 @@ describe("Feature of igo-html5", function() {
 
     describe("just after data read", function() {
       it("display title of last MoveSet", function() {
-        expect(document.getElementById("title").innerText).toEqual("高尾紳路 x 清成哲也");
+        expect(document.getElementById("title").textContent).toEqual("高尾紳路 x 清成哲也");
       });
       it("display MoveSet number with total MoveSet's", function() {
-        expect(document.getElementById("set_num").innerText).toEqual("[2/2]");
+        expect(document.getElementById("set_num").textContent).toEqual("[2/2]");
       });
       it("display total number of moves", function() {
-        expect(document.getElementById("num_moves").innerText).toEqual("135手目 / 全135手");
+        expect(document.getElementById("num_moves").textContent).toEqual("135手目 / 全135手");
       });
       it("display comment of last move", function() {
-        expect(document.getElementById("comment").innerText).toEqual("入力はここまで");
+        expect(document.getElementById("comment").textContent).toEqual("入力はここまで");
       });
     });
 
@@ -28,21 +28,21 @@ describe("Feature of igo-html5", function() {
         document.getElementById("radio_mode_play").click();
       });
       it("display number of moves of 0", function() {
-        expect(document.getElementById("num_moves").innerText).toEqual("0手目 / 全135手");
+        expect(document.getElementById("num_moves").textContent).toEqual("0手目 / 全135手");
       });
       it("display no comment", function() {
-        expect(document.getElementById("comment").innerText).toEqual("");
+        expect(document.getElementById("comment").textContent).toEqual("");
       });
       it("keep drop-down list for branch hidden", function() {
         expect(document.getElementById("branch_select").style.display).toEqual('none');
       });
       it("display last number of moves after play to last", function() {
         document.getElementById("button_to_last").click();
-        expect(document.getElementById("num_moves").innerText).toEqual("135手目 / 全135手");
+        expect(document.getElementById("num_moves").textContent).toEqual("135手目 / 全135手");
       });
       it("display comment of last move after play to last", function() {
         document.getElementById("button_to_last").click();
-        expect(document.getElementById("comment").innerText).toEqual("入力はここまで");
+        expect(document.getElementById("comment").textContent).toEqual("入力はここまで");
       });
     });
 
@@ -52,16 +52,16 @@ describe("Feature of igo-html5", function() {
         document.getElementById("button_next_junc").click();
       });
       it("display number of moves of 19", function() {
-        expect(document.getElementById("num_moves").innerText).toEqual("19手目 / 全135手");
+        expect(document.getElementById("num_moves").textContent).toEqual("19手目 / 全135手");
       });
       it("show drop-down list for branch", function() {
         expect(document.getElementById("branch_select").style.display).toEqual("inline");
       });
       it("show drop-down list for branch with three options", function() {
         var branch_select = document.getElementById("branch_select");
-        expect(branch_select.options[0].innerText).toEqual("本譜");
-        expect(branch_select.options[1].innerText).toEqual("変化0: 不要な変化");
-        expect(branch_select.options[2].innerText).toEqual("変化1: ");
+        expect(branch_select.options[0].textContent).toEqual("本譜");
+        expect(branch_select.options[1].textContent).toEqual("変化0: 不要な変化");
+        expect(branch_select.options[2].textContent).toEqual("変化1: ");
       });
     });
 
@@ -73,22 +73,22 @@ describe("Feature of igo-html5", function() {
         document.getElementById("branch_select").onchange();
       });
       it("display total number of moves of the branch", function() {
-        expect(document.getElementById("num_moves").innerText).toEqual("0手目 / 全3手");
+        expect(document.getElementById("num_moves").textContent).toEqual("0手目 / 全3手");
       });
       it("display last number of moves after play to last", function() {
         document.getElementById("button_to_last").click();
-        expect(document.getElementById("num_moves").innerText).toEqual("3手目 / 全3手");
+        expect(document.getElementById("num_moves").textContent).toEqual("3手目 / 全3手");
       });
       it("display comment of last move after play to last", function() {
         document.getElementById("button_to_last").click();
-        expect(document.getElementById("comment").innerText).toEqual("うそ");
+        expect(document.getElementById("comment").textContent).toEqual("うそ");
       });
       it("display total number of trunk moves and no comment after selecting trunk", function() {
         document.getElementById("button_next_move").click();
         document.getElementById("branch_select").selectedIndex = 0;
         document.getElementById("branch_select").onchange();
-        expect(document.getElementById("num_moves").innerText).toEqual("19手目 / 全135手");
-        expect(document.getElementById("comment").innerText).toEqual("");
+        expect(document.getElementById("num_moves").textContent).toEqual("19手目 / 全135手");
+        expect(document.getElementById("comment").textContent).toEqual("");
       });
     });
   });
