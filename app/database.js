@@ -29,7 +29,7 @@ Database.prototype = {
 
   promiseToReadMoveBook : function() {
     var refLastMoveBook = this._refMoveBooks.orderByKey().limitToLast(this._cursorForFirebase);
-    var promiseMoveBooks = refLastMoveBook.once('value')
+    var promiseMoveBooks = refLastMoveBook.once('value');
     this._cursorForFirebase++;
     return new Promise(function(resolve, reject) {
       promiseMoveBooks.then(function(snapshot) {

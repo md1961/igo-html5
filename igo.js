@@ -310,18 +310,45 @@ function isReadOnlyHandler(checkbox) {
 }
 
 function gridClickHandler() {
+  var x = parseInt(this.getAttribute('x_coord'));
+  var y = parseInt(this.getAttribute('y_coord'));
   if (isPlayMode()) {
-    if (! moveSet.isReadOnly) {
+    if (isPlayingBlack() || isPlayingWhite()) {
+      if (!isPlayingTurn() || isNextMoveAt(x, y)) {
+        playNext();
+      } else {
+        alert('WRONG MOVE!');
+      }
+      return;
+    } else if (! moveSet.isReadOnly) {
       return;
     } else {
       setTempMode();
       prepareForTempMode();
     }
   }
-
-  var x = parseInt(this.getAttribute('x_coord'));
-  var y = parseInt(this.getAttribute('y_coord'));
   putStone(x, y);
+}
+
+function isPlayingTurn() {
+  return (isBlackTurn() && isPlayingBlack()) || (!isBlackTurn() && isPlayingWhite());
+}
+
+function isPlayingBlack() {
+  return document.getElementById('plays_black').checked;
+}
+
+function isPlayingWhite() {
+  return document.getElementById('plays_white').checked;
+}
+
+function isNextMoveAt(x, y) {
+  var strMove = moveSet.nextMove();
+  if (strMove === null) {
+    return false;
+  }
+  var move = parseMove(strMove);
+  return x == move[1] && y == move[2];
 }
 
 function putStone(x, y) {
