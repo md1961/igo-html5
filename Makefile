@@ -13,7 +13,8 @@ $(JS_ALL_MIN) : $(SRC)
 
 $(INDEX_PROD) : $(INDEX_DEVEL)
 	patch -o $@ < html_productionize.patch
+	chmod +r $@
 
 .PHONY: clean
 clean :
-	rm -f $(JS_ALL_MIN) $(INDEX_PROD)
+	rm -f $(JS_ALL_MIN) $(INDEX_PROD) $(INDEX_PROD).rej

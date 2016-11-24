@@ -123,12 +123,18 @@ MoveSet.prototype = {
     return this._numMovesToPlay || 0;
   },
 
-  playNext : function() {
+  nextMove : function() {
     if (this._indexPlay >= this._moves.length()) {
       this._indexPlay = this._moves.length();
       return null;
     }
-    return this._moves.get(this._indexPlay++);
+    return this._moves.get(this._indexPlay);
+  },
+
+  playNext : function() {
+    var move = this.nextMove();
+    this._indexPlay++;
+    return move;
   },
 
   playPrev : function() {

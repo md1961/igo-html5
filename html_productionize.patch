@@ -2,7 +2,7 @@ diff --git a/index.html b/index.html
 index 934b299..96ce91e 100644
 --- a/index.html
 +++ b/index.html
-@@ -13,15 +13,7 @@
+@@ -13,16 +13,7 @@
      <!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
      <script src="https://www.gstatic.com/firebasejs/3.4.1/firebase.js"></script>
 
@@ -10,6 +10,7 @@ index 934b299..96ce91e 100644
 -    <script type="text/javascript" src="lib/kuma_util.js">  </script>
 -    <script type="text/javascript" src="lib/firebase_util.js"></script>
 -    <script type="text/javascript" src="app/config_application.js"></script>
+-    <script type="text/javascript" src="app/database.js"> </script>
 -    <script type="text/javascript" src="app/moves.js">    </script>
 -    <script type="text/javascript" src="app/move_set.js"> </script>
 -    <script type="text/javascript" src="app/move_book.js"></script>
@@ -17,5 +18,5 @@ index 934b299..96ce91e 100644
 -    <script type="text/javascript" src="igo.js"></script>
 +    <script type="text/javascript" src="igo-min.js"></script>
 
-
-     <!-- Jasmine files
+     <link rel="shortcut icon" type="image/png" href="assets/Faust_I.jpg">
+     <link rel="stylesheet" href="assets/igo.css">
