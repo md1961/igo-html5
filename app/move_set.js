@@ -133,7 +133,9 @@ MoveSet.prototype = {
 
   playNext : function() {
     var move = this.nextMove();
-    this._indexPlay++;
+    if (move !== null) {
+      this._indexPlay++;
+    }
     return move;
   },
 
