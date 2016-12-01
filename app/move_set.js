@@ -251,8 +251,8 @@ MoveSet.prototype = {
   },
 
   readDataInHash : function(hash) {
-    this.title      = hash.title;
-    this.isReadOnly = hash.isReadOnly;
+    this.title      = hash.title || '';
+    this.isReadOnly = hash.isReadOnly === undefined ? false : hash.isReadOnly;
     this.inits      = hash.inits || [];
     this._moves     = new Moves(hash.moves || []);
   },
