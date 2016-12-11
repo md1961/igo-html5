@@ -6,12 +6,14 @@ function Database() {
     var da = configFirebase.databaseAccount;
     this._authenticateForFirebase(da.email, da.password);
 
-    this._refMoveBooks = firebase.database().ref(FIREBASE_KEY_MOVEBOOKS);
+    this._refMoveBooks     = firebase.database().ref(FIREBASE_KEY_MOVEBOOKS);
+    this._refMoveBookNames = firebase.database().ref(FIREBASE_KEY_MOVEBOOK_NAMES);
     this._cursorForFirebase = 1;
   }
 }
 
-const FIREBASE_KEY_MOVEBOOKS = 'data/moveBooks';
+const FIREBASE_KEY_MOVEBOOKS      = 'data/moveBooks';
+const FIREBASE_KEY_MOVEBOOK_NAMES = 'data/moveBookNames';
 
 Database.prototype = {
 
@@ -24,7 +26,14 @@ Database.prototype = {
   },
 
   writeMoveBook : function(moveBookInHash) {
-    this._refMoveBooks.push().set(moveBookInHash);
+    var obj = Object.assign({}, moveBookInHash);
+    var ref = this._refMoveBooks.push();
+    var key = ref.key;
+    ref.set(obj);
+    delete obj.moveSets;
+    var updates = {};
+    updates[key] = obj;
+    this._refMoveBookNames.update(updates);
   },
 
   promiseToReadMoveBook : function() {
