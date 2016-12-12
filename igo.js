@@ -37,7 +37,7 @@ function showMoveBookNamesFromFirebase() {
   database.promiseToReadMoveBookHeaders().then(function(headers) {
     var keys = Object.keys(headers);
     var names = Object.values(headers).map(function(obj) { return obj.name; });
-    var hashNamesWithDbKeys = {}
+    var hashNamesWithDbKeys = {};
     for (var i = 0; i < names.length; i++) {
       hashNamesWithDbKeys[names[i]] = keys[i];
     }
@@ -55,6 +55,8 @@ function showMoveBookNamesFromFirebase() {
       ulNames.appendChild(li);
     }
     ulNames.style.display = 'block';
+  }).catch(function(reason) {
+    alert('Failed to read from Firebase: ' + reason);
   });
 }
 
