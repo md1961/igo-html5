@@ -14,6 +14,7 @@
     <script src="https://www.gstatic.com/firebasejs/3.4.1/firebase.js"></script>
 
     <script type="text/javascript" src="lib/canvas_util.js"></script>
+    <script type="text/javascript" src="lib/html_util.js">  </script>
     <script type="text/javascript" src="lib/kuma_util.js">  </script>
     <script type="text/javascript" src="lib/firebase_util.js"></script>
     <script type="text/javascript" src="app/config_application.js"></script>
@@ -195,7 +196,8 @@
             <input type="button" id="button_to_write_data_to_firebase" value="Firebaseへ書込"
                    onclick="writeDataToFirebase();">
             <input type="button" id="button_to_read_data_from_firebase" value="Firebaseから読込"
-                   onclick="readDataFromFirebase();">
+                   onclick="showMoveBookNamesFromFirebase();">
+            <ul id="move_book_name_list" hidden></ul>
           </span>
         </div>
       </div>
