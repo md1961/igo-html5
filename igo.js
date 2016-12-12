@@ -20,17 +20,46 @@ function writeDataToFirebase() {
   database.writeMoveBook(moveBook.toHash());
 }
 
-function readDataFromFirebase() {
+function readDataFromFirebase(key) {
   if (! confirm("いま表示されているデータを上書きしていいですか？")) {
     return;
   }
   var moveDisplay = document.getElementById("moves_display");
-  database.promiseToReadMoveBook().then(function(objMoveBook) {
+  database.promiseToReadMoveBook(key).then(function(objMoveBook) {
     moveDisplay.value = JSON.stringify(objMoveBook);
     readDataIntoMoveBook();
   }).catch(function(reason) {
     alert('Failed to read from Firebase: ' + reason);
   });
+}
+
+function showMoveBookNamesFromFirebase() {
+  database.promiseToReadMoveBookHeaders().then(function(headers) {
+    var keys = Object.keys(headers);
+    var names = Object.values(headers).map(function(obj) { return obj.name; });
+    var hashNamesWithDbKeys = {}
+    for (var i = 0; i < names.length; i++) {
+      hashNamesWithDbKeys[names[i]] = keys[i];
+    }
+    var ulNames = document.getElementById('move_book_name_list');
+    HtmlUtil.removeAllChildren(ulNames);
+    for (var name of Object.keys(hashNamesWithDbKeys)) {
+      var key = hashNamesWithDbKeys[name];
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.setAttribute('href', "javascript: selectMoveBookByName('" + key + "');");
+      a.textContent = name;
+      li.appendChild(a);
+      ulNames.appendChild(li);
+    }
+    ulNames.style.display = 'block';
+  });
+}
+
+function selectMoveBookByName(key) {
+  var ulNames = document.getElementById('move_book_name_list');
+  ulNames.style.display = 'none';
+  readDataFromFirebase(key);
 }
 
 function getQueryString() {
