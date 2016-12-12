@@ -41,6 +41,8 @@ function showMoveBookNamesFromFirebase() {
     for (var i = 0; i < names.length; i++) {
       hashNamesWithDbKeys[names[i]] = keys[i];
     }
+    hashNamesWithDbKeys['キャンセル'] = '';
+
     var ulNames = document.getElementById('move_book_name_list');
     HtmlUtil.removeAllChildren(ulNames);
     for (var name of Object.keys(hashNamesWithDbKeys)) {
@@ -59,6 +61,9 @@ function showMoveBookNamesFromFirebase() {
 function selectMoveBookByName(key) {
   var ulNames = document.getElementById('move_book_name_list');
   ulNames.style.display = 'none';
+  if (key === '') {
+    return;
+  }
   readDataFromFirebase(key);
 }
 
