@@ -1,4 +1,4 @@
-window.onload = function() {
+document.addEventListener('DOMContentLoaded', function() {
   var boardColor = DEFAULT_BOARD_COLOR;
   if (getQueryString() == 'real_color') {
     boardColor = REAL_BOARD_COLOR;
@@ -12,7 +12,7 @@ window.onload = function() {
     document.getElementById('button_to_read_data_from_firebase').style.display = 'none';
     document.getElementById('button_to_write_data_to_firebase' ).style.display = 'none';
   }
-};
+});
 
 var database;
 
