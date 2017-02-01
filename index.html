@@ -193,15 +193,15 @@
             <input type="button" id="button_to_read_data_from_local_storage" value="Localから読込"
                    onclick="readDataFromLocalStorage();">
             &nbsp;&nbsp;
-            <input type="button" id="button_to_write_data_to_firebase" value="Firebaseへ書込"
+            <input type="button" id="button_to_write_data_to_firebase" value="FBへ書込"
                    onclick="writeDataToFirebase();">
+            <input type="button" id="button_to_read_data_from_firebase" value="FBから読込"
+                   onclick="showMoveBookNamesFromFirebase();">
           </span>
+          <ul id="move_book_name_list" hidden></ul>
         </div>
       </div>
     </div>
-            <input type="button" id="button_to_read_data_from_firebase" value="Firebaseから読込"
-                   onclick="showMoveBookNamesFromFirebase();">
-            <ul id="move_book_name_list" hidden></ul>
   </body>
 </html>
 
