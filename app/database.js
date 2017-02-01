@@ -26,14 +26,23 @@ Database.prototype = {
   },
 
   writeMoveBook : function(moveBookInHash) {
-    var obj = Object.assign({}, moveBookInHash);
-    var ref = this._refMoveBooks.push();
-    var key = ref.key;
-    ref.set(obj);
-    delete obj.moveSets;
-    var updates = {};
-    updates[key] = obj;
-    this._refMoveBookHeaders.update(updates);
+    database.promiseToReadMoveBookHeaders().then(function(headers) {
+      var names = Object.values(headers).map(function(obj) { return obj.name; });
+      if (names.indexOf(moveBookInHash.name) >= 0 && moveBookInHash.firebaseKey === null) {
+        alert('同じ名前の記録帳があります。上書きできません。');
+      } else {
+        var obj = Object.assign({}, moveBookInHash);
+        var ref = this._refMoveBooks.push();
+        var key = ref.key;
+        ref.set(obj);
+        delete obj.moveSets;
+        var updates = {};
+        updates[key] = obj;
+        this._refMoveBookHeaders.update(updates);
+      }
+    }).catch(function(reason) {
+      alert('Failed to read from Firebase: ' + reason);
+    });
   },
 
   promiseToReadMoveBook : function(key) {

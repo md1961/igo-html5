@@ -1,7 +1,8 @@
 function MoveBook() {
-  this._name     = 'MoveBook1';
-  this._moveSets = [];
-  this._cursor = null;
+  this._name        = 'MoveBook1';
+  this._moveSets    = [];
+  this._firebaseKey = null;
+  this._cursor      = null;
 
   this.usesSGF = true;
 }
@@ -54,7 +55,7 @@ MoveBook.prototype = {
     return '[' + (this._cursor + 1) + '/' + this._moveSets.length + ']';
   },
 
-  readDataInJson : function(json) {
+  readDataInJson : function(json, key) {
     var _object = JSON.parse(json);
     var arrayOfHash;
     if (_object.hasOwnProperty('moveSets')) {
@@ -71,6 +72,7 @@ MoveBook.prototype = {
       _moveSet.readDataInHash(hash);
       this.add(_moveSet);
     }
+    this._firebaseKey = key;
     this._cursor = 0;
   },
 
@@ -81,9 +83,10 @@ MoveBook.prototype = {
     var now = new Date();
     var timestamp = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
     return {
-      "name"     : this._name,
-      "moveSets" : moveSets,
-      "timestamp": timestamp,
+      "name"       : this._name,
+      "moveSets"   : moveSets,
+      "firebaseKey": this._firebaseKey,
+      "timestamp"  : timestamp,
     };
   },
 

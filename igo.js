@@ -27,7 +27,7 @@ function readDataFromFirebase(key) {
   var moveDisplay = document.getElementById("moves_display");
   database.promiseToReadMoveBook(key).then(function(objMoveBook) {
     moveDisplay.value = JSON.stringify(objMoveBook);
-    readDataIntoMoveBook();
+    readDataIntoMoveBook(key);
   }).catch(function(reason) {
     alert('Failed to read from Firebase: ' + reason);
   });
@@ -259,10 +259,10 @@ function restoreMode() {
   modeSaved = null;
 }
 
-function readDataIntoMoveBook() {
+function readDataIntoMoveBook(firebaseKey) {
   var moveDisplay = document.getElementById("moves_display");
   moveBook = new MoveBook();
-  moveBook.readDataInJson(moveDisplay.value);
+  moveBook.readDataInJson(moveDisplay.value, firebaseKey);
   document.getElementById("book_name").textContent = moveBook.name;
 
   moveSet = moveBook.prev();
@@ -305,7 +305,7 @@ function readDataFromLocalStorage() {
 
     var moveDisplay = document.getElementById("moves_display");
     moveDisplay.value = data;
-    readDataIntoMoveBook();
+    readDataIntoMoveBook(null);
   }
 }
 
