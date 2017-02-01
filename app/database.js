@@ -26,7 +26,7 @@ Database.prototype = {
   },
 
   writeMoveBook : function(moveBookInHash) {
-    database.promiseToReadMoveBookHeaders().then(function(headers) {
+    this.promiseToReadMoveBookHeaders().then(function(headers) {
       var names = Object.values(headers).map(function(obj) { return obj.name; });
       if (names.indexOf(moveBookInHash.name) >= 0 && moveBookInHash.firebaseKey === null) {
         alert('同じ名前の記録帳があります。上書きできません。');
@@ -63,6 +63,38 @@ Database.prototype = {
       promiseMoveBookHeaders.then(function(snapshot) {
         resolve(snapshot.val());
       });
+    });
+  },
+
+  removeOneOldestMovebookWithDuplicateName : function() {
+    var refMoveBookHeaders = this._refMoveBookHeaders;
+    var refMoveBooks       = this._refMoveBooks
+    this.promiseToReadMoveBookHeaders().then(function(headers) {
+      var keys = Object.keys(headers);
+      var names = Object.values(headers).map(function(obj) { return obj.name; });
+      var i;
+      for (i = 0, sz = names.length; i < sz; i++) {
+        if (names.slice(i + 1).indexOf(names[i]) >= 0) {
+          break;
+        }
+      }
+      if (i > names.length - 1) {
+        alert('MoveBook の名称の重複はありません。');
+      } else {
+        var key = keys[i];
+        refMoveBookHeaders.child(key).remove()
+          .then(function() {
+            refMoveBooks.child(key).remove()
+              .then(function() {
+                alert('「' + names[i] + '」(key=' + key + ') が削除されました。');
+              });
+          })
+          .catch(function() {
+            alert('「' + names[i] + '」(key=' + key + ') が削除できませんでした。');
+          });
+      }
+    }).catch(function(reason) {
+      alert('Failed to read from Firebase: ' + reason);
     });
   },
 
