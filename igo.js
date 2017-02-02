@@ -1,4 +1,4 @@
-window.onload = function() {
+document.addEventListener('DOMContentLoaded', function() {
   var boardColor = DEFAULT_BOARD_COLOR;
   if (getQueryString() == 'real_color') {
     boardColor = REAL_BOARD_COLOR;
@@ -12,7 +12,7 @@ window.onload = function() {
     document.getElementById('button_to_read_data_from_firebase').style.display = 'none';
     document.getElementById('button_to_write_data_to_firebase' ).style.display = 'none';
   }
-};
+});
 
 var database;
 
@@ -37,7 +37,7 @@ function showMoveBookNamesFromFirebase() {
   database.promiseToReadMoveBookHeaders().then(function(headers) {
     var keys = Object.keys(headers);
     var names = Object.values(headers).map(function(obj) { return obj.name; });
-    var hashNamesWithDbKeys = {}
+    var hashNamesWithDbKeys = {};
     for (var i = 0; i < names.length; i++) {
       hashNamesWithDbKeys[names[i]] = keys[i];
     }
@@ -55,6 +55,8 @@ function showMoveBookNamesFromFirebase() {
       ulNames.appendChild(li);
     }
     ulNames.style.display = 'block';
+  }).catch(function(reason) {
+    alert('Failed to read from Firebase: ' + reason);
   });
 }
 
